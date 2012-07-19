@@ -8,13 +8,14 @@ import org.jawk.intermediate.AwkTuples;
  * @param tuples The tuples containing the intermediate code.
  */
 public interface AwkInterpreter {
-  /**
-   * Traverse the tuples, interpreting tuple opcodes and arguments
-   * and acting on them accordingly.
-   *
-   * @param tuples The tuples to compile.
-   *
-   * @return the exit code returned by the script.
-   */
-  int interpret(AwkTuples tuples);
+
+	/**
+	 * Traverse the tuples, interpreting tuple opcodes and arguments
+	 * and acting on them accordingly.
+	 *
+	 * @param tuples The tuples to compile.
+	 *
+	 * @return the exit code returned by the script.
+	 */
+	int interpret(AwkTuples tuples);
 }

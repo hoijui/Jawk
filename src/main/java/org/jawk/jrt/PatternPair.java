@@ -15,34 +15,40 @@ import java.util.regex.Pattern;
  * matched (unless the text matches the first regex).
  */
 public class PatternPair {
-  private Pattern p1;
-  private Pattern p2;
-  private boolean within = false;
-  public PatternPair(String s1, String s2) {
-	p1 = Pattern.compile(s1);
-	p2 = Pattern.compile(s2);
-  }
-  /**
-   * Text is matched against this regex pair, returning true only
-   * if this or previous text matches the first regex, up until
-   * the text is matched against the second regex.
-   * <p>
-   * @param str Text to match against the first and second
-   * 	regular expressions.
-   * @return true if this or previous text matches the first regex,
-   * 	up until text matches the second regex, which is still considered
-   * 	a match, but subsequent text is not considered a match
-   * 	(unless, of course, the text matches the first regex).
-   */
-  public boolean matches(String str) {
-	if (p1.matcher(str).find())
-		within = true;
-	if (within && p2.matcher(str).find()) {
-		within = false;
-		return true;	// inclusive
-	}
-	return within;
-  }
-  public String toString() { return p1+","+p2; }
-}
 
+	private Pattern p1;
+	private Pattern p2;
+	private boolean within = false;
+
+	public PatternPair(String s1, String s2) {
+		p1 = Pattern.compile(s1);
+		p2 = Pattern.compile(s2);
+	}
+
+	/**
+	 * Text is matched against this regex pair, returning true only
+	 * if this or previous text matches the first regex, up until
+	 * the text is matched against the second regex.
+	 * <p>
+	 * @param str Text to match against the first and second
+	 *  regular expressions.
+	 * @return true if this or previous text matches the first regex,
+	 * 	 up until text matches the second regex, which is still considered
+	 * 	 a match, but subsequent text is not considered a match
+	 * 	 (unless, of course, the text matches the first regex).
+	 */
+	public boolean matches(String str) {
+		if (p1.matcher(str).find()) {
+			within = true;
+		}
+		if (within && p2.matcher(str).find()) {
+			within = false;
+			return true; // inclusive
+		}
+		return within;
+	}
+
+	public String toString() {
+		return p1 + "," + p2;
+	}
+}

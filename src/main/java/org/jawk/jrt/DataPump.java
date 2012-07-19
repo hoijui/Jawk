@@ -14,40 +14,43 @@ import java.io.PrintStream;
  * of the calling process (the interpreter itself).
  */
 public class DataPump extends Thread {
-  private InputStream is;
-  private PrintStream os;
 
-  /**
-   * Allocate the data pump and start the thread.
-   *
-   * @param s A human-readable description of this data pump.
-   *	It is part of the thread name, and, therefore, visible
-   *	upon a VM thread dump.
-   * @param is The input stream.
-   * @param os The output stream.
-   */
-  public DataPump(String s, InputStream is, PrintStream os) {
-	super("DataPump for "+s);
-	this.is = is;
-	this.os = os;
-	//setDaemon(true);
-	start();
-  }
+	private InputStream is;
+	private PrintStream os;
 
-  /**
-   * VM entry point for the thread.  It performs the data
-   * relay.
-   */
-  public final void run() {
-	try {
-		byte[] b = new byte[4096];
-		int len;
-		while((len=is.read(b, 0, b.length)) >= 0)
-			os.write(b, 0, len);
-	} catch (IOException ioe) {
-		// ignore
+	/**
+	 * Allocate the data pump and start the thread.
+	 *
+	 * @param s A human-readable description of this data pump.
+	 *   It is part of the thread name, and, therefore, visible
+	 *   upon a VM thread dump.
+	 * @param is The input stream.
+	 * @param os The output stream.
+	 */
+	public DataPump(String s, InputStream is, PrintStream os) {
+		super("DataPump for " + s);
+		this.is = is;
+		this.os = os;
+		//setDaemon(true);
+		start();
 	}
-	try { is.close(); } catch (IOException ioe) {}
-  }
-} // public class DataPump {Thread}
 
+	/**
+	 * VM entry point for the thread.  It performs the data
+	 * relay.
+	 */
+	public final void run() {
+		try {
+			byte[] b = new byte[4096];
+			int len;
+			while ((len = is.read(b, 0, b.length)) >= 0) {
+				os.write(b, 0, len);
+			}
+		} catch (IOException ioe) {
+			// ignore
+		}
+		try {
+			is.close();
+		} catch (IOException ioe) {}
+	}
+} // public class DataPump {Thread}

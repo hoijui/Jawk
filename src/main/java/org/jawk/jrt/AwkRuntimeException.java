@@ -6,8 +6,12 @@ package org.jawk.jrt;
  * exceptions and other runtime exceptions.
  */
 public class AwkRuntimeException extends RuntimeException {
-  public AwkRuntimeException(String msg) { super(msg); }
-  public AwkRuntimeException(int lineno, String msg) {
-	super(msg+" (line: "+lineno+")");
-  }
+
+	public AwkRuntimeException(String msg) {
+		super(msg);
+	}
+
+	public AwkRuntimeException(int lineno, String msg) {
+		super(msg + " (line: " + lineno + ")");
+	}
 }

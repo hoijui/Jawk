@@ -13,9 +13,11 @@ package org.jawk.jrt;
  */
 //public interface KeyList extends java.util.List<Object>
 public interface KeyList {
-  /**
-   * Retrieve the number of elements in the KeyList.
-   */
-  int size();
-  Object getFirstAndRemove();
+
+	/**
+	 * Retrieve the number of elements in the KeyList.
+	 */
+	int size();
+
+	Object getFirstAndRemove();
 }

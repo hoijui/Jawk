@@ -40,55 +40,56 @@ import org.jawk.jrt.VariableManager;
  * The Jawk lexer expects extension keywords to match  as _ID_'s.
  */
 public interface JawkExtension {
-  /**
-   * Called after the creation and before normal processing of the
-   * extension, pass in the Jawk Runtime Manager
-   * and the Variable Manager once.
-   * <p>
-   * It is guaranteed init() is called before invoke() is called.
-   */
-  void init(VariableManager vm, JRT jrt);
 
-  /**
-   * The name of the extension package.
-   */
-  String getExtensionName();
+	/**
+	 * Called after the creation and before normal processing of the
+	 * extension, pass in the Jawk Runtime Manager
+	 * and the Variable Manager once.
+	 * <p>
+	 * It is guaranteed init() is called before invoke() is called.
+	 */
+	void init(VariableManager vm, JRT jrt);
 
-  /**
-   * All the extended keywords supported
-   * by this extension.
-   * <p>
-   * <strong>Note:</strong> Jawk will
-   * throw a runtime exception if the
-   * keyword collides with any other keyword
-   * in the system, extension or otherwise.
-   */
-  String[] extensionKeywords();
+	/**
+	 * The name of the extension package.
+	 */
+	String getExtensionName();
 
-  /**
-   * Define the parameters which are <strong>expected</strong> to be
-   * associative arrays.  This is used by the semantic analyzer
-   * to enforce type checking and correct Jawk variable allocation
-   * (which is done at the beginning of script execution).
-   *
-   * @param extension_keyword The extension keyword to check.
-   * @param num_args How many actual parameters are used in the call.
-   *
-   * @return An array of parameter indexes containing associative arrays.
-   * 	<strong>Note:</strong> non-inclusion of a parameter index
-   * 	into this array makes no implication as to whether the
-   * 	parameter is a scalar or an associative array.  It means
-   * 	that its type is not guaranteed to be an associative array.
-   */
-  int[] getAssocArrayParameterPositions(String extension_keyword, int num_args);
+	/**
+	 * All the extended keywords supported
+	 * by this extension.
+	 * <p>
+	 * <strong>Note:</strong> Jawk will
+	 * throw a runtime exception if the
+	 * keyword collides with any other keyword
+	 * in the system, extension or otherwise.
+	 */
+	String[] extensionKeywords();
 
-  /**
-   * Invoke extension as a method.
-   *
-   * @param keyword The extension keyword.
-   * @param args Arguments to the extension.
-   *
-   * @return The return value (result) of the extension.
-   */
-  Object invoke(String keyword, Object[] args);
+	/**
+	 * Define the parameters which are <strong>expected</strong> to be
+	 * associative arrays.  This is used by the semantic analyzer
+	 * to enforce type checking and correct Jawk variable allocation
+	 * (which is done at the beginning of script execution).
+	 *
+	 * @param extension_keyword The extension keyword to check.
+	 * @param num_args How many actual parameters are used in the call.
+	 *
+	 * @return An array of parameter indexes containing associative arrays.
+	 * 	<strong>Note:</strong> non-inclusion of a parameter index
+	 * 	into this array makes no implication as to whether the
+	 * 	parameter is a scalar or an associative array.  It means
+	 * 	that its type is not guaranteed to be an associative array.
+	 */
+	int[] getAssocArrayParameterPositions(String extension_keyword, int num_args);
+
+	/**
+	 * Invoke extension as a method.
+	 *
+	 * @param keyword The extension keyword.
+	 * @param args Arguments to the extension.
+	 *
+	 * @return The return value (result) of the extension.
+	 */
+	Object invoke(String keyword, Object[] args);
 } // public interface JawkExtension

@@ -9,5 +9,6 @@ package org.jawk.intermediate;
  * interpretation requires this as well as jump capability.
  */
 public interface PositionForCompilation extends Position {
-  int index();
+
+	int index();
 }

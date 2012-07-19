@@ -12,7 +12,12 @@ import java.util.LinkedList;
  * checks if pop() is executed on an empty stack.
  */
 public class LinkedListStackImpl<E> extends LinkedList<E> implements MyStack<E> {
-  public void push(E o) { addFirst(o); }
-  public E pop() { return removeFirst(); }
-}
 
+	public void push(E o) {
+		addFirst(o);
+	}
+
+	public E pop() {
+		return removeFirst();
+	}
+}

@@ -8,27 +8,25 @@ import java.util.Enumeration;
  */
 public class RegexTokenizer implements Enumeration<Object> {
 
-  private String[] array;
-  private int idx=0;
+	private String[] array;
+	private int idx = 0;
 
-  /**
-   * Construct a RegexTokenizer.
-   *
-   * @param input The input string to tokenize.
-   * @param regex_string The regular expression deliniating tokens
-   *	within the input string.
-   */
-  public RegexTokenizer(String input, String regex_string) {
-	array = input.split(regex_string, -2);
-  }
+	/**
+	 * Construct a RegexTokenizer.
+	 *
+	 * @param input The input string to tokenize.
+	 * @param regex_string The regular expression deliniating tokens
+	 *   within the input string.
+	 */
+	public RegexTokenizer(String input, String regex_string) {
+		array = input.split(regex_string, -2);
+	}
 
-  // to satisfy the Enumeration<Object> interface
-  public boolean hasMoreElements() {
-	return idx < array.length;
-  }
+	public boolean hasMoreElements() {
+		return idx < array.length;
+	}
 
-  public Object nextElement() {
-	return array[idx++];
-  }
+	public Object nextElement() {
+		return array[idx++];
+	}
 }
-

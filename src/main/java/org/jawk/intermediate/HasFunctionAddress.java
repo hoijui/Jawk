@@ -18,14 +18,15 @@ package org.jawk.intermediate;
  * the correct function address.
  */
 public interface HasFunctionAddress {
-  /**
-   * Get an address to the tuple where this function is
-   * defined.
-   * <p>
-   * If getFunctionAddress() is called prior to defining
-   * the function address (prior to parsing the function
-   * block), the result is undefined.  (As of this writing,
-   * a NullPointerException is thrown.)
-   */
-  Address getFunctionAddress();
+
+	/**
+	 * Get an address to the tuple where this function is
+	 * defined.
+	 * <p>
+	 * If getFunctionAddress() is called prior to defining
+	 * the function address (prior to parsing the function
+	 * block), the result is undefined.  (As of this writing,
+	 * a NullPointerException is thrown.)
+	 */
+	Address getFunctionAddress();
 }

@@ -10,11 +10,12 @@ import org.jawk.intermediate.AwkTuples;
  * @param tuples The tuples containing the intermediate code.
  */
 public interface AwkCompiler {
-  /**
-   * Traverse the tuples, translating tuple opcodes and arguments
-   * to target machine code.
-   *
-   * @param tuples The tuples to compile.
-   */
-  void compile(AwkTuples tuples);
+
+	/**
+	 * Traverse the tuples, translating tuple opcodes and arguments
+	 * to target machine code.
+	 *
+	 * @param tuples The tuples to compile.
+	 */
+	void compile(AwkTuples tuples);
 }

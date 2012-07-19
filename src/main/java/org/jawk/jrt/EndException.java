@@ -11,6 +11,12 @@ package org.jawk.jrt;
  * Jawk terminates with an exit code.
  */
 public class EndException extends RuntimeException {
-  public EndException(String s) { super(s); }
-  public EndException() { super(); }
+
+	public EndException(String s) {
+		super(s);
+	}
+
+	public EndException() {
+		super();
+	}
 }

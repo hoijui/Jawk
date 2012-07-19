@@ -165,542 +165,572 @@ import org.jawk.jrt.VariableManager;
  */
 public class CoreExtension extends AbstractExtension implements JawkExtension {
 
-  private static CoreExtension instance = null;
-  private static final Object INSTANCE_LOCK = new Object();
+	private static CoreExtension instance = null;
+	private static final Object INSTANCE_LOCK = new Object();
 
-  public CoreExtension() {
-	synchronized(INSTANCE_LOCK) {
-		if (instance == null)
-			instance = this;
-		else
-			System.err.println("Warning : Multiple CoreExtension instances in this VM.  Using original instance.");
-	}
-  }
-
-  // to satisfy the JawkExtension interface
-
-  public String getExtensionName() { return "Core Extension"; }
-  public String[] extensionKeywords() {
-	return new String[] {
-		"Array",	// i.e.  Array(array,1,3,5,7,9,11)
-		"Map",		// i.e.  Map(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-		"HashMap",	// i.e.  HashMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-		"TreeMap",	// i.e.  TreeMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-		"LinkedMap",	// i.e.  LinkedMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-		"MapUnion",	// i.e.  MapUnion(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-		"MapCopy",	// i.e.  cnt = MapCopy(aa_target, aa_source)
-		"TypeOf",	// i.e.  typestring = TypeOf(item)
-		"String",	// i.e.  str = String(3)
-		"Double",	// i.e.  dbl = Double(3)
-		"Halt",		// i.e.  Halt()
-		"Dereference",	// i.e.  f(Dereference(r1))
-		"DeRef",	// i.e.  	(see above, but replace Dereference with DeRef)
-		"NewReference",	// i.e.  ref = NewReference(Map("hi","there"))
-		"NewRef",	// i.e.  	(see above, but replace Reference with Ref)
-		"Unreference",	// i.e.  b = Unreference(ref)
-		"UnRef",	// i.e.  	(see above, but replace Unreference with UnRef)
-		"InRef",	// i.e.  while(k = InRef(r2)) [ same as for(k in assocarr) ]
-		"IsInRef",	// i.e.  if (IsInRef(r1, "key")) [ same as if("key" in assocarr) ]
-		"DumpRefs",	// i.e.  DumpRefs()
-		"Timeout",	// i.e.  r = Timeout(300)
-		"Throw",	// i.e.  Throw("this is an awkruntimeexception")
-		"Version",	// i.e.  print Version(aa)
-
-		"Date",		// i.e.  str = Date()
-		"FileExists",	// i.e.  b = FileExists("/a/b/c")
-	};
-  }
-
-  public int[] getAssocArrayParameterPositions(String extension_keyword, int num_args) {
-	if ((false
-			|| extension_keyword.equals("Map")
-			|| extension_keyword.equals("HashMap")
-			|| extension_keyword.equals("LinkedMap")
-			|| extension_keyword.equals("TreeMap")
-			) && num_args%2 == 1
-	)
-		// first argument of a *Map() function
-		// must be an associative array
-		return new int[] {0};
-	else if (false
-			|| extension_keyword.equals("Array")
-	)
-		// first argument of Array must be
-		// an associative array
-		return new int[] {0};
-	else if (false
-			|| extension_keyword.equals("NewReference")
-			|| extension_keyword.equals("NewRef")
-	)
-		if (num_args == 1)
-			return new int[] {0};
-		else
-			return super.getAssocArrayParameterPositions(extension_keyword, num_args);
-	else
-		return super.getAssocArrayParameterPositions(extension_keyword, num_args);
-  }
-
-  public Object invoke(String keyword, Object[] args) {
-	if (false)
-		;
-	else if (keyword.equals("Map") || keyword.equals("HashMap"))
-		return map(args, vm, AssocArray.MT_HASH);
-	else if (keyword.equals("LinkedMap"))
-		return map(args, vm, AssocArray.MT_LINKED);
-	else if (keyword.equals("TreeMap"))
-		return map(args, vm, AssocArray.MT_TREE);
-	else if (keyword.equals("MapUnion"))
-		return mapunion(args, vm, AssocArray.MT_LINKED);
-	else if (keyword.equals("MapCopy")) {
-		checkNumArgs(args, 2);
-		return mapcopy(args);
-	}
-	else if (keyword.equals("Array"))
-		return array(args, vm);
-	else if (keyword.equals("TypeOf")) {
-		checkNumArgs(args, 1);
-		return typeof(args[0], vm);
-	}
-	else if (keyword.equals("String")) {
-		checkNumArgs(args, 1);
-		return tostring(args[0], vm);
-	}
-	else if (keyword.equals("Double")) {
-		checkNumArgs(args, 1);
-		return todouble(args[0], vm);
-	}
-	else if (keyword.equals("Halt")) {
-		if (args.length == 0)
-			Runtime.getRuntime().halt(0);
-		else if (args.length == 1)
-			Runtime.getRuntime().halt((int) JRT.toDouble(args[0]));
-		else
-			throw new IllegalAwkArgumentException(keyword+" requires 0 or 1 argument, not "+args.length);
-	}
-	else if (keyword.equals("NewReference") || keyword.equals("NewRef"))
-		if (args.length == 1)
-			return newreference(args[0]);
-		else if (args.length == 3)
-			return newreference(toAwkString(args[0]), args[1], args[2]);
-		else
-			throw new IllegalAwkArgumentException(keyword+" requires 1 or 3 arguments, not "+args.length);
-	else if (keyword.equals("Dereference") || keyword.equals("DeRef")) {
-		if (args.length == 1)
-			return resolve(dereference(args[0], vm), vm);
-		else if (args.length == 2)
-			return resolve(dereference(toAwkString(args[0]), args[1], vm), vm);
-		else
-			throw new IllegalAwkArgumentException(keyword+" requires 1 or 2 arguments, not "+args.length);
-	}
-	else if (keyword.equals("Unreference") || keyword.equals("UnRef")) {
-		checkNumArgs(args, 1);
-		return unreference(args[0], vm);
-	}
-	else if (keyword.equals("InRef")) {
-		checkNumArgs(args, 1);
-		return inref(args[0], vm);
-	}
-	else if (keyword.equals("IsInRef")) {
-		checkNumArgs(args, 2);
-		return isinref(args[0], args[1], vm);
-	}
-	else if (keyword.equals("DumpRefs")) {
-		checkNumArgs(args, 0);
-		dumprefs();
-	}
-	else if (keyword.equals("Timeout")) {
-		checkNumArgs(args, 1);
-		return timeout((int) JRT.toDouble(args[0]));
-	}
-	else if (keyword.equals("Throw"))
-		throw new AwkRuntimeException(Arrays.toString(args));
-	else if (keyword.equals("Version")) {
-		checkNumArgs(args, 1);
-		return version(args[0]);
-	}
-	else if (keyword.equals("Date")) {
-		if (args.length == 0)
-			return date();
-		else if (args.length == 1)
-			return date(toAwkString(args[0]));
-		else
-			throw new IllegalAwkArgumentException(keyword+" expects 0 or 1 argument, not "+args.length);
-	}
-	else if (keyword.equals("FileExists")) {
-		checkNumArgs(args, 1);
-		return fileexists(toAwkString(args[0]));
-	}
-	else
-		throw new NotImplementedError(keyword);
-	// never reached
-	return null;
-  }
-
-  private Object resolve(Object arg, VariableManager vm) {
-	while(true) {
-		if (arg instanceof AssocArray)
-			return arg;
-		String arg_check = toAwkString(arg);
-		if (reference_map.get(arg_check) != null)
-			arg = reference_map.get(arg_check);
-		else
-			return arg;
-	}
-  }
-
-  private int refmap_idx=0;
-  private Map<String,Object> reference_map = new HashMap<String,Object>();
-
-  static final String newreference(Object arg) {
-	if (! (arg instanceof AssocArray))
-		throw new IllegalAwkArgumentException("NewRef[erence] requires an assoc array, not "+arg.getClass().getName());
-
-	// otherwise, set the reference and return the new key
-
-	// get next refmap_idx
-	int r_idx = instance.refmap_idx++;
-	// inspect the argument
-	String arg_string;
-	if (arg instanceof AssocArray)
-		arg_string = arg.getClass().getName();
-	else
-		arg_string = arg.toString();
-	if (arg_string.length() > 63)
-		arg_string = arg_string.substring(0, 60)+"...";
-	// build Reference (scalar) string to this argument
-	String retval = "@REFERENCE@ "+r_idx+" <"+arg_string+">";
-	instance.reference_map.put(retval, arg);
-	return retval;
-  }
-
-  // this version assigns an assoc array a key/value pair
-  static final Object newreference(String refstring, Object key, Object value) {
-	AssocArray aa = (AssocArray) instance.reference_map.get(refstring);
-	if (aa == null)
-		throw new IllegalAwkArgumentException("AssocArray reference doesn't exist.");
-	return aa.put(key, value);
-  }
-
-  // this version assigns an object to a reference
-  private Object dereference(Object arg, VariableManager vm) {
-	// return the reference if the arg is a reference key
-	if (arg instanceof AssocArray)
-		throw new IllegalAwkArgumentException("an assoc array cannot be a reference handle");
-	else {
-		String arg_check = toAwkString(arg);
-		return dereference(arg_check);
-	}
-  }
-
-  // split this out for static access by other extensions
-  static final Object dereference(String arg_check) {
-	if (instance.reference_map.get(arg_check) != null)
-		return instance.reference_map.get(arg_check);
-	else
-		throw new IllegalAwkArgumentException(arg_check+" not a valid reference");
-  }
-
-  // this version assumes an assoc array is stored as a reference,
-  // and to retrieve the stored value
-  static final Object dereference(String refstring, Object key, VariableManager vm) {
-	AssocArray aa = (AssocArray) instance.reference_map.get(refstring);
-	if (aa == null)
-		throw new IllegalAwkArgumentException("AssocArray reference doesn't exist.");
-	if (! (key instanceof AssocArray)) {
-		// check if key is a reference string!
-		String key_check = instance.toAwkString(key);
-		if (instance.reference_map.get(key_check) != null)
-			// assume it is a reference rather than an assoc array key itself
-			key = instance.reference_map.get(key_check);
-	}
-	return aa.get(key);
-  }
-
-  static final int unreference(Object arg, VariableManager vm) {
-	String arg_check = instance.toAwkString(arg);
-	if (instance.reference_map.get(arg_check) == null)
-		throw new IllegalAwkArgumentException("Not a reference : "+arg_check);
-
-	instance.reference_map.remove(arg_check);
-	assert instance.reference_map.get(arg_check) == null;
-	return 1;
-  }
-
-  private Map<AssocArray,Iterator> iterators = new HashMap<AssocArray,Iterator>();
-
-  private Object inref(Object arg, VariableManager vm) {
-	if (arg instanceof AssocArray)
-		throw new IllegalAwkArgumentException("InRef requires a Reference (string) argument, not an assoc array");
-	String arg_check = toAwkString(arg);
-	if (reference_map.get(arg_check) == null)
-		throw new IllegalAwkArgumentException("Not a reference : "+arg_check);
-	Object o = reference_map.get(arg_check);
-	if (!(o instanceof AssocArray))
-		throw new IllegalAwkArgumentException("Reference not an assoc array.  ref.class = "+o.getClass().getName());
-
-	AssocArray aa = (AssocArray) o;
-
-	// use an in_map to keep track of existing iterators
-
-	//Iterator<Object> iter = iterators.get(aa);
-	Iterator iter = iterators.get(aa);
-	if (iter == null)
-		//iterators.put(aa, iter = aa.keySet().iterator());
-		// without a new Collection, modification to the
-		// assoc array during iteration causes a ConcurrentModificationException
-		iterators.put(aa, iter = new ArrayList<Object>(aa.keySet()).iterator());
-
-	Object retval = null;
-
-	while (iter.hasNext()) {
-		retval = iter.next();
-		if (retval instanceof String && retval.toString().equals(""))
-			throw new AwkRuntimeException("Assoc array key contains a blank string ?!");
-		break;
-	}
-
-	if (retval == null) {
-		iterators.remove(aa);
-		retval = "";
-	}
-
-	if (retval instanceof AssocArray) {
-		// search if item is referred to already
-		for (String ref : reference_map.keySet())
-			if (reference_map.get(ref) == retval)
-				return ref;
-		// otherwise, return new reference to this item
-		//return newreference(arg_check, retval);
-		return newreference(retval);
-	} else
-		return retval;
-  }
-
-  private static final Integer ZERO = new Integer(0);
-  private static final Integer ONE = new Integer(1);
-
-  private int isinref(Object ref, Object key, VariableManager vm) {
-	if (ref instanceof AssocArray)
-		throw new IllegalAwkArgumentException("Expecting a reference string for the 1st argument, not an assoc array.");
-	String refstring = toAwkString(ref);
-	return isinref(refstring, key);
-  }
-
-  static final int isinref(String refstring, Object key) {
-	Object o = instance.reference_map.get(refstring);
-	if (o == null)
-		throw new IllegalAwkArgumentException("Invalid refstring : "+refstring);
-	AssocArray aa = (AssocArray) o;
-	return aa.isIn(key)?ONE:ZERO;
-  }
-
-  private void dumprefs() {
-	for(Object o1 : reference_map.keySet()) {
-		Object o2 = reference_map.get(o1);
-		if (o1 instanceof AssocArray)
-			o1 = ((AssocArray) o1).mapString();
-		if (o2 instanceof AssocArray)
-			o2 = ((AssocArray) o2).mapString();
-		System.out.println("REF : "+o1+" = "+o2);
-	}
-  }
-
-  static final String typeof(Object arg, VariableManager vm) {
-	if (false)
-		throw new Error("Should never reach here.");
-	else if (arg instanceof AssocArray)
-		return "AssocArray";
-	else if (arg instanceof Integer)
-		return "Integer";
-	else if (arg instanceof Double)
-		return "Double";
-	else {
-		String string_rep = instance.toAwkString(arg);
-		if (instance.reference_map.get(string_rep) != null)
-			return "Reference";
-		else
-			return "String";
-	}
-  }
-
-  private int get(AssocArray retval, AssocArray map, Object key) {
-	retval.clear();
-	retval.put(0, map.get(key));
-	return 1;
-  }
-
-  private Object toscalar(AssocArray aa) {
-	return aa.get(0);
-  }
-
-  private Object map(Object[] args, VariableManager vm, int map_type) {
-	if (args.length % 2 == 0)
-		return submap(args, vm, map_type);
-	else
-		return toplevelmap(args, vm, map_type, false);	// false = map assignment
-  }
-
-  private Object mapunion(Object[] args, VariableManager vm, int map_type) {
-	return toplevelmap(args, vm, map_type, true);	// true = map union
-  }
-
-  private int toplevelmap(Object[] args, VariableManager vm, int map_type, boolean map_union) {
-	AssocArray aa = (AssocArray) args[0];
-	if (! map_union) {
-		aa.clear();
-		aa.useMapType(map_type);
-	}
-	int cnt=0;
-	for(int i=1;i<args.length;i+=2) {
-		if (args[i] instanceof AssocArray) args[i] = newreference(args[i]);
-		if (args[i+1] instanceof AssocArray) args[i+1] = newreference(args[i+1]);
-
-		aa.put(args[i], args[i+1]);
-
-		++cnt;
-	}
-	return cnt;
-  }
-
-  private AssocArray submap(Object[] args, VariableManager vm, int map_type) {
-	AssocArray aa = new AssocArray(false);
-	aa.useMapType(map_type);
-	for(int i=0;i<args.length;i+=2) {
-		if (args[i] instanceof AssocArray) args[i] = newreference(args[i]);
-		if (args[i+1] instanceof AssocArray) args[i+1] = newreference(args[i+1]);
-
-		aa.put(args[i], args[i+1]);
-	}
-	return aa;
-  }
-
-  private int array(Object[] args, VariableManager vm) {
-	AssocArray aa = (AssocArray) args[0];
-	aa.clear();
-	aa.useMapType(AssocArray.MT_TREE);
-	String subsep = toAwkString(vm.getSUBSEP());
-	int cnt=0;
-	for(int i=1;i<args.length;++i) {
-		Object o = args[i];
-		if (o instanceof AssocArray) {
-			AssocArray arr = (AssocArray) o;
-			for(Object key : arr.keySet())
-				aa.put(""+i+subsep+key, arr.get(key));
-		} else
-			aa.put(""+i, o);
-		//aa.put(args[i], args[i+1]);
-		++cnt;
-	}
-	return cnt;
-  }
-
-  /*
-  private AssocArray subarray(Object[] args, VariableManager vm) {
-	AssocArray aa = new AssocArray(false);
-	aa.clear();
-	//aa.useLinkedHashMap();
-	aa.useMapType(AssocArray.MT_TREE);
-	String subsep = toAwkString(vm.getSUBSEP());
-	int cnt=0;
-	for(int i=1;i<=args.length;++i) {
-		Object o = args[i-1];
-		if (o instanceof AssocArray) {
-			AssocArray arr = (AssocArray) o;
-			for(Object key : arr.keySet())
-				aa.put(""+i+subsep+key, arr.get(key));
-		} else
-			aa.put(""+i, o);
-		//aa.put(args[i], args[i+1]);
-		++cnt;
-	}
-	return aa;
-  }
-  */
-
-  private int mapcopy(Object[] args) {
-	AssocArray aa_target = (AssocArray) args[0];
-	AssocArray aa_source = (AssocArray) args[1];
-	aa_target.clear();
-	int cnt=0;
-	for (Object o : aa_source.keySet()) {
-		aa_target.put(o, aa_source.get(o));
-		++cnt;
-	}
-	return cnt;
-  }
-
-  private Object todouble(Object arg, VariableManager vm) {
-	if (arg instanceof AssocArray)
-		throw new IllegalArgumentException("Cannot deduce double value from an associative array.");
-	if (arg instanceof Number)
-		return ((Number)arg).doubleValue();
-
-	// otherwise, a string
-
-	try {
-		String str = toAwkString(arg);
-		double d = Double.parseDouble(str);
-		return d;
-	} catch (NumberFormatException nfe) {
-		return "";
-	}
-  }
-
-  private static String tostring(Object arg, VariableManager vm) {
-	if (arg instanceof AssocArray)
-		return ((AssocArray) arg).mapString();
-	else
-		return instance.toAwkString(arg);
-  }
-
-  private int wait_int = 0;
-
-  private BlockObject timeout_blocker = new BlockObject() {
-	public String getNotifierTag() { return "Timeout"; }
-	public final void block()
-	throws InterruptedException {
-		synchronized(timeout_blocker) {
-			timeout_blocker.wait(wait_int);
+	public CoreExtension() {
+		synchronized (INSTANCE_LOCK) {
+			if (instance == null) {
+				instance = this;
+			} else {
+				System.err.println("Warning : Multiple CoreExtension instances in this VM.  Using original instance.");
+			}
 		}
 	}
-  };
-  private Object timeout(int ms) {
-	if (ms <= 0)
-		throw new IllegalAwkArgumentException("Timeout requires a positive # argument, not "+ms+".");
-	wait_int = ms;
-	return timeout_blocker;
-  }
 
-  private String version(Object obj) {
-	if (obj instanceof AssocArray)
-		return ((AssocArray) obj).getMapVersion();
-	else {
-		Class<?> cls = (Class<?>) obj.getClass();
-		return cls.getPackage().getSpecificationVersion();
+	// to satisfy the JawkExtension interface
+	public String getExtensionName() {
+		return "Core Extension";
 	}
-  }
 
-  // single threaded, so one Date object (unsynchronized) will do
-  private final Date date_obj = new Date();
+	public String[] extensionKeywords() {
+		return new String[] {
+				"Array",	// i.e.  Array(array,1,3,5,7,9,11)
+				"Map",		// i.e.  Map(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"HashMap",	// i.e.  HashMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"TreeMap",	// i.e.  TreeMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"LinkedMap",	// i.e.  LinkedMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"MapUnion",	// i.e.  MapUnion(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"MapCopy",	// i.e.  cnt = MapCopy(aa_target, aa_source)
+				"TypeOf",	// i.e.  typestring = TypeOf(item)
+				"String",	// i.e.  str = String(3)
+				"Double",	// i.e.  dbl = Double(3)
+				"Halt",		// i.e.  Halt()
+				"Dereference",	// i.e.  f(Dereference(r1))
+				"DeRef",	// i.e.  	(see above, but replace Dereference with DeRef)
+				"NewReference",	// i.e.  ref = NewReference(Map("hi","there"))
+				"NewRef",	// i.e.  	(see above, but replace Reference with Ref)
+				"Unreference",	// i.e.  b = Unreference(ref)
+				"UnRef",	// i.e.  	(see above, but replace Unreference with UnRef)
+				"InRef",	// i.e.  while(k = InRef(r2)) [ same as for(k in assocarr) ]
+				"IsInRef",	// i.e.  if (IsInRef(r1, "key")) [ same as if("key" in assocarr) ]
+				"DumpRefs",	// i.e.  DumpRefs()
+				"Timeout",	// i.e.  r = Timeout(300)
+				"Throw",	// i.e.  Throw("this is an awkruntimeexception")
+				"Version",	// i.e.  print Version(aa)
 
-  private String date() {
-	date_obj.setTime(System.currentTimeMillis());
-	return date_obj.toString();
-  }
+				"Date",		// i.e.  str = Date()
+				"FileExists",	// i.e.  b = FileExists("/a/b/c")
+				};
+	}
 
-  private final SimpleDateFormat df = new SimpleDateFormat();
+	public int[] getAssocArrayParameterPositions(String extension_keyword, int num_args) {
+		if ((false
+				|| extension_keyword.equals("Map")
+				|| extension_keyword.equals("HashMap")
+				|| extension_keyword.equals("LinkedMap")
+				|| extension_keyword.equals("TreeMap")) && num_args % 2 == 1) {
+			// first argument of a *Map() function
+			// must be an associative array
+			return new int[] {0};
+		} else if (false
+				|| extension_keyword.equals("Array"))
+		{
+			// first argument of Array must be
+			// an associative array
+			return new int[] {0};
+		} else if (false
+				|| extension_keyword.equals("NewReference")
+				|| extension_keyword.equals("NewRef"))
+		{
+			if (num_args == 1) {
+				return new int[] {0};
+			} else {
+				return super.getAssocArrayParameterPositions(extension_keyword, num_args);
+			}
+		} else {
+			return super.getAssocArrayParameterPositions(extension_keyword, num_args);
+		}
+	}
 
-  private String date(String format_string) {
-	date_obj.setTime(System.currentTimeMillis());
-	df.applyPattern(format_string);
-	return df.format(date_obj);
-  }
+	public Object invoke(String keyword, Object[] args) {
+		if (false) {
+		} else if (keyword.equals("Map") || keyword.equals("HashMap")) {
+			return map(args, vm, AssocArray.MT_HASH);
+		} else if (keyword.equals("LinkedMap")) {
+			return map(args, vm, AssocArray.MT_LINKED);
+		} else if (keyword.equals("TreeMap")) {
+			return map(args, vm, AssocArray.MT_TREE);
+		} else if (keyword.equals("MapUnion")) {
+			return mapunion(args, vm, AssocArray.MT_LINKED);
+		} else if (keyword.equals("MapCopy")) {
+			checkNumArgs(args, 2);
+			return mapcopy(args);
+		} else if (keyword.equals("Array")) {
+			return array(args, vm);
+		} else if (keyword.equals("TypeOf")) {
+			checkNumArgs(args, 1);
+			return typeof(args[0], vm);
+		} else if (keyword.equals("String")) {
+			checkNumArgs(args, 1);
+			return tostring(args[0], vm);
+		} else if (keyword.equals("Double")) {
+			checkNumArgs(args, 1);
+			return todouble(args[0], vm);
+		} else if (keyword.equals("Halt")) {
+			if (args.length == 0) {
+				Runtime.getRuntime().halt(0);
+			} else if (args.length == 1) {
+				Runtime.getRuntime().halt((int) JRT.toDouble(args[0]));
+			} else {
+				throw new IllegalAwkArgumentException(keyword + " requires 0 or 1 argument, not " + args.length);
+			}
+		} else if (keyword.equals("NewReference") || keyword.equals("NewRef")) {
+			if (args.length == 1) {
+				return newreference(args[0]);
+			} else if (args.length == 3) {
+				return newreference(toAwkString(args[0]), args[1], args[2]);
+			} else {
+				throw new IllegalAwkArgumentException(keyword + " requires 1 or 3 arguments, not " + args.length);
+			}
+		} else if (keyword.equals("Dereference") || keyword.equals("DeRef")) {
+			if (args.length == 1)
+				return resolve(dereference(args[0], vm), vm);
+			else if (args.length == 2)
+				return resolve(dereference(toAwkString(args[0]), args[1], vm), vm);
+			else
+				throw new IllegalAwkArgumentException(keyword+" requires 1 or 2 arguments, not "+args.length);
+		} else if (keyword.equals("Unreference") || keyword.equals("UnRef")) {
+			checkNumArgs(args, 1);
+			return unreference(args[0], vm);
+		} else if (keyword.equals("InRef")) {
+			checkNumArgs(args, 1);
+			return inref(args[0], vm);
+		} else if (keyword.equals("IsInRef")) {
+			checkNumArgs(args, 2);
+			return isinref(args[0], args[1], vm);
+		} else if (keyword.equals("DumpRefs")) {
+			checkNumArgs(args, 0);
+			dumprefs();
+		} else if (keyword.equals("Timeout")) {
+			checkNumArgs(args, 1);
+			return timeout((int) JRT.toDouble(args[0]));
+		} else if (keyword.equals("Throw")) {
+			throw new AwkRuntimeException(Arrays.toString(args));
+		} else if (keyword.equals("Version")) {
+			checkNumArgs(args, 1);
+			return version(args[0]);
+		} else if (keyword.equals("Date")) {
+			if (args.length == 0) {
+				return date();
+			} else if (args.length == 1) {
+				return date(toAwkString(args[0]));
+			} else {
+				throw new IllegalAwkArgumentException(keyword + " expects 0 or 1 argument, not " + args.length);
+			}
+		} else if (keyword.equals("FileExists")) {
+			checkNumArgs(args, 1);
+			return fileexists(toAwkString(args[0]));
+		} else {
+			throw new NotImplementedError(keyword);
+		}
+		// never reached
+		return null;
+	}
 
-  private int fileexists(String path) {
-	if (new File(path).exists())
-		return ONE;
-	else
-		return ZERO;
-  }
+	private Object resolve(Object arg, VariableManager vm) {
+		while (true) {
+			if (arg instanceof AssocArray) {
+				return arg;
+			}
+			String arg_check = toAwkString(arg);
+			if (reference_map.get(arg_check) != null) {
+				arg = reference_map.get(arg_check);
+			} else {
+				return arg;
+			}
+		}
+	}
+
+	private int refmap_idx = 0;
+	private Map<String, Object> reference_map = new HashMap<String, Object>();
+
+	static final String newreference(Object arg) {
+		if (!(arg instanceof AssocArray)) {
+			throw new IllegalAwkArgumentException("NewRef[erence] requires an assoc array, not " + arg.getClass().getName());
+		}
+
+		// otherwise, set the reference and return the new key
+
+		// get next refmap_idx
+		int r_idx = instance.refmap_idx++;
+		// inspect the argument
+		String arg_string;
+		if (arg instanceof AssocArray) {
+			arg_string = arg.getClass().getName();
+		} else {
+			arg_string = arg.toString();
+		}
+		if (arg_string.length() > 63) {
+			arg_string = arg_string.substring(0, 60) + "...";
+		}
+		// build Reference (scalar) string to this argument
+		String retval = "@REFERENCE@ " + r_idx + " <" + arg_string + ">";
+		instance.reference_map.put(retval, arg);
+		return retval;
+	}
+
+	// this version assigns an assoc array a key/value pair
+	static final Object newreference(String refstring, Object key, Object value) {
+		AssocArray aa = (AssocArray) instance.reference_map.get(refstring);
+		if (aa == null) {
+			throw new IllegalAwkArgumentException("AssocArray reference doesn't exist.");
+		}
+		return aa.put(key, value);
+	}
+
+	// this version assigns an object to a reference
+	private Object dereference(Object arg, VariableManager vm) {
+		// return the reference if the arg is a reference key
+		if (arg instanceof AssocArray) {
+			throw new IllegalAwkArgumentException("an assoc array cannot be a reference handle");
+		} else {
+			String arg_check = toAwkString(arg);
+			return dereference(arg_check);
+		}
+	}
+
+	// split this out for static access by other extensions
+	static final Object dereference(String arg_check) {
+		if (instance.reference_map.get(arg_check) != null) {
+			return instance.reference_map.get(arg_check);
+		} else {
+			throw new IllegalAwkArgumentException(arg_check + " not a valid reference");
+		}
+	}
+
+	// this version assumes an assoc array is stored as a reference,
+	// and to retrieve the stored value
+	static final Object dereference(String refstring, Object key, VariableManager vm) {
+		AssocArray aa = (AssocArray) instance.reference_map.get(refstring);
+		if (aa == null) {
+			throw new IllegalAwkArgumentException("AssocArray reference doesn't exist.");
+		}
+		if (!(key instanceof AssocArray)) {
+			// check if key is a reference string!
+			String key_check = instance.toAwkString(key);
+			if (instance.reference_map.get(key_check) != null) // assume it is a reference rather than an assoc array key itself
+			{
+				key = instance.reference_map.get(key_check);
+			}
+		}
+		return aa.get(key);
+	}
+
+	static final int unreference(Object arg, VariableManager vm) {
+		String arg_check = instance.toAwkString(arg);
+		if (instance.reference_map.get(arg_check) == null) {
+			throw new IllegalAwkArgumentException("Not a reference : " + arg_check);
+		}
+
+		instance.reference_map.remove(arg_check);
+		assert instance.reference_map.get(arg_check) == null;
+		return 1;
+	}
+	private Map<AssocArray, Iterator> iterators = new HashMap<AssocArray, Iterator>();
+
+	private Object inref(Object arg, VariableManager vm) {
+		if (arg instanceof AssocArray) {
+			throw new IllegalAwkArgumentException("InRef requires a Reference (string) argument, not an assoc array");
+		}
+		String arg_check = toAwkString(arg);
+		if (reference_map.get(arg_check) == null) {
+			throw new IllegalAwkArgumentException("Not a reference : " + arg_check);
+		}
+		Object o = reference_map.get(arg_check);
+		if (!(o instanceof AssocArray)) {
+			throw new IllegalAwkArgumentException("Reference not an assoc array.  ref.class = " + o.getClass().getName());
+		}
+
+		AssocArray aa = (AssocArray) o;
+
+		// use an in_map to keep track of existing iterators
+
+		//Iterator<Object> iter = iterators.get(aa);
+		Iterator iter = iterators.get(aa);
+		if (iter == null) //iterators.put(aa, iter = aa.keySet().iterator());
+		// without a new Collection, modification to the
+		// assoc array during iteration causes a ConcurrentModificationException
+		{
+			iterators.put(aa, iter = new ArrayList<Object>(aa.keySet()).iterator());
+		}
+
+		Object retval = null;
+
+		while (iter.hasNext()) {
+			retval = iter.next();
+			if (retval instanceof String && retval.toString().equals("")) {
+				throw new AwkRuntimeException("Assoc array key contains a blank string ?!");
+			}
+			break;
+		}
+
+		if (retval == null) {
+			iterators.remove(aa);
+			retval = "";
+		}
+
+		if (retval instanceof AssocArray) {
+			// search if item is referred to already
+			for (String ref : reference_map.keySet()) {
+				if (reference_map.get(ref) == retval) {
+					return ref;
+				}
+			}
+			// otherwise, return new reference to this item
+			//return newreference(arg_check, retval);
+			return newreference(retval);
+		} else {
+			return retval;
+		}
+	}
+
+	private static final Integer ZERO = new Integer(0);
+	private static final Integer ONE = new Integer(1);
+
+	private int isinref(Object ref, Object key, VariableManager vm) {
+		if (ref instanceof AssocArray) {
+			throw new IllegalAwkArgumentException("Expecting a reference string for the 1st argument, not an assoc array.");
+		}
+		String refstring = toAwkString(ref);
+		return isinref(refstring, key);
+	}
+
+	static final int isinref(String refstring, Object key) {
+		Object o = instance.reference_map.get(refstring);
+		if (o == null) {
+			throw new IllegalAwkArgumentException("Invalid refstring : " + refstring);
+		}
+		AssocArray aa = (AssocArray) o;
+		return aa.isIn(key) ? ONE : ZERO;
+	}
+
+	private void dumprefs() {
+		for (Object o1 : reference_map.keySet()) {
+			Object o2 = reference_map.get(o1);
+			if (o1 instanceof AssocArray) {
+				o1 = ((AssocArray) o1).mapString();
+			}
+			if (o2 instanceof AssocArray) {
+				o2 = ((AssocArray) o2).mapString();
+			}
+			System.out.println("REF : " + o1 + " = " + o2);
+		}
+	}
+
+	static final String typeof(Object arg, VariableManager vm) {
+		if (false) {
+			throw new Error("Should never reach here.");
+		} else if (arg instanceof AssocArray) {
+			return "AssocArray";
+		} else if (arg instanceof Integer) {
+			return "Integer";
+		} else if (arg instanceof Double) {
+			return "Double";
+		} else {
+			String string_rep = instance.toAwkString(arg);
+			if (instance.reference_map.get(string_rep) != null) {
+				return "Reference";
+			} else {
+				return "String";
+			}
+		}
+	}
+
+	private int get(AssocArray retval, AssocArray map, Object key) {
+		retval.clear();
+		retval.put(0, map.get(key));
+		return 1;
+	}
+
+	private Object toscalar(AssocArray aa) {
+		return aa.get(0);
+	}
+
+	private Object map(Object[] args, VariableManager vm, int map_type) {
+		if (args.length % 2 == 0) {
+			return submap(args, vm, map_type);
+		} else {
+			return toplevelmap(args, vm, map_type, false);	// false = map assignment
+		}
+	}
+
+	private Object mapunion(Object[] args, VariableManager vm, int map_type) {
+		return toplevelmap(args, vm, map_type, true);	// true = map union
+	}
+
+	private int toplevelmap(Object[] args, VariableManager vm, int map_type, boolean map_union) {
+		AssocArray aa = (AssocArray) args[0];
+		if (!map_union) {
+			aa.clear();
+			aa.useMapType(map_type);
+		}
+		int cnt = 0;
+		for (int i = 1; i < args.length; i += 2) {
+			if (args[i] instanceof AssocArray) {
+				args[i] = newreference(args[i]);
+			}
+			if (args[i + 1] instanceof AssocArray) {
+				args[i + 1] = newreference(args[i + 1]);
+			}
+
+			aa.put(args[i], args[i + 1]);
+
+			++cnt;
+		}
+		return cnt;
+	}
+
+	private AssocArray submap(Object[] args, VariableManager vm, int map_type) {
+		AssocArray aa = new AssocArray(false);
+		aa.useMapType(map_type);
+		for (int i = 0; i < args.length; i += 2) {
+			if (args[i] instanceof AssocArray) {
+				args[i] = newreference(args[i]);
+			}
+			if (args[i + 1] instanceof AssocArray) {
+				args[i + 1] = newreference(args[i + 1]);
+			}
+
+			aa.put(args[i], args[i + 1]);
+		}
+		return aa;
+	}
+
+	private int array(Object[] args, VariableManager vm) {
+		AssocArray aa = (AssocArray) args[0];
+		aa.clear();
+		aa.useMapType(AssocArray.MT_TREE);
+		String subsep = toAwkString(vm.getSUBSEP());
+		int cnt = 0;
+		for (int i = 1; i < args.length; ++i) {
+			Object o = args[i];
+			if (o instanceof AssocArray) {
+				AssocArray arr = (AssocArray) o;
+				for (Object key : arr.keySet()) {
+					aa.put("" + i + subsep + key, arr.get(key));
+				}
+			} else {
+				aa.put("" + i, o);
+			}
+			//aa.put(args[i], args[i+1]);
+			++cnt;
+		}
+		return cnt;
+	}
+
+	/*private AssocArray subarray(Object[] args, VariableManager vm) {
+		AssocArray aa = new AssocArray(false);
+		aa.clear();
+		//aa.useLinkedHashMap();
+		aa.useMapType(AssocArray.MT_TREE);
+		String subsep = toAwkString(vm.getSUBSEP());
+		int cnt = 0;
+		for (int i = 1; i <= args.length; ++i) {
+			Object o = args[i - 1];
+			if (o instanceof AssocArray) {
+				AssocArray arr = (AssocArray) o;
+				for (Object key : arr.keySet()) {
+					aa.put("" + i + subsep + key, arr.get(key));
+				}
+			} else {
+				aa.put("" + i, o);
+			}
+			//aa.put(args[i], args[i+1]);
+			++cnt;
+		}
+		return aa;
+	}*/
+	private int mapcopy(Object[] args) {
+		AssocArray aa_target = (AssocArray) args[0];
+		AssocArray aa_source = (AssocArray) args[1];
+		aa_target.clear();
+		int cnt = 0;
+		for (Object o : aa_source.keySet()) {
+			aa_target.put(o, aa_source.get(o));
+			++cnt;
+		}
+		return cnt;
+	}
+
+	private Object todouble(Object arg, VariableManager vm) {
+		if (arg instanceof AssocArray) {
+			throw new IllegalArgumentException("Cannot deduce double value from an associative array.");
+		}
+		if (arg instanceof Number) {
+			return ((Number) arg).doubleValue();
+		}
+
+		// otherwise, a string
+
+		try {
+			String str = toAwkString(arg);
+			double d = Double.parseDouble(str);
+			return d;
+		} catch (NumberFormatException nfe) {
+			return "";
+		}
+	}
+
+	private static String tostring(Object arg, VariableManager vm) {
+		if (arg instanceof AssocArray) {
+			return ((AssocArray) arg).mapString();
+		} else {
+			return instance.toAwkString(arg);
+		}
+	}
+	private int wait_int = 0;
+	private BlockObject timeout_blocker = new BlockObject() {
+
+		public String getNotifierTag() {
+			return "Timeout";
+		}
+
+		public final void block()
+				throws InterruptedException {
+			synchronized (timeout_blocker) {
+				timeout_blocker.wait(wait_int);
+			}
+		}
+	};
+
+	private Object timeout(int ms) {
+		if (ms <= 0) {
+			throw new IllegalAwkArgumentException("Timeout requires a positive # argument, not " + ms + ".");
+		}
+		wait_int = ms;
+		return timeout_blocker;
+	}
+
+	private String version(Object obj) {
+		if (obj instanceof AssocArray) {
+			return ((AssocArray) obj).getMapVersion();
+		} else {
+			Class<?> cls = (Class<?>) obj.getClass();
+			return cls.getPackage().getSpecificationVersion();
+		}
+	}
+
+	// single threaded, so one Date object (unsynchronized) will do
+	private final Date date_obj = new Date();
+
+	private String date() {
+		date_obj.setTime(System.currentTimeMillis());
+		return date_obj.toString();
+	}
+	private final SimpleDateFormat df = new SimpleDateFormat();
+
+	private String date(String format_string) {
+		date_obj.setTime(System.currentTimeMillis());
+		df.applyPattern(format_string);
+		return df.format(date_obj);
+	}
+
+	private int fileexists(String path) {
+		if (new File(path).exists()) {
+			return ONE;
+		} else {
+			return ZERO;
+		}
+	}
 } // public class CoreExtension {AbstractExtension} [JawkExtension]
-

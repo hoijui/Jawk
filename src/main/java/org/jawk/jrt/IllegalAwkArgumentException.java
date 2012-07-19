@@ -6,7 +6,8 @@ package org.jawk.jrt;
  * argument exception issues.
  */
 public class IllegalAwkArgumentException extends IllegalArgumentException {
-  public IllegalAwkArgumentException(String msg) {
-	super(msg);
-  }
+
+	public IllegalAwkArgumentException(String msg) {
+		super(msg);
+	}
 }
