@@ -91,17 +91,17 @@ public final class BulkBlockObject extends BlockObject {
 
 			String handle = checkForNonblockHandle();
 
-			if (handle == ALL_HANDLES_ARE_BLANK) { // FIXME
+			if (handle.equals(ALL_HANDLES_ARE_BLANK)) {
 				this.wait();
 				throw new Error("Should never be notified.");
 			}
 
-			if (handle == ALL_HANDLES_ARE_BLOCKED) { // FIXME
+			if (handle.equals(ALL_HANDLES_ARE_BLOCKED)) {
 				this.wait();
 				handle = checkForNonblockHandle();
 			}
-			assert handle != null; // FIXME
-			assert handle != ALL_HANDLES_ARE_BLOCKED : "handle == ALL_HANDLES_ARE_BLOCKED is an invalid return value ... willBlock() could be of issue";
+			assert (handle != null);
+			assert !handle.equals(ALL_HANDLES_ARE_BLOCKED) : "handle == ALL_HANDLES_ARE_BLOCKED is an invalid return value ... willBlock() could be of issue";
 			block_result = handle;
 		}
 	}

@@ -146,8 +146,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private int argc_offset = NULL_OFFSET;
 	private int argv_offset = NULL_OFFSET;
 
-	private static final Integer ZERO = new Integer(0);
-	private static final Integer ONE = new Integer(1);
+	private static final Integer ZERO = Integer.valueOf(0);
+	private static final Integer ONE = Integer.valueOf(1);
 
 	private Random random_number_generator;
 	private int oldseed;
@@ -1579,9 +1579,9 @@ public class AVM implements AwkInterpreter, VariableManager {
 						assert environ_offset != NULL_OFFSET;
 						// set the initial variables
 						Map<String, String> env = System.getenv();
-						for (String key : env.keySet()) {
-							assignArray(environ_offset, key, env.get(key), true);
-							pop();			// clean up the stack after the assignment
+						for (Map.Entry<String, String> var : env.entrySet()) {
+							assignArray(environ_offset, var.getKey(), var.getValue(), true);
+							pop(); // clean up the stack after the assignment
 						}
 						position.next();
 						break;

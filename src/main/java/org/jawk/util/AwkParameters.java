@@ -82,26 +82,26 @@ public class AwkParameters {
 		String cls = mainclass.getName();
 		dest.println("usage:");
 		dest.println(
-				"java ... "+cls+" [-F fs_val]"
-				+(extension_description==null?""
-				+" [-f script-filename]"
-				+" [-o output-filename]"
-				+" [-c]"
-				+" [-z]"
-				+" [-Z]"
-				+" [-d dest-directory]"
-				+" [-S]"
-				+" [-s]"
-				+" [-x]"
-				+" [-y]"
-				+" [-r]"
-				+" [-ext]"
-				+" [-ni]"
-				:"")
-				+" [-t]"
-				+" [-v name=val]..."
-				+(extension_description==null?" [script]":"")
-				+" [name=val | input_filename]...");
+				"java ... " + cls + " [-F fs_val]"
+				+ (extension_description == null ? ""
+				+ " [-f script-filename]"
+				+ " [-o output-filename]"
+				+ " [-c]"
+				+ " [-z]"
+				+ " [-Z]"
+				+ " [-d dest-directory]"
+				+ " [-S]"
+				+ " [-s]"
+				+ " [-x]"
+				+ " [-y]"
+				+ " [-r]"
+				+ " [-ext]"
+				+ " [-ni]"
+				: "")
+				+ " [-t]"
+				+ " [-v name=val]..."
+				+ (extension_description == null ? " [script]" : "")
+				+ " [name=val | input_filename]...");
 		dest.println();
 		dest.println(" -F fs_val = Use fs_val for FS.");
 		if (extension_description == null) {

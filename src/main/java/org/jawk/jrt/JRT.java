@@ -91,8 +91,8 @@ public class JRT {
 	public final void assignInitialVariables(Map<String, Object> initial_var_map) {
 		assert initial_var_map != null;
 		//System.out.println("initial_var_map = "+initial_var_map);
-		for (String name : initial_var_map.keySet()) {
-			vm.assignVariable(name, initial_var_map.get(name));
+		for (Map.Entry<String, Object> var : initial_var_map.entrySet()) {
+			vm.assignVariable(var.getKey(), var.getValue());
 		}
 	}
 
@@ -108,8 +108,8 @@ public class JRT {
 	public static void assignEnvironmentVariables(AssocArray aa) {
 		assert aa.keySet().isEmpty();
 		Map<String, String> env = System.getenv();
-		for (String key : env.keySet()) {
-			aa.put(key, env.get(key));
+		for (Map.Entry<String, String> var : env.entrySet()) {
+			aa.put(var.getKey(), var.getValue());
 		}
 	}
 
@@ -700,9 +700,9 @@ public class JRT {
 		}
 		input_fields.set(0, new_dollar_zero_sb.toString());
 	}
-	private static final Integer ONE = new Integer(1);
-	private static final Integer ZERO = new Integer(0);
-	private static final Integer MINUS_ONE = new Integer(-1);
+	private static final Integer ONE = Integer.valueOf(1);
+	private static final Integer ZERO = Integer.valueOf(0);
+	private static final Integer MINUS_ONE = Integer.valueOf(-1);
 	private String jrt_input_string;
 
 	public Integer jrtConsumeFileInputForGetline(String filename) {
@@ -946,8 +946,8 @@ public class JRT {
 		if (!IS_WINDOWS) {
 			try {
 				// causes a hard exit ?!
-				int rv1 = p.waitFor();
-				int rv2 = p.exitValue();
+				p.waitFor();
+				p.exitValue();
 			} catch (InterruptedException ie) {
 				throw new AwkRuntimeException("Caught exception while waiting for process exit: " + ie);
 			}
@@ -984,8 +984,8 @@ public class JRT {
 			if (!IS_WINDOWS) {
 				try {
 					// causes a hard die ?!
-					int rv1 = p.waitFor();
-					int rv2 = p.exitValue();
+					p.waitFor();
+					p.exitValue();
 				} catch (InterruptedException ie) {
 					throw new AwkRuntimeException("Caught exception while waiting for process exit: " + ie);
 				}
@@ -1030,9 +1030,9 @@ public class JRT {
 			new DataPump(cmd, p.getInputStream(), System.out);
 			try {
 				int retcode = p.waitFor();
-				return new Integer(retcode);
+				return Integer.valueOf(retcode);
 			} catch (InterruptedException ie) {
-				return new Integer(p.exitValue());
+				return Integer.valueOf(p.exitValue());
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -1152,7 +1152,7 @@ public class JRT {
 			m.appendReplacement(sb, repl);
 		}
 		m.appendTail(sb);
-		return new Integer(cnt);
+		return Integer.valueOf(cnt);
 	}
 
 	public static String substr(Object startpos_obj, String str) {

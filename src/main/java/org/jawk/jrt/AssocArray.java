@@ -177,7 +177,7 @@ public class AssocArray implements Comparator<Object> {
 			String s2 = o2.toString();
 			return s1.compareTo(s2);
 		} else {
-			if (o2 instanceof Double || o2 instanceof Double) {
+			if (o1 instanceof Double || o2 instanceof Double) {
 				Double d1 = ((Double) o1);
 				Double d2 = ((Double) o2);
 				return d1.compareTo(d2);

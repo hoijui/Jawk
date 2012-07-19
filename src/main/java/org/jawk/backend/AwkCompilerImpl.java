@@ -764,6 +764,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		cg.addMethod(mg_reb.getMethod());
 		il_reb.dispose();
 
+		FileOutputStream fos = null;
 		try {
 			cg.addEmptyConstructor(ACC_PUBLIC);
 			addMainMethod();
@@ -784,10 +785,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			String path = extractDirname(clsname, File.separator);
 			if (path != null) {
-				new File(path).mkdirs();
+				boolean dirCreated = new File(path).mkdirs();
+				if (!dirCreated) {
+					throw new IOException("Failed to create directory \"" + path + "\".");
+				}
 			}
 
-			FileOutputStream fos = new FileOutputStream(clsname + ".class");
+			fos = new FileOutputStream(clsname + ".class");
 			cg.getJavaClass().dump(fos);
 			if (VERBOSE) {
 				System.err.println("(wrote: " + cg + ")");
@@ -795,6 +799,14 @@ public class AwkCompilerImpl implements AwkCompiler {
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 			System.exit(1);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -3013,13 +3025,15 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 					Map<String, Integer> global_var_offset_map = tuples.getGlobalVariableOffsetMap();
 
-					for (String name : global_var_offset_map.keySet()) {
+					for (Map.Entry<String, Integer> var : global_var_offset_map.entrySet()) {
 						// dump "name = value" onto stdout
+
+						String name = var.getKey();
+						int offset = var.getValue();
 
 						// ...
 						JVMTools_print(name + " = ");
 						JVMTools_getStaticField(System.class.getName(), "out", PrintStream.class);
-						int offset = global_var_offset_map.get(name);
 						JVMTools_getField(Object.class, "global_" + offset);
 						// if it's a map, get its "map" field
 						// for printing

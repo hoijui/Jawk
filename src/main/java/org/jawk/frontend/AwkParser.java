@@ -239,33 +239,29 @@ public class AwkParser {
 		this.additional_functions = additional_functions;
 		this.additional_type_functions = additional_type_functions;
 		this.no_input = no_input;
-		if (additional_functions) {
-			// HACK : When recompiling via exec(),
-			// this code is executed more than once.
-			// As a result, guard against polluting the
-			// KEYWORDS with different symbol ids.
-			// etc.
-			if (KEYWORDS.get("_sleep") == null) {
-				// Must not be reentrant!
-				// (See hack notice above.)
-				assert KEYWORDS.get("_sleep") == null;
-				assert KEYWORDS.get("_dump") == null;
-				KEYWORDS.put("_sleep", s_idx++);
-				KEYWORDS.put("_dump", s_idx++);
-				BUILTIN_FUNC_NAMES.put("exec", f_idx++);
-			}
+		// HACK : When recompiling via exec(),
+		// this code is executed more than once.
+		// As a result, guard against polluting the
+		// KEYWORDS with different symbol ids.
+		// etc.
+		if (additional_functions && (KEYWORDS.get("_sleep") == null)) {
+			// Must not be reentrant!
+			// (See hack notice above.)
+			assert KEYWORDS.get("_sleep") == null;
+			assert KEYWORDS.get("_dump") == null;
+			KEYWORDS.put("_sleep", s_idx++);
+			KEYWORDS.put("_dump", s_idx++);
+			BUILTIN_FUNC_NAMES.put("exec", f_idx++);
 		}
-		if (additional_type_functions) {
-			if (KEYWORDS.get("_INTEGER") == null) {
-				// Must not be reentrant!
-				// (See hack notice above.)
-				assert KEYWORDS.get("_INTEGER") == null;
-				assert KEYWORDS.get("_DOUBLE") == null;
-				assert KEYWORDS.get("_STRING") == null;
-				KEYWORDS.put("_INTEGER", s_idx++);
-				KEYWORDS.put("_DOUBLE", s_idx++);
-				KEYWORDS.put("_STRING", s_idx++);
-			}
+		if (additional_type_functions && (KEYWORDS.get("_INTEGER") == null)) {
+			// Must not be reentrant!
+			// (See hack notice above.)
+			assert KEYWORDS.get("_INTEGER") == null;
+			assert KEYWORDS.get("_DOUBLE") == null;
+			assert KEYWORDS.get("_STRING") == null;
+			KEYWORDS.put("_INTEGER", s_idx++);
+			KEYWORDS.put("_DOUBLE", s_idx++);
+			KEYWORDS.put("_STRING", s_idx++);
 		}
 		// Special handling for exec().
 		// Need to keep "extensions" around only
@@ -989,14 +985,14 @@ public class AwkParser {
 		int op = 0;
 		String txt = null;
 		AST comparison_expression = null;
-		if (allow_comparators) {
-			if (token == _EQ_ || token == _GT_ || token == _GE_ || token == _LT_ || token == _LE_ || token == _NE_ || token == _MATCHES_ || token == _NOT_MATCHES_) {
-				op = token;
-				txt = text.toString();
-				lexer();
-				comparison_expression = COMPARISON_EXPRESSION(allow_comparators, allow_in_keyword, allow_multidim_indices);
-				return new ComparisonExpression_AST(expression, op, txt, comparison_expression);
-			}
+		if (allow_comparators
+				&& (token == _EQ_ || token == _GT_ || token == _GE_ || token == _LT_ || token == _LE_ || token == _NE_ || token == _MATCHES_ || token == _NOT_MATCHES_))
+		{
+			op = token;
+			txt = text.toString();
+			lexer();
+			comparison_expression = COMPARISON_EXPRESSION(allow_comparators, allow_in_keyword, allow_multidim_indices);
+			return new ComparisonExpression_AST(expression, op, txt, comparison_expression);
 		}
 		return expression;
 	}
@@ -1149,10 +1145,8 @@ public class AwkParser {
 
 		AST factor_ast = FACTOR(allow_comparators, allow_in_keyword, allow_multidim_indices);
 
-		if (pre_inc || pre_dec) {
-			if (!isLvalue(factor_ast)) {
-				throw new ParserException("Cannot pre inc/dec a non-lvalue");
-			}
+		if ((pre_inc || pre_dec) && !isLvalue(factor_ast)) {
+			throw new ParserException("Cannot pre inc/dec a non-lvalue");
 		}
 
 		// only do post ops if:
@@ -1334,7 +1328,7 @@ public class AwkParser {
 
 		if (id_token == _EXTENSION_) {
 			String extension_keyword = id;
-			JawkExtension extension = extensions.get(extension_keyword);
+			//JawkExtension extension = extensions.get(extension_keyword);
 			AST params;
 
 			/*
@@ -2656,6 +2650,7 @@ public class AwkParser {
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
+			assert ast2 != null;
 
 			ID_AST array_id_ast = (ID_AST) ast2;
 			if (array_id_ast.isScalar()) {
@@ -2663,11 +2658,9 @@ public class AwkParser {
 			}
 			array_id_ast.setArray(true);
 
-
 			break_address = tuples.createAddress("break_address");
 
 			// push array onto the stack
-			assert ast2 != null;
 			int ast2_result = ast2.populateTuples(tuples);
 			// pops the array and pushes the keyset
 			tuples.keylist();
@@ -3265,15 +3258,11 @@ public class AwkParser {
 				AST fparam = symbol_table.getFunctionParameterIDAST(id, f_ptr.id);
 
 
-				if (aparam.isArray()) {
-					if (fparam.isScalar()) {
-						aparam.throwSemanticException(id + ": Actual parameter (" + aparam + ") is an array, but formal parameter is used like a scalar.");
-					}
+				if (aparam.isArray() && fparam.isScalar()) {
+					aparam.throwSemanticException(id + ": Actual parameter (" + aparam + ") is an array, but formal parameter is used like a scalar.");
 				}
-				if (aparam.isScalar()) {
-					if (fparam.isArray()) {
-						aparam.throwSemanticException(id + ": Actual parameter (" + aparam + ") is a scalar, but formal parameter is used like an array.");
-					}
+				if (aparam.isScalar() && fparam.isArray()) {
+					aparam.throwSemanticException(id + ": Actual parameter (" + aparam + ") is a scalar, but formal parameter is used like an array.");
 				}
 				// condition parameters appropriately
 				// (based on function parameter semantics)
@@ -3819,7 +3808,7 @@ public class AwkParser {
 		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
-			tuples.push(I.intValue());
+			tuples.push(I);
 			popSourceLineNumber(tuples);
 			return 1;
 		}

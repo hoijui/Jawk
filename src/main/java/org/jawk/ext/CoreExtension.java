@@ -349,7 +349,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	private Map<String, Object> reference_map = new HashMap<String, Object>();
 
 	static String newreference(Object arg) {
-		if (!(arg instanceof AssocArray)) {
+		if (!(arg instanceof AssocArray)) { // FIXME see other FIXME below
 			throw new IllegalAwkArgumentException("NewRef[erence] requires an assoc array, not " + arg.getClass().getName());
 		}
 
@@ -359,7 +359,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		int r_idx = instance.refmap_idx++;
 		// inspect the argument
 		String arg_string;
-		if (arg instanceof AssocArray) {
+		if (arg instanceof AssocArray) { // FIXME This does not make sense with the FIXME marked line above
 			arg_string = arg.getClass().getName();
 		} else {
 			arg_string = arg.toString();
@@ -488,8 +488,8 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		}
 	}
 
-	private static final Integer ZERO = new Integer(0);
-	private static final Integer ONE = new Integer(1);
+	private static final Integer ZERO = Integer.valueOf(0);
+	private static final Integer ONE = Integer.valueOf(1);
 
 	private int isinref(Object ref, Object key, VariableManager vm) {
 		if (ref instanceof AssocArray) {
