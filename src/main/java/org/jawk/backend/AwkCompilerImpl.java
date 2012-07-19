@@ -116,8 +116,8 @@ import org.jawk.util.AwkParameters;
  *	public final void setFILENAME(String arg) { <i><strong>filename_field</strong></i> = arg; }
  *	public final void setNF(String arg) { <i><strong>nf_field</strong></i> = arg; }
  *
- *	private final Object getNR() { if (<i><strong>nr_field</strong></i> == null) return ""; else return <i><strong>nr_field</strong></i>; }
- *	private final Object getFNR() { if (<i><strong>fnr_field</strong></i> == null) return ""; else return <i><strong>fnr_field</strong></i>; }
+ *	private Object getNR() { if (<i><strong>nr_field</strong></i> == null) return ""; else return <i><strong>nr_field</strong></i>; }
+ *	private Object getFNR() { if (<i><strong>fnr_field</strong></i> == null) return ""; else return <i><strong>fnr_field</strong></i>; }
  *
  *	public final void incNR() { <i><strong>nr_field</strong></i> = (int) JRT.toDouble(JRT.inc(getNR())); }
  *	public final void incFNR() { <i><strong>fnr_field</strong></i> = (int) JRT.toDouble(JRT.inc(getFNR())); }
@@ -275,7 +275,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		assert assertStaticClassVarsAreFromPackage();
 	}
 
-	private static final boolean assertStaticClassVarsAreFromPackage() {
+	private static boolean assertStaticClassVarsAreFromPackage() {
 		//String packagename = System.getProperty("jawk.rtPackgeName", "org.jawk.jrt");
 		String packagename = "org.jawk.jrt";
 		if (packagename != null) {
@@ -371,6 +371,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			marked = true;
 		}
 
+		@Override
 		public InstructionHandle append(Instruction i) {
 			InstructionHandle retval = super.append(i);
 			if (marked) {
@@ -380,6 +381,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			return retval;
 		}
 
+		@Override
 		public BranchHandle append(BranchInstruction i) {
 			BranchHandle retval = super.append(i);
 			if (marked) {
@@ -389,6 +391,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			return retval;
 		}
 
+		@Override
 		public InstructionHandle append(CompoundInstruction i) {
 			InstructionHandle retval = super.append(i);
 			if (marked) {
@@ -434,7 +437,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * @throws IllegalArgumentException if the classname does
 	 * not conform to the rules described above.
 	 */
-	private static final void validateClassname(String classname)
+	private static void validateClassname(String classname)
 			throws IllegalArgumentException {
 		// - check for non-null
 		assert classname != null;
@@ -452,7 +455,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 		}
 		// - check for $
-		if (classname.indexOf("$") >= 0) {
+		if (classname.indexOf('$') >= 0) {
 			throw new IllegalArgumentException("classname cannot contain a $");
 		}
 		// - check for no ..'s in classname
@@ -475,7 +478,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * @return The "dir" part of the class "path".  If no
 	 * separators exist, null is returned.
 	 */
-	private static final String extractDirname(String classname, String separator) {
+	private static String extractDirname(String classname, String separator) {
 		// converts
 		// a.b.c.d
 		// to
@@ -502,13 +505,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * @return The "name" part of the class "path".  If no
 	 * separators (periods) exist, classname is returned.
 	 */
-	private static final String extractClassname(String classname) {
+	private static String extractClassname(String classname) {
 		// converts
 		// a.b.c.d
 		// to
 		// d
 		assert classname != null && classname.length() > 0;
-		int dot_idx = classname.lastIndexOf(".");
+		int dot_idx = classname.lastIndexOf('.');
 		if (dot_idx == -1) {
 			return classname;
 		} else {
@@ -581,7 +584,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				il_reb.append(factory.createNew("java.lang.StringBuffer"));
 		il_reb.append(InstructionConstants.DUP);
 		il_reb.append(factory.createInvoke("java.lang.StringBuffer", "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
-		il_reb.append(factory.createStore(new ObjectType("java.lang.StringBuffer"), sb_reb.getIndex()));
+		il_reb.append(InstructionFactory.createStore(new ObjectType("java.lang.StringBuffer"), sb_reb.getIndex()));
 		dregister_reb.setStart(ih);
 		sb_reb.setStart(ih);
 
@@ -621,7 +624,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		static_il.append(factory.createInvoke(Integer.class.getName(), "valueOf", getObjectType(Integer.class), buildArgs(new Class[] {Integer.TYPE}), INVOKESTATIC));
 		static_il.append(factory.createFieldAccess(classname, "MINUS_ONE", getObjectType(Integer.class), Constants.PUTSTATIC));
 
-		static_il.append(factory.createReturn(Type.VOID));
+		static_il.append(InstructionFactory.createReturn(Type.VOID));
 
 		static_mg.setMaxStack();
 		static_mg.setMaxLocals();
@@ -669,6 +672,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 *
 	 * @see org.jawk.intermediate.Address
 	 */
+	@Override
 	public final void compile(AwkTuples tuples) {
 		precompile();
 		getOffsets(tuples);
@@ -707,7 +711,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		postcompile(tuples);
 	}
 
-	private final void addExitCode(InstructionList il, MethodGen mg) {
+	private void addExitCode(InstructionList il, MethodGen mg) {
 		// strategy:
 		//
 		// try {
@@ -734,7 +738,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		InstructionHandle ih2_end =
 				il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, "exit_code", Type.INT, Constants.GETFIELD));
-		il.append(factory.createReturn(Type.INT));
+		il.append(InstructionFactory.createReturn(Type.INT));
 		bh1.setTarget(ih_reb);
 
 		// catch2
@@ -743,7 +747,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				il.append(InstructionConstants.POP);
 		il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, "exit_code", Type.INT, Constants.GETFIELD));
-		il.append(factory.createReturn(Type.INT));
+		il.append(InstructionFactory.createReturn(Type.INT));
 
 		mg.addExceptionHandler(ih1_start, ih1_end, ih1_catch, new ObjectType(EndExceptionClass.getName()));
 		mg.addExceptionHandler(ih_reb, ih2_end, ih2_catch, new ObjectType(EndExceptionClass.getName()));
@@ -794,7 +798,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private final void addMainMethod() {
+	private void addMainMethod() {
 		InstructionList il = new InstructionList();
 
 		MethodGen mg = new MethodGen(ACC_PUBLIC | ACC_STATIC,
@@ -818,7 +822,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(InstructionConstants.DUP);
 		LocalVariableGen mainclass_arg = mg.addLocalVariable("mainclass_", new ObjectType(classname), null, null);
 		InstructionHandle ih =
-				il.append(factory.createStore(new ObjectType(classname), mainclass_arg.getIndex()));
+				il.append(InstructionFactory.createStore(new ObjectType(classname), mainclass_arg.getIndex()));
 		mainclass_arg.setStart(ih);
 
 
@@ -831,7 +835,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(Object.class.getName(), "getClass", getObjectType(Class.class), new Type[] {}, INVOKEVIRTUAL));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class
 
-		il.append(factory.createLoad(Type.OBJECT, 0));
+		il.append(InstructionFactory.createLoad(Type.OBJECT, 0));
 		il.append(factory.createFieldAccess(classname, "EXTENSION_DESCRIPTION", getObjectType(String.class), Constants.GETSTATIC));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class, args, desc
 		il.append(factory.createInvoke(AwkParameters.class.getName(), "<init>",
@@ -848,7 +852,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(System.class.getName(), "exit", Type.VOID, new Type[] {Type.INT}, INVOKESTATIC));
 		// ??? the return (below) is required, even though we're exit()ing (above) ???
 		// ??? (missing return results in a VerifyError) ???
-		il.append(factory.createReturn(org.apache.bcel.generic.Type.VOID));
+		il.append(InstructionFactory.createReturn(org.apache.bcel.generic.Type.VOID));
 
 		mg.setMaxStack();
 		mg.setMaxLocals();
@@ -878,7 +882,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		createAssignVariableMethod(tuples);
 	}
 
-	private final void createAssignVariableMethod(AwkTuples tuples) {
+	private void createAssignVariableMethod(AwkTuples tuples) {
 
 		InstructionList il = new InstructionList();
 		MethodGen method = new MethodGen(
@@ -951,7 +955,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 					// ..., this, value
 					il.append(factory.createFieldAccess(classname, "global_" + offset, getObjectType(Object.class), Constants.PUTFIELD));
 					// ...
-					il.append(factory.createReturn(Type.VOID));
+					il.append(InstructionFactory.createReturn(Type.VOID));
 				}
 			}
 
@@ -965,7 +969,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		// This occurs when a variable assignment happens
 		// to a var that does not exist within the script.
 
-		il.append(factory.createReturn(Type.VOID));
+		il.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
@@ -991,7 +995,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(InstructionConstants.POP);	// pop the null
 		il.append(new PUSH(cp, ""));
 		InstructionHandle ih =
-				il.append(factory.createReturn(getObjectType(Object.class)));
+				il.append(InstructionFactory.createReturn(getObjectType(Object.class)));
 		bh.setTarget(ih);
 
 		method.setMaxStack();
@@ -1022,7 +1026,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		// set field
 		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
 
-		il.append(factory.createReturn(Type.VOID));
+		il.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
@@ -1041,7 +1045,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createFieldAccess(classname, "ZERO", getObjectType(Integer.class), Constants.GETSTATIC));
 		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
 
-		il.append(factory.createReturn(Type.VOID));
+		il.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
@@ -1056,7 +1060,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(InstructionConstants.ALOAD_0);
 		il.append(InstructionConstants.ALOAD_1);
 		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
-		il.append(factory.createReturn(Type.VOID));
+		il.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
@@ -1071,7 +1075,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, argv_field, getObjectType(Object.class), Constants.GETFIELD));
 
-		il.append(factory.createReturn(getObjectType(Object.class)));
+		il.append(InstructionFactory.createReturn(getObjectType(Object.class)));
 
 		method.setMaxStack();
 		method.setMaxLocals();
@@ -1300,7 +1304,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private static final String[] toStringArray(List<String> list) {
+	private static String[] toStringArray(List<String> list) {
 		String[] retval = new String[list.size()];
 		for (int i = 0; i < retval.length; i++) {
 			retval[i] = list.get(i);
@@ -1308,7 +1312,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return retval;
 	}
 
-	private static final Class[] toClassArray(List<Class> list) {
+	private static Class[] toClassArray(List<Class> list) {
 		Class[] retval = new Class[list.size()];
 		for (int i = 0; i < retval.length; i++) {
 			retval[i] = list.get(i);
@@ -1316,7 +1320,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return retval;
 	}
 
-	private final void addPartialParamCall(String func_name, int num_formal_params, int num_actual_params) {
+	private void addPartialParamCall(String func_name, int num_formal_params, int num_actual_params) {
 
 		//System.err.println("PARTIAL_PARAM_CALL: "+func_name+" - "+num_formal_params+" - "+num_actual_params);
 
@@ -1343,12 +1347,12 @@ public class AwkCompilerImpl implements AwkCompiler {
 			if (i >= num_actual_params) {
 				il.append(InstructionConstants.ACONST_NULL);
 			} else {
-				il.append(factory.createLoad(getObjectType(Object.class), local_vars.get("locals_" + i)));
+				il.append(InstructionFactory.createLoad(getObjectType(Object.class), local_vars.get("locals_" + i)));
 			}
 		}
 		il.append(factory.createInvoke(classname, "FUNC_" + func_name, getObjectType(Object.class), buildArgs(toClassArray(arg_classes)), Constants.INVOKEVIRTUAL));
 
-		il.append(factory.createReturn(getObjectType(Object.class)));
+		il.append(InstructionFactory.createReturn(getObjectType(Object.class)));
 
 		method.setMaxStack();
 		method.setMaxLocals();
@@ -1392,7 +1396,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 	// tuples provided only in the event of dumping global variables to stdout
 	// via the _DUMP extension
-	private final void translateToJVM(PositionForCompilation position, int opcode, AwkTuples tuples) {
+	private void translateToJVM(PositionForCompilation position, int opcode, AwkTuples tuples) {
 		switch (opcode) {
 			case AwkTuples._SET_EXIT_ADDRESS_: {
 				exit_address = position.addressArg();
@@ -1628,7 +1632,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				JVMTools_toAwkString();
 				LocalVariableGen fmt_arg = lmg.addLocalVariable("fmt_arg_" + (++fmt_arg_idx), getObjectType(String.class), null, null);
 				InstructionHandle ih =
-						il.append(factory.createStore(getObjectType(String.class), fmt_arg.getIndex()));
+						il.append(InstructionFactory.createStore(getObjectType(String.class), fmt_arg.getIndex()));
 				fmt_arg.setStart(ih);
 				il.append(new PUSH(cp, num_args - 1));
 				il.append(factory.createNewArray(getObjectType(Object.class), (short) 1));
@@ -1643,13 +1647,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 					// ..., {args}, array, array, arg, i
 					JVMTools_SWAP();
 					// ..., {args}, array, array, i, arg
-					il.append(factory.createArrayStore(getObjectType(Object.class)));
+					il.append(InstructionFactory.createArrayStore(getObjectType(Object.class)));
 					// ..., {args}, array
 				}
 
 				// ..., array
 
-				il.append(factory.createLoad(getObjectType(String.class), fmt_arg.getIndex()));
+				il.append(InstructionFactory.createLoad(getObjectType(String.class), fmt_arg.getIndex()));
 				switch (opcode) {
 					case AwkTuples._PRINTF_:
 						JVMTools_invokeStatic(Void.TYPE, JRT_Class,
@@ -1698,7 +1702,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				// ..., {args}, ps, format_string
 				LocalVariableGen fmt_arg = lmg.addLocalVariable("fmt_arg_" + (++fmt_arg_idx), getObjectType(String.class), null, null);
 				InstructionHandle ih =
-						il.append(factory.createStore(getObjectType(String.class), fmt_arg.getIndex()));
+						il.append(InstructionFactory.createStore(getObjectType(String.class), fmt_arg.getIndex()));
 				fmt_arg.setStart(ih);
 
 				// ..., {args}, ps
@@ -1717,7 +1721,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 					// ..., {args}, ps, array, array, arg, i
 					JVMTools_SWAP();
 					// ..., {args}, ps, array, array, i, arg
-					il.append(factory.createArrayStore(getObjectType(Object.class)));
+					il.append(InstructionFactory.createArrayStore(getObjectType(Object.class)));
 					// ..., {args}, ps, array
 					if (i != num_args - 2) {
 						// ..., {args}, ps, array
@@ -1734,7 +1738,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 				// ..., ps, array
 
-				il.append(factory.createLoad(getObjectType(String.class), fmt_arg.getIndex()));
+				il.append(InstructionFactory.createLoad(getObjectType(String.class), fmt_arg.getIndex()));
 				// ..., ps, array, fmt_arg
 				JVMTools_invokeStatic(Void.TYPE, JRT_Class,
 						parameters.trap_illegal_format_exceptions ? "printfFunction" : "printfFunctionNoCatch",
@@ -2193,7 +2197,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._RETURN_FROM_FUNCTION_: {
 				JVMTools_getLocalVariable(Object.class, "_return_value_");
-				il.append(factory.createReturn(org.apache.bcel.generic.Type.OBJECT));
+				il.append(InstructionFactory.createReturn(org.apache.bcel.generic.Type.OBJECT));
 				break;
 			}
 			case AwkTuples._THIS_: {
@@ -2728,7 +2732,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 				LocalVariableGen array_idx_arg = lmg.addLocalVariable("arr_idx_arg_" + (++arr_idx_arg_idx), getObjectType(Object.class), null, null);
 				InstructionHandle ih =
-						il.append(factory.createStore(getObjectType(Object.class), array_idx_arg.getIndex()));
+						il.append(InstructionFactory.createStore(getObjectType(Object.class), array_idx_arg.getIndex()));
 				array_idx_arg.setStart(ih);
 				// ..., orig-value, repl-string, ere
 				JVMTools_getLocalVariable(StringBuffer.class, "sb");
@@ -2747,7 +2751,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				JVMTools_getVariable(arr_offset, is_global, true);	// true = is an array
 				JVMTools_cast(AssocArrayClass);
 				// ..., repl_count, array
-				il.append(factory.createLoad(getObjectType(Object.class), array_idx_arg.getIndex()));
+				il.append(InstructionFactory.createLoad(getObjectType(Object.class), array_idx_arg.getIndex()));
 				// ..., repl_count, array, array-index
 				JVMTools_getLocalVariable(StringBuffer.class, "sb");
 				JVMTools_invokeVirtual(String.class, Object.class, "toString");
@@ -3066,7 +3070,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private final void resolveBranchHandleTargets() {
+	private void resolveBranchHandleTargets() {
 		for (org.jawk.intermediate.Address addr : branch_handles.keySet()) {
 			List<BranchHandle> list = branch_handles.get(addr);
 			for (BranchHandle bh : list) {
@@ -3075,14 +3079,14 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private final void getInputField() {
+	private void getInputField() {
 		// same code as _GET_INPUT_FIELD_
 		JVMTools_getField(JRT_Class, "input_runtime");
 		JVMTools_SWAP();
 		JVMTools_invokeVirtual(Object.class, JRT_Class, "jrtGetInputField", Object.class);
 	}
 
-	private final void assignAsInputField() {
+	private void assignAsInputField() {
 		// ..., text, fieldnum
 		JVMTools_toDouble();
 		JVMTools_D2I();
@@ -3129,11 +3133,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
-	private final void JVMTools_allocateStaticField(Class vartype, String varname) {
+	private void JVMTools_allocateStaticField(Class vartype, String varname) {
 		JVMTools_allocateStaticField(vartype, varname, ACC_PRIVATE);
 	}
 
-	private final void JVMTools_allocateStaticField(Class vartype, String varname, int public_or_private) {
+	private void JVMTools_allocateStaticField(Class vartype, String varname, int public_or_private) {
 		FieldGen fg = new FieldGen(public_or_private | ACC_STATIC | ACC_FINAL,
 				getObjectType(vartype),
 				varname,
@@ -3141,7 +3145,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		cg.addField(fg.getField());
 	}
 
-	private final void JVMTools_allocateField(Class vartype, String varname) {
+	private void JVMTools_allocateField(Class vartype, String varname) {
 		FieldGen fg = new FieldGen(ACC_PRIVATE,
 				getObjectType(vartype),
 				varname,
@@ -3149,227 +3153,227 @@ public class AwkCompilerImpl implements AwkCompiler {
 		cg.addField(fg.getField());
 	}
 
-	private final void JVMTools_GOTO(org.jawk.intermediate.Address addr) {
+	private void JVMTools_GOTO(org.jawk.intermediate.Address addr) {
 		BranchHandle bh = il.append(new GOTO(null));
 		JVMTools_addBranchHandle(addr, bh);
 	}
 
-	private final BranchHandle JVMTools_GOTO() {
+	private BranchHandle JVMTools_GOTO() {
 		return il.append(new GOTO(null));
 	}
 
-	private final void JVMTools_IFEQ(org.jawk.intermediate.Address addr) {
+	private void JVMTools_IFEQ(org.jawk.intermediate.Address addr) {
 		BranchHandle bh = il.append(new IFEQ(null));
 		JVMTools_addBranchHandle(addr, bh);
 	}
 
-	private final void JVMTools_IFNE(org.jawk.intermediate.Address addr) {
+	private void JVMTools_IFNE(org.jawk.intermediate.Address addr) {
 		BranchHandle bh = il.append(new IFNE(null));
 		JVMTools_addBranchHandle(addr, bh);
 	}
 
-	private final void JVMTools_IFLE(org.jawk.intermediate.Address addr) {
+	private void JVMTools_IFLE(org.jawk.intermediate.Address addr) {
 		BranchHandle bh = il.append(new IFLE(null));
 		JVMTools_addBranchHandle(addr, bh);
 	}
 
-	private final BranchHandle JVMTools_IFNONNULL() {
+	private BranchHandle JVMTools_IFNONNULL() {
 		return il.append(new IFNONNULL(null));
 	}
 
-	private final InstructionHandle JVMTools_NOP() {
+	private InstructionHandle JVMTools_NOP() {
 		return il.append(InstructionConstants.NOP);
 	}
 
-	private final InstructionHandle JVMTools_SWAP() {
+	private InstructionHandle JVMTools_SWAP() {
 		return il.append(InstructionConstants.SWAP);
 	}
 
-	private final InstructionHandle JVMTools_POP() {
+	private InstructionHandle JVMTools_POP() {
 		return il.append(InstructionConstants.POP);
 	}
 
-	private final InstructionHandle JVMTools_POP2() {
+	private InstructionHandle JVMTools_POP2() {
 		return il.append(InstructionConstants.POP2);
 	}
 
-	private final InstructionHandle JVMTools_DUP() {
+	private InstructionHandle JVMTools_DUP() {
 		return il.append(InstructionConstants.DUP);
 	}
 
-	private final InstructionHandle JVMTools_DUP_X1() {
+	private InstructionHandle JVMTools_DUP_X1() {
 		return il.append(InstructionConstants.DUP_X1);
 	}
 
-	private final InstructionHandle JVMTools_DUP_X2() {
+	private InstructionHandle JVMTools_DUP_X2() {
 		return il.append(InstructionConstants.DUP_X2);
 	}
 
-	private final void JVMTools_DUP2() {
+	private void JVMTools_DUP2() {
 		il.append(InstructionConstants.DUP2);
 	}
 
-	private final void JVMTools_DUP2_X1() {
+	private void JVMTools_DUP2_X1() {
 		il.append(InstructionConstants.DUP2_X1);
 	}
 
-	private final void JVMTools_DUP2_X2() {
+	private void JVMTools_DUP2_X2() {
 		il.append(InstructionConstants.DUP2_X2);
 	}
 
-	private final InstructionHandle JVMTools_D2I() {
+	private InstructionHandle JVMTools_D2I() {
 		return il.append(InstructionConstants.D2I);
 	}
 
-	private final InstructionHandle JVMTools_I2D() {
+	private InstructionHandle JVMTools_I2D() {
 		return il.append(InstructionConstants.I2D);
 	}
 
-	private final void JVMTools_D2L() {
+	private void JVMTools_D2L() {
 		il.append(InstructionConstants.D2L);
 	}
 
-	private final void JVMTools_IADD() {
+	private void JVMTools_IADD() {
 		il.append(InstructionConstants.IADD);
 	}
 
-	private final void JVMTools_ISUB() {
+	private void JVMTools_ISUB() {
 		il.append(InstructionConstants.ISUB);
 	}
 
-	private final void JVMTools_DADD() {
+	private void JVMTools_DADD() {
 		il.append(InstructionConstants.DADD);
 	}
 
-	private final void JVMTools_DSUB() {
+	private void JVMTools_DSUB() {
 		il.append(InstructionConstants.DSUB);
 	}
 
-	private final void JVMTools_DMUL() {
+	private void JVMTools_DMUL() {
 		il.append(InstructionConstants.DMUL);
 	}
 
-	private final void JVMTools_DDIV() {
+	private void JVMTools_DDIV() {
 		il.append(InstructionConstants.DDIV);
 	}
 
-	private final void JVMTools_DREM() {
+	private void JVMTools_DREM() {
 		il.append(InstructionConstants.DREM);
 	}
 
-	private final void JVMTools_DNEG() {
+	private void JVMTools_DNEG() {
 		il.append(InstructionConstants.DNEG);
 	}
 
-	private final void JVMTools_LMUL() {
+	private void JVMTools_LMUL() {
 		il.append(InstructionConstants.LMUL);
 	}
 
-	private final void JVMTools_returnVoid() {
-		il.append(factory.createReturn(org.apache.bcel.generic.Type.VOID));
+	private void JVMTools_returnVoid() {
+		il.append(InstructionFactory.createReturn(org.apache.bcel.generic.Type.VOID));
 	}
 
-	private final void JVMTools_pushInteger(int i) {
+	private void JVMTools_pushInteger(int i) {
 		il.append(new PUSH(cp, i));
 		JVMTools_invokeStatic(Integer.class, Integer.class, "valueOf", Integer.TYPE);
 	}
 
-	private final void JVMTools_pushDouble(double d) {
+	private void JVMTools_pushDouble(double d) {
 		il.append(new PUSH(cp, d));
 		JVMTools_invokeStatic(Double.class, Double.class, "valueOf", Double.TYPE);
 	}
 
-	private final void JVMTools_pushString(String s) {
+	private void JVMTools_pushString(String s) {
 		il.append(new PUSH(cp, s));
 	}
 
-	private final void JVMTools_pushBoolean(boolean b) {
+	private void JVMTools_pushBoolean(boolean b) {
 		il.append(new PUSH(cp, b));
 	}
 
-	private final void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name) {
+	private void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {}), INVOKEINTERFACE));
 	}
 
-	private final void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name, Class arg_type) {
+	private void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name, Class arg_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type}), INVOKEINTERFACE));
 	}
 
-	private final void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type) {
+	private void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type}), INVOKEINTERFACE));
 	}
 
-	private final void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name) {
+	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {}), INVOKESTATIC));
 	}
 
-	private final void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type) {
+	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type}), INVOKESTATIC));
 	}
 
-	private final void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type) {
+	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type}), INVOKESTATIC));
 	}
 
-	private final void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type) {
+	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type, arg3_type}), INVOKESTATIC));
 	}
 
-	private final void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type, Class arg4_type) {
+	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type, Class arg4_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type, arg3_type, arg4_type}), INVOKESTATIC));
 	}
 
-	private final void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type, Class arg4_type, Class arg5_type) {
+	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type, Class arg4_type, Class arg5_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type, arg3_type, arg4_type, arg5_type}), INVOKESTATIC));
 	}
 
-	private final InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name) {
+	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {}), INVOKEVIRTUAL));
 	}
 
-	private final InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type) {
+	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type}), INVOKEVIRTUAL));
 	}
 
-	private final InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg_type2) {
+	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg_type2) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg_type2}), INVOKEVIRTUAL));
 	}
 
-	private final InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg_type2, Class arg_type3) {
+	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg_type2, Class arg_type3) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg_type2, arg_type3}), INVOKEVIRTUAL));
 	}
 
-	private final void JVMTools_allocateLocalVariable(Class vartype, String varname) {
+	private void JVMTools_allocateLocalVariable(Class vartype, String varname) {
 		assert local_vars.get(varname) == null;
 		LocalVariableGen lg = mg.addLocalVariable(varname, getObjectType(vartype), null, null);
 		local_vars.put(varname, lg.getIndex());
 		lg.setStart(JVMTools_NOP());
 	}
 
-	private final void JVMTools_allocateFunctionParameters(String[] param_names) {
+	private void JVMTools_allocateFunctionParameters(String[] param_names) {
 		for (int i = 0; i < param_names.length; i++) {
 			assert local_vars.get(param_names[i]) == null;
 			local_vars.put(param_names[i], i + 1);
 		}
 	}
 
-	private final InstructionHandle JVMTools_getLocalVariable(Class vartype, String varname) {
+	private InstructionHandle JVMTools_getLocalVariable(Class vartype, String varname) {
 		Integer I = local_vars.get(varname);
 		if (I == null) {
 			throw new Error(varname + " not found as a local variable");
 		}
-		return il.append(factory.createLoad(getObjectType(vartype), I));
+		return il.append(InstructionFactory.createLoad(getObjectType(vartype), I));
 	}
 
-	private final void JVMTools_storeToLocalVariable(Class vartype, String varname) {
+	private void JVMTools_storeToLocalVariable(Class vartype, String varname) {
 		Integer I = local_vars.get(varname);
 		if (I == null) {
 			throw new Error(varname + " not found as a local variable");
 		}
-		il.append(factory.createStore(getObjectType(vartype), I));
+		il.append(InstructionFactory.createStore(getObjectType(vartype), I));
 	}
 
-	private final void JVMTools_addBranchHandle(org.jawk.intermediate.Address addr, BranchHandle bh) {
+	private void JVMTools_addBranchHandle(org.jawk.intermediate.Address addr, BranchHandle bh) {
 		List<BranchHandle> list = branch_handles.get(addr);
 		if (list == null) {
 			branch_handles.put(addr, list = new ArrayList<BranchHandle>());
@@ -3377,52 +3381,52 @@ public class AwkCompilerImpl implements AwkCompiler {
 		list.add(bh);
 	}
 
-	private final void JVMTools_print(String const_str) {
+	private void JVMTools_print(String const_str) {
 		JVMTools_getStaticField("java.lang.System", "out", PrintStream.class);
 		il.append(new PUSH(cp, const_str));
 		JVMTools_invokeVirtual(Void.TYPE, PrintStream.class, "print", String.class);
 	}
 
-	private final void JVMTools_println() {
+	private void JVMTools_println() {
 		JVMTools_getStaticField("java.lang.System", "out", PrintStream.class);
 		JVMTools_invokeVirtual(Void.TYPE, PrintStream.class, "println");
 	}
 
-	private final void JVMTools_printlnWithPS() {
+	private void JVMTools_printlnWithPS() {
 		// ..., ps
 		JVMTools_DUP();
 		JVMTools_invokeVirtual(Void.TYPE, PrintStream.class, "println");
 		// ..., ps
 	}
 
-	private final InstructionHandle JVMTools_getStaticField(String classname, String fieldname, Class fieldtype) {
+	private InstructionHandle JVMTools_getStaticField(String classname, String fieldname, Class fieldtype) {
 		return il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.GETSTATIC));
 	}
 
-	private final InstructionHandle JVMTools_getField(Class fieldtype, String fieldname) {
+	private InstructionHandle JVMTools_getField(Class fieldtype, String fieldname) {
 		InstructionHandle ih = il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.GETFIELD));
 		return ih;
 	}
 
-	private final void JVMTools_storeStaticField(Class fieldtype, String fieldname) {
+	private void JVMTools_storeStaticField(Class fieldtype, String fieldname) {
 		il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.PUTSTATIC));
 	}
 
-	private final void JVMTools_storeField(Class fieldtype, String fieldname) {
+	private void JVMTools_storeField(Class fieldtype, String fieldname) {
 		il.append(InstructionConstants.ALOAD_0);
 		JVMTools_SWAP();
 		il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.PUTFIELD));
 	}
 
-	private final InstructionHandle JVMTools_printString() {
+	private InstructionHandle JVMTools_printString() {
 		InstructionHandle ih = JVMTools_getStaticField("java.lang.System", "out", PrintStream.class);
 		JVMTools_SWAP();
 		JVMTools_invokeVirtual(Void.TYPE, PrintStream.class, "print", String.class);
 		return ih;
 	}
 
-	private final InstructionHandle JVMTools_printStringWithPS() {
+	private InstructionHandle JVMTools_printStringWithPS() {
 		// ..., string, ps
 		InstructionHandle ih = JVMTools_DUP_X1();
 		JVMTools_SWAP();
@@ -3431,24 +3435,24 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return ih;
 	}
 
-	private final void JVMTools_new(String newtype) {
+	private void JVMTools_new(String newtype) {
 		il.append(factory.createNew(newtype));
 		JVMTools_DUP();
 		il.append(factory.createInvoke(newtype, "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
 	}
 
-	private final void JVMTools_new(String newtype, Class paramtype) {
+	private void JVMTools_new(String newtype, Class paramtype) {
 		JVMTools_new(il, newtype, paramtype);
 	}
 
-	private final void JVMTools_new(InstructionList il, String newtype, Class paramtype) {
+	private void JVMTools_new(InstructionList il, String newtype, Class paramtype) {
 		il.append(factory.createNew(newtype));
 		il.append(InstructionConstants.DUP_X1);
 		il.append(InstructionConstants.SWAP);
 		il.append(factory.createInvoke(newtype, "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {paramtype}), INVOKESPECIAL));
 	}
 
-	private final void JVMTools_new(String newtype, Class paramtype1, Class paramtype2) {
+	private void JVMTools_new(String newtype, Class paramtype1, Class paramtype2) {
 		// ..., param1, param2
 		il.append(factory.createNew(newtype));
 		// ..., param1, param2, objref
@@ -3459,38 +3463,38 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(newtype, "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {paramtype1, paramtype2}), INVOKESPECIAL));
 	}
 
-	private final void JVMTools_instanceOf(Class checkclass) {
+	private void JVMTools_instanceOf(Class checkclass) {
 		il.append(factory.createInstanceOf(new ObjectType(checkclass.getName())));
 	}
 
-	private final InstructionHandle JVMTools_cast(Class to) {
+	private InstructionHandle JVMTools_cast(Class to) {
 		return il.append(factory.createCheckCast(new ObjectType(to.getName())));
 	}
 
-	private final void JVMTools_swap2() {
+	private void JVMTools_swap2() {
 		JVMTools_DUP2_X2();
 		JVMTools_POP2();
 	}
 
-	private final InstructionHandle JVMTools_toAwkString() {
+	private InstructionHandle JVMTools_toAwkString() {
 		InstructionHandle ih = JVMTools_getVariable(convfmt_offset, true, false);	// true = is_global, false = NOT an array
 		JVMTools_invokeVirtual(String.class, Object.class, "toString");
 		JVMTools_invokeStatic(String.class, JRT_Class, "toAwkString", Object.class, String.class);
 		return ih;
 	}
 
-	private final InstructionHandle JVMTools_toAwkStringForOutput() {
+	private InstructionHandle JVMTools_toAwkStringForOutput() {
 		InstructionHandle ih = JVMTools_getVariable(ofmt_offset, true, false);	// true = is_global, false = NOT an array
 		JVMTools_invokeVirtual(String.class, Object.class, "toString");
 		JVMTools_invokeStatic(String.class, JRT_Class, "toAwkStringForOutput", Object.class, String.class);
 		return ih;
 	}
 
-	private final void JVMTools_toDouble() {
+	private void JVMTools_toDouble() {
 		JVMTools_invokeStatic(Double.TYPE, JRT_Class, "toDouble", Object.class);
 	}
 
-	private final void JVMTools_toDouble(int num_refs) {
+	private void JVMTools_toDouble(int num_refs) {
 		if (num_refs == 1) {
 			JVMTools_toDouble();
 		} else if (num_refs == 2) {
@@ -3504,15 +3508,15 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private final void JVMTools_storeRegister() {
+	private void JVMTools_storeRegister() {
 		JVMTools_storeToLocalVariable(Double.TYPE, "dregister");
 	}
 
-	private final InstructionHandle JVMTools_loadRegister() {
+	private InstructionHandle JVMTools_loadRegister() {
 		return JVMTools_getLocalVariable(Double.TYPE, "dregister");
 	}
 
-	private final BranchHandle JVMTools_ifInt() {
+	private BranchHandle JVMTools_ifInt() {
 		// stack: ..., double
 		JVMTools_DUP2();
 		// ..., double, double
@@ -3525,23 +3529,23 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return JVMTools_IFEQ();
 	}
 
-	private final void JVMTools_DCMPL() {
+	private void JVMTools_DCMPL() {
 		il.append(InstructionConstants.DCMPL);
 	}
 
-	private final BranchHandle JVMTools_IFEQ() {
+	private BranchHandle JVMTools_IFEQ() {
 		return il.append(new IFEQ(null));
 	}
 
-	private final BranchHandle JVMTools_IFNE() {
+	private BranchHandle JVMTools_IFNE() {
 		return il.append(new IFNE(null));
 	}
 
-	private final BranchHandle JVMTools_IFLE() {
+	private BranchHandle JVMTools_IFLE() {
 		return il.append(new IFLE(null));
 	}
 
-	private final void JVMTools_fromDoubleToNumber() {
+	private void JVMTools_fromDoubleToNumber() {
 		JVMTools_DUP2();
 		BranchHandle bh = JVMTools_ifInt();
 		// double here
@@ -3558,14 +3562,14 @@ public class AwkCompilerImpl implements AwkCompiler {
 		bh_end.setTarget(ih_end);
 	}
 
-	private final BranchHandle JVMTools_ifStringNotEquals(String str) {
+	private BranchHandle JVMTools_ifStringNotEquals(String str) {
 		// stack: ..., stringref
 		JVMTools_pushString(str);
 		JVMTools_invokeVirtual(Boolean.TYPE, String.class, "equals", Object.class);
 		return JVMTools_IFEQ();
 	}
 
-	private final void JVMTools_newAssocArray() {
+	private void JVMTools_newAssocArray() {
 		il.append(factory.createNew(AssocArrayClass.getName()));
 		il.append(InstructionConstants.DUP);
 		il.append(new PUSH(cp, parameters.sorted_array_keys));	// false = not in sorted order
@@ -3575,7 +3579,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				INVOKESPECIAL));
 	}
 
-	private final InstructionHandle JVMTools_getVariable(int offset, boolean is_global, boolean is_array) {
+	private InstructionHandle JVMTools_getVariable(int offset, boolean is_global, boolean is_array) {
 		if (offset < 0) {
 			throw new IllegalArgumentException("offset = " + offset + " ?!  is_global=" + is_global + ", is_array=" + is_array);
 		}
@@ -3612,7 +3616,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return retval;
 	}
 
-	private final void JVMTools_setVariable(int offset, boolean is_global) {
+	private void JVMTools_setVariable(int offset, boolean is_global) {
 		if (is_global) {
 			JVMTools_storeField(Object.class, "global_" + offset);
 		} else {
@@ -3620,24 +3624,24 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private final void JVMTools_throwNewException(Class cls, String msg) {
+	private void JVMTools_throwNewException(Class cls, String msg) {
 		JVMTools_throwNewException(il, cls, msg);
 	}
 
-	private final void JVMTools_throwNewException(InstructionList il, Class cls, String msg) {
+	private void JVMTools_throwNewException(InstructionList il, Class cls, String msg) {
 		il.append(new PUSH(cp, msg));
 		JVMTools_new(il, cls.getName(), String.class);
 		//JVMTools_DEBUG("Throwing end exception: "+msg);
 		il.append(InstructionConstants.ATHROW);
 	}
 
-	private final void JVMTools_DEBUG(String msg) {
+	private void JVMTools_DEBUG(String msg) {
 		JVMTools_getStaticField(System.class.getName(), "out", PrintStream.class);
 		il.append(new PUSH(cp, "DEBUG: " + msg));
 		JVMTools_invokeVirtual(Void.TYPE, PrintStream.class, "println", String.class);
 	}
 
-	private final void JVMTools_DEBUG(int offset, boolean is_global) {
+	private void JVMTools_DEBUG(int offset, boolean is_global) {
 		JVMTools_DEBUG("Variable offset: " + offset + ", " + is_global + " ...");
 		JVMTools_getStaticField(System.class.getName(), "out", PrintStream.class);
 		JVMTools_getVariable(offset, is_global, false);	// false = is NOT an array
@@ -3651,7 +3655,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * object reference (i.e., an integer or a double), a VerifyError
 	 * will occur.
 	 */
-	private final void JVMTools_DEBUG_TOS() {
+	private void JVMTools_DEBUG_TOS() {
 		// ... objref
 		JVMTools_DUP();
 		JVMTools_invokeVirtual(Class.class, Object.class, "getClass");

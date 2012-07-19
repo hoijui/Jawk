@@ -42,6 +42,7 @@ public abstract class AbstractExtension implements JawkExtension {
 	 * @param arg_count The number of actual parameters used in this
 	 * 	extension invocation.
 	 */
+	@Override
 	public int[] getAssocArrayParameterPositions(String extension_keyword, int arg_count) {
 		return new int[0];
 	}
@@ -57,7 +58,7 @@ public abstract class AbstractExtension implements JawkExtension {
 	 * @throws IllegalAwkArgumentException if the number of arguments
 	 * 	do not match the expected number of arguments.
 	 */
-	protected static final void checkNumArgs(Object[] arr, int expected_num) {
+	protected static void checkNumArgs(Object[] arr, int expected_num) {
 		// some sanity checks on the arguments
 		// (made into assertions so that
 		// production code does not perform

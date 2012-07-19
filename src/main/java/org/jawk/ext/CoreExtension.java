@@ -28,7 +28,7 @@ import org.jawk.jrt.VariableManager;
  * Inserts elements into an associative array whose keys
  * are ordered non-negative integers, and the values
  * are the arguments themselves.  The first argument is
- * the assocative array itself.
+ * the associative array itself.
  * <li><strong>Map/HashMap/TreeMap/LinkedMap</strong> - <code><font size=+1>Map(map,k1,v1,k2,v2,...,kN,vN)</font></code>,
  * or <code><font size=+1>Map(k1,v1,k2,v2,...,kN,vN)</font></code>.<br>
  * Build an associative array with its keys/values as
@@ -37,7 +37,7 @@ import org.jawk.jrt.VariableManager;
  * parameter count version returns an anonymous associative
  * array for the purposes of providing a map by function
  * call parameter.<br>
- * Map/HashMap configures the assocative array as a
+ * Map/HashMap configures the associative array as a
  * hash map, TreeMap as an ordered map, and LinkedMap
  * as a map which traverses the key set in order of
  * insertion.
@@ -108,7 +108,7 @@ import org.jawk.jrt.VariableManager;
  * These restrictions, while sufficient for AWK, are detrimental
  * to extensions because associative arrays are excellent vehicles
  * for configuration and return values for user extensions.
- * Plus, associative arrays can be subclassed, which can be used
+ * Plus, associative arrays can be overriden, which can be used
  * to enforce type safety within user extensions.  Unfortunately, the
  * memory model restrictions make using associative arrays in this
  * capacity very difficult.
@@ -137,27 +137,27 @@ import org.jawk.jrt.VariableManager;
  * <li><strong>UnRef / Unreference</strong> - <code><font size=+1>UnRef(handle)</font></code><br>
  * Eliminate the reference occupied by the reference cache.
  * <li><strong>InRef</strong> - <code><font size=+1>while(key = InRef(handle)) ...</font></code><br>
- * Iterate through the keyset of the associative array
+ * Iterate through the key-set of the associative array
  * referred to by handle in the reference cache.
  * This is similar to:
  * <blockquote><pre>
  * for (key in assocarray)
  * 	...</pre></blockquote>
- * where assocarray is the associative array referred to by
+ * where <code>assocarray</code> is the associative array referred to by
  * handle in the reference cache.
  * <br>
  * <strong>Warning:</strong> unlike the IN keyword, InRef
  * will maintain state regardless of scope.  That is,
  * if one were to break; out of the while loop above,
  * the next call to InRef() will be the next anticipated
- * element of the assoc array.
+ * element of the <code>assoc</code> array.
  * <li><strong>IsInRef</strong> - <code><font size=+1>b = IsInRef(handle, key)</font></code><br>
  * Checks whether the associative array in the reference cache
  * contains the key.  This is similar to:
  * <blockquote><pre>
  * if (key in assocarray)
  *	...</pre></blockquote>
- * where assocarray is the associative array referred to by
+ * where <code>assocarray</code> is the associative array referred to by
  * handle in the reference cache.
  * <li><strong>DumpRefs</strong> - <code><font size=+1>DumpRefs()</font></code><br>
  * Dumps the reference cache to stdout.
@@ -178,11 +178,12 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		}
 	}
 
-	// to satisfy the JawkExtension interface
+	@Override
 	public String getExtensionName() {
 		return "Core Extension";
 	}
 
+	@Override
 	public String[] extensionKeywords() {
 		return new String[] {
 				"Array",	// i.e.  Array(array,1,3,5,7,9,11)
@@ -214,6 +215,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 				};
 	}
 
+	@Override
 	public int[] getAssocArrayParameterPositions(String extension_keyword, int num_args) {
 		if ((false
 				|| extension_keyword.equals("Map")
@@ -243,6 +245,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		}
 	}
 
+	@Override
 	public Object invoke(String keyword, Object[] args) {
 		if (false) {
 		} else if (keyword.equals("Map") || keyword.equals("HashMap")) {
@@ -345,7 +348,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	private int refmap_idx = 0;
 	private Map<String, Object> reference_map = new HashMap<String, Object>();
 
-	static final String newreference(Object arg) {
+	static String newreference(Object arg) {
 		if (!(arg instanceof AssocArray)) {
 			throw new IllegalAwkArgumentException("NewRef[erence] requires an assoc array, not " + arg.getClass().getName());
 		}
@@ -371,7 +374,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	}
 
 	// this version assigns an assoc array a key/value pair
-	static final Object newreference(String refstring, Object key, Object value) {
+	static Object newreference(String refstring, Object key, Object value) {
 		AssocArray aa = (AssocArray) instance.reference_map.get(refstring);
 		if (aa == null) {
 			throw new IllegalAwkArgumentException("AssocArray reference doesn't exist.");
@@ -391,7 +394,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	}
 
 	// split this out for static access by other extensions
-	static final Object dereference(String arg_check) {
+	static Object dereference(String arg_check) {
 		if (instance.reference_map.get(arg_check) != null) {
 			return instance.reference_map.get(arg_check);
 		} else {
@@ -401,7 +404,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 
 	// this version assumes an assoc array is stored as a reference,
 	// and to retrieve the stored value
-	static final Object dereference(String refstring, Object key, VariableManager vm) {
+	static Object dereference(String refstring, Object key, VariableManager vm) {
 		AssocArray aa = (AssocArray) instance.reference_map.get(refstring);
 		if (aa == null) {
 			throw new IllegalAwkArgumentException("AssocArray reference doesn't exist.");
@@ -417,7 +420,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		return aa.get(key);
 	}
 
-	static final int unreference(Object arg, VariableManager vm) {
+	static int unreference(Object arg, VariableManager vm) {
 		String arg_check = instance.toAwkString(arg);
 		if (instance.reference_map.get(arg_check) == null) {
 			throw new IllegalAwkArgumentException("Not a reference : " + arg_check);
@@ -496,7 +499,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		return isinref(refstring, key);
 	}
 
-	static final int isinref(String refstring, Object key) {
+	static int isinref(String refstring, Object key) {
 		Object o = instance.reference_map.get(refstring);
 		if (o == null) {
 			throw new IllegalAwkArgumentException("Invalid refstring : " + refstring);
@@ -518,7 +521,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		}
 	}
 
-	static final String typeof(Object arg, VariableManager vm) {
+	static String typeof(Object arg, VariableManager vm) {
 		if (false) {
 			throw new Error("Should never reach here.");
 		} else if (arg instanceof AssocArray) {
@@ -682,10 +685,12 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	private int wait_int = 0;
 	private BlockObject timeout_blocker = new BlockObject() {
 
+		@Override
 		public String getNotifierTag() {
 			return "Timeout";
 		}
 
+		@Override
 		public final void block()
 				throws InterruptedException {
 			synchronized (timeout_blocker) {

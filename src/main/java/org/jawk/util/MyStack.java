@@ -3,9 +3,9 @@ package org.jawk.util;
 /**
  * A stack-like interface.
  * <p>
- * Unfortunately, java.util.Stack uses a Vector, and is,
+ * Unfortunately, <code>java.util.Stack</code> uses a Vector, and is,
  * therefore, needlessly synchronized in a non-multi-threaded
- * environment.  As a result, it was necessary to reimplement the
+ * environment. As a result, it was necessary to re-implement the
  * stack in this manner by using a non-synchronized list.
  */
 public interface MyStack<E> {

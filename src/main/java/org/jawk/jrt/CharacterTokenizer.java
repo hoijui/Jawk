@@ -11,7 +11,7 @@ import java.util.Enumeration;
 public class CharacterTokenizer implements Enumeration<Object> {
 
 	private String input;
-	private int idx=0;
+	private int idx = 0;
 
 	/**
 	 * Construct a CharacterTokenizer.
@@ -22,10 +22,12 @@ public class CharacterTokenizer implements Enumeration<Object> {
 		this.input = input;
 	}
 
+	@Override
 	public boolean hasMoreElements() {
 		return idx < input.length();
 	}
 
+	@Override
 	public Object nextElement() {
 		return Character.toString(input.charAt(idx++));
 	}

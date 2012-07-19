@@ -34,7 +34,7 @@ public class ArrayStackImpl<E> extends ArrayList<E> implements MyStack<E> {
 	 * Pops an item off the stack.
 	 * <p>
 	 * Warning: no checks are done in terms of size, etc.
-	 * If a pop() occurrs on an empty stack,
+	 * If a pop() occurs on an empty stack,
 	 * an ArrayIndexOutOfBoundException is thrown.
 	 *
 	 * @return The top of the stack. The element is subsequently

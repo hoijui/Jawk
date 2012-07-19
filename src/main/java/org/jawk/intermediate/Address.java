@@ -28,7 +28,7 @@ public interface Address {
 
 	/**
 	 * Set the tuple index of this address.
-	 * This can be defered anytime after creation of the address,
+	 * This can be deferred anytime after creation of the address,
 	 * but the index must be assigned prior to traversing the tuples.
 	 *
 	 * @param idx The tuple location within the tuple list (queue)

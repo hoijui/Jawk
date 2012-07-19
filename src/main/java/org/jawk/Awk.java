@@ -49,7 +49,7 @@ import org.jawk.util.DestDirClassLoader;
  * As of this writing, Jawk traverses the tuples once for
  * interpretation, and two times for compilation (once for
  * global variable arrangement, and the second time for
- * translation to bytecode).
+ * translation to byte-code).
  * <p>
  * By default a minimal set of extensions are automatically
  * included.  Please refer to the EXTENSION_PREFIX static field
@@ -64,8 +64,8 @@ import org.jawk.util.DestDirClassLoader;
  * <p>
  * <strong>Note:</strong> Compilation requires the installation of
  * <a href="http://jakarta.apache.org/bcel/" target=_TOP>The Apache Byte Code Engineering Library (BCEL)</a>.
- * Please see the AwkCompilerImpl Javadocs or the
- * project webpage for more details.
+ * Please see the AwkCompilerImpl JavaDocs or the
+ * project web page for more details.
  *
  * @see org.jawk.backend.AVM
  * @see org.jawk.backend.AwkCompilerImpl
@@ -238,7 +238,7 @@ public class Awk {
 	 * @param is The input stream to use as stdin.
 	 * @param os The output stream to use as stdout.
 	 * @param es The output stream to use as stderr.
-	 * @throws Exception enables exceptions to propogate to the callee.
+	 * @throws Exception enables exceptions to propagate to the callee.
 	 */
 	public Awk(String args[], InputStream is, PrintStream os, PrintStream es)
 			throws Exception {

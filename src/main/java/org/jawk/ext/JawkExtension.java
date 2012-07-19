@@ -27,7 +27,7 @@ import org.jawk.jrt.VariableManager;
  * <strong>Note:</strong> By disabling Jawk's default behavior of
  * consuming input from stdin, it can cause your script to loop
  * through all of the action rule conditions repeatedly, consuming
- * CPU without bounds.  To guard against this, the extesion should
+ * CPU without bounds.  To guard against this, the extension should
  * provide some sort of poll or block call to avoid
  * out-of-control CPU resource consumption.
  * </blockquote>

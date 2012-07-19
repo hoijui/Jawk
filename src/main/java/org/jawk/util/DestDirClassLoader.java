@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * Load classes from a particular directory, disregarding the
- * environmental classpath setting.
+ * environmental class-path setting.
  * This is useful when a directory is specified for class files,
  * and it would not make sense to deviate from that directory.
  * <p>
@@ -21,6 +21,7 @@ public final class DestDirClassLoader extends ClassLoader {
 		this.dirname = dirname;
 	}
 
+	@Override
 	protected Class<?> findClass(String name)
 			throws ClassNotFoundException {
 		byte[] b = loadClassData(name);

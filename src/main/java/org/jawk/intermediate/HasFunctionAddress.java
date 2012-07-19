@@ -11,7 +11,7 @@ package org.jawk.intermediate;
  * function f(x) { print x*x }
  * </pre>
  * </blockquote>
- * f() is refered to prior to its definition.  Therefore,
+ * f() is referred to prior to its definition.  Therefore,
  * the getFunctionAddress() call within the BEGIN block
  * will not return a meaningful address.  However, anytime
  * after f(x) is defined, getFunctionAddress() will return

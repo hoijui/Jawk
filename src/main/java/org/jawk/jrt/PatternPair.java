@@ -48,6 +48,7 @@ public class PatternPair {
 		return within;
 	}
 
+	@Override
 	public String toString() {
 		return p1 + "," + p2;
 	}

@@ -16,7 +16,7 @@ public class SingleCharacterTokenizer implements Enumeration<Object> {
 	 * Construct a RegexTokenizer.
 	 *
 	 * @param input The input string to tokenize.
-	 * @param split_char The character which deliniates tokens
+	 * @param split_char The character which delineates tokens
 	 *   within the input string.
 	 */
 	public SingleCharacterTokenizer(String input, int split_char) {

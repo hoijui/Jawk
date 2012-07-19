@@ -48,7 +48,7 @@ import org.jawk.util.MyStack;
  * <p>
  * The interpreter runs completely independent of the frontend/intermediate step.
  * In fact, an intermediate file produced by Jawk is sufficient to
- * execute on this interpreter.  The binding datastructure is
+ * execute on this interpreter.  The binding data-structure is
  * the AwkParameters, which can contain options pertinent to
  * the interpreter.  For example, the interpreter must know about
  * the -v command line arguments, as well as the file/variable list
@@ -58,7 +58,7 @@ import org.jawk.util.MyStack;
  * <p>
  * Semantic analysis has occurred prior to execution of the interpreter.
  * Therefore, the interpreter throws AwkRuntimeExceptions upon most
- * errors/conditions.  It can also throw a java.lang.Error if an
+ * errors/conditions.  It can also throw a <code>java.lang.Error</code> if an
  * interpreter error is encountered.
  */
 public class AVM implements AwkInterpreter, VariableManager {
@@ -160,7 +160,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 
 	/**
 	 * Maps global variable names to their global array offsets.
-	 * It is useful when passing variable assignments from the filelist
+	 * It is useful when passing variable assignments from the file-list
 	 * portion of the command-line arguments.
 	 */
 	private Map<String,Integer> global_variable_offsets;
@@ -179,6 +179,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 *
 	 * @return The return code (the value passed into the exit call).
 	 */
+	@Override
 	public int interpret(AwkTuples tuples) {
 
 		Map<String, Pattern> regexps = new HashMap<String, Pattern>();
@@ -1727,7 +1728,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						if (count == 1) {
 							s = JRT.toAwkString(pop(), convfmt);
 						} else {
-							StringBuffer sb = new StringBuffer();
+							StringBuilder sb = new StringBuilder();
 							sb.append(JRT.toAwkString(pop(), convfmt));
 							String subsep = JRT.toAwkString(runtime_stack.getVariable(subsep_offset, true), convfmt);
 							for (int i = 1; i < count; i++) {
@@ -1983,7 +1984,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		jrt.jrtCloseAll();
 	}
 
-	private final void avmDump(AssocArray[] aa_array) {
+	private void avmDump(AssocArray[] aa_array) {
 		if (aa_array == null) {
 			// dump the runtime stack
 			Object[] globals = runtime_stack.globals;
@@ -2004,7 +2005,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		}
 	}
 
-	private final void printTo(PrintStream ps, int num_args) {
+	private void printTo(PrintStream ps, int num_args) {
 		// print items from the top of the stack
 		// # of items
 		if (num_args == 0) {
@@ -2031,7 +2032,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		}
 	}
 
-	private final void printfTo(PrintStream ps, int num_args) {
+	private void printfTo(PrintStream ps, int num_args) {
 		assert num_args > 0;
 		ps.print(sprintfFunction(num_args));
 		// for now, since we are not using Process.waitFor()
@@ -2043,7 +2044,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	/**
 	 * sprintf() functionality
 	 */
-	private final String sprintfFunction(int num_args) {
+	private String sprintfFunction(int num_args) {
 		assert num_args > 0;
 		// all but the format argument
 		Object[] arg_array = new Object[num_args - 1];
@@ -2066,7 +2067,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	/**
 	 * sub() functionality
 	 */
-	private final String replaceFirst(String orig, String ere, String repl) {
+	private String replaceFirst(String orig, String ere, String repl) {
 		replace_first_sb.setLength(0);
 		push(JRT.replaceFirst(orig, repl, ere, replace_first_sb, getCONVFMT().toString()));
 		return replace_first_sb.toString();
@@ -2077,7 +2078,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	/**
 	 * gsub() functionality
 	 */
-	private final String replaceAll(String orig, String ere, String repl) {
+	private String replaceAll(String orig, String ere, String repl) {
 		replace_all_sb.setLength(0);
 		push(JRT.replaceAll(orig, repl, ere, replace_all_sb, getCONVFMT().toString()));
 		return replace_all_sb.toString();
@@ -2145,6 +2146,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	/**
 	 * @return The string value of the record separator.
 	 */
+	@Override
 	public final Object getRS() {
 		assert rs_offset != NULL_OFFSET;
 		Object rs_obj = runtime_stack.getVariable(rs_offset, true);	// true = global
@@ -2154,6 +2156,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	/**
 	 * @return The string value of the output field separator.
 	 */
+	@Override
 	public final Object getOFS() {
 		assert ofs_offset != NULL_OFFSET;
 		Object ofs_obj = runtime_stack.getVariable(ofs_offset, true);	// true = global
@@ -2163,6 +2166,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	/**
 	 * @return The string value of the SUBSEP variable.
 	 */
+	@Override
 	public final Object getSUBSEP() {
 		assert subsep_offset != NULL_OFFSET;
 		Object subsep_obj = runtime_stack.getVariable(subsep_offset, true);	// true = global
@@ -2176,7 +2180,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 *
 	 * @param name_value The variable assignment in <i>name=value</i> form.
 	 */
-	private final void setFilelistVariable(String name_value)
+	private void setFilelistVariable(String name_value)
 			throws IllegalArgumentException {
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
@@ -2216,6 +2220,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		// otherwise, do nothing
 	}
 
+	@Override
 	public final void assignVariable(String name, Object obj) {
 		// make sure we're not receiving funcname=value assignments
 		if (function_names.contains(name)) {
@@ -2315,43 +2320,51 @@ public class AVM implements AwkInterpreter, VariableManager {
 		return retval;
 	} // private boolean avmConsumeInput(boolean for_getline) throws IOException
 
-	// to satisfy the VariableManager interface
+	@Override
 	public Object getFS() {
 		assert fs_offset != NULL_OFFSET;
 		Object fs_string = runtime_stack.getVariable(fs_offset, true);	// true = global
 		return fs_string;
 	}
 
+	@Override
 	public Object getCONVFMT() {
 		assert convfmt_offset != NULL_OFFSET : "convfmt_offset not defined";
 		Object convfmt_string = runtime_stack.getVariable(convfmt_offset, true);	// true = global
 		return convfmt_string;
 	}
 
+	@Override
 	public void resetFNR() {
 		runtime_stack.setVariable(fnr_offset, ZERO, true);
 	}
 
+	@Override
 	public void incFNR() {
 		inc(fnr_offset, true);
 	}
 
+	@Override
 	public void incNR() {
 		inc(nr_offset, true);
 	}
 
+	@Override
 	public void setNF(Integer I) {
 		runtime_stack.setVariable(nf_offset, I, true);
 	}
 
+	@Override
 	public void setFILENAME(String filename) {
 		runtime_stack.setVariable(filename_offset, filename, true);
 	}
 
+	@Override
 	public Object getARGV() {
 		return runtime_stack.getVariable(argv_offset, true);
 	}
 
+	@Override
 	public Object getARGC() {
 		return runtime_stack.getVariable(argc_offset, true);
 	}

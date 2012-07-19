@@ -97,6 +97,7 @@ public abstract class BlockObject {
 	 * Ensure non-evaluation of a BlockObject by throwing an AWK Runtime
 	 * exception, in case it leaks into AWK evaluation space.
 	 */
+	@Override
 	public final String toString() {
 		throw new AwkRuntimeException("Extension Violation : Cannot AWK-evaluate a BlockObject.");
 	}

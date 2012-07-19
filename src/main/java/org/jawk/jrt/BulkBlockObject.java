@@ -55,7 +55,7 @@ public final class BulkBlockObject extends BlockObject {
 		this.vm = vm;
 	}
 
-	public final boolean containsHandle(String handle) {
+	public boolean containsHandle(String handle) {
 		return handles.contains(handle);
 	}
 
@@ -72,7 +72,8 @@ public final class BulkBlockObject extends BlockObject {
 	 * @return The client string containing the handle of the
 	 * non-blocking object.
 	 */
-	public final String getNotifierTag() {
+	@Override
+	public String getNotifierTag() {
 		assert prefix != null;
 		assert vm != null;
 		return prefix
@@ -83,28 +84,29 @@ public final class BulkBlockObject extends BlockObject {
 	private static final String ALL_HANDLES_ARE_BLANK = "ALL_HANDLES_ARE_BLANK";
 	private static final String ALL_HANDLES_ARE_BLOCKED = "ALL_HANDLES_ARE_BLOCKED";
 
-	public final void block()
+	@Override
+	public void block()
 			throws InterruptedException {
 		synchronized (this) {
 
 			String handle = checkForNonblockHandle();
 
-			if (handle == ALL_HANDLES_ARE_BLANK) {
+			if (handle == ALL_HANDLES_ARE_BLANK) { // FIXME
 				this.wait();
 				throw new Error("Should never be notified.");
 			}
 
-			if (handle == ALL_HANDLES_ARE_BLOCKED) {
+			if (handle == ALL_HANDLES_ARE_BLOCKED) { // FIXME
 				this.wait();
 				handle = checkForNonblockHandle();
 			}
-			assert handle != null;
+			assert handle != null; // FIXME
 			assert handle != ALL_HANDLES_ARE_BLOCKED : "handle == ALL_HANDLES_ARE_BLOCKED is an invalid return value ... willBlock() could be of issue";
 			block_result = handle;
 		}
 	}
 
-	private final String checkForNonblockHandle() {
+	private String checkForNonblockHandle() {
 		boolean all_handles_are_blank = true;
 		// cycle through all block_handles
 		// check if any of them has accepted sockets
@@ -138,17 +140,18 @@ public final class BulkBlockObject extends BlockObject {
 	}
 	private static final BlockHandleValidator no_block_handle_validation = new BlockHandleValidator() {
 
+		@Override
 		public final String isBlockHandleValid(String handle) {
 			// always valid
 			return null;
 		}
 	};
 
-	public final BlockObject populateHandleSet(Object[] args, VariableManager vm) {
+	public BlockObject populateHandleSet(Object[] args, VariableManager vm) {
 		return populateHandleSet(args, vm, no_block_handle_validation);
 	}
 
-	public final BlockObject populateHandleSet(Object[] args, VariableManager vm, BlockHandleValidator validator) {
+	public BlockObject populateHandleSet(Object[] args, VariableManager vm, BlockHandleValidator validator) {
 		BlockObject blocker = this;
 
 		if (args.length == 0) {

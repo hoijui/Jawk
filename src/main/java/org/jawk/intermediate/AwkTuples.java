@@ -28,18 +28,22 @@ public class AwkTuples implements Serializable {
 			this.lbl = lbl;
 		}
 
+		@Override
 		public String label() {
 			return lbl;
 		}
 
+		@Override
 		public String toString() {
 			return label();
 		}
 
+		@Override
 		public void assignIndex(int idx) {
 			this.idx = idx;
 		}
 
+		@Override
 		public int index() {
 			assert idx >= 0 : toString();
 			return idx;
@@ -50,16 +54,19 @@ public class AwkTuples implements Serializable {
 		// index within the queue
 
 		private int idx = 0;
-		private Tuple tuple = queue.size() == 0 ? null : queue.get(idx); // current tuple
+		private Tuple tuple = queue.isEmpty() ? null : queue.get(idx); // current tuple
 
+		@Override
 		public int index() {
 			return idx;
 		}
 
+		@Override
 		public boolean isEOF() {
 			return idx >= queue.size();
 		}
 
+		@Override
 		public void next() {
 			assert tuple != null;
 			++idx;
@@ -67,18 +74,22 @@ public class AwkTuples implements Serializable {
 			assert queue.size() == idx || queue.get(idx) == tuple;
 		}
 
+		@Override
 		public void jump(Address address) {
 			tuple = queue.get(idx = address.index());
 		}
 
+		@Override
 		public String toString() {
 			return "[" + idx + "]-->" + tuple.toString();
 		}
 
+		@Override
 		public int opcode() {
 			return tuple.opcode;
 		}
 
+		@Override
 		public int intArg(int arg_idx) {
 			Class c = tuple.types[arg_idx];
 			if (c == Integer.class) {
@@ -87,6 +98,7 @@ public class AwkTuples implements Serializable {
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
 		}
 
+		@Override
 		public boolean boolArg(int arg_idx) {
 			Class c = tuple.types[arg_idx];
 			if (c == Boolean.class) {
@@ -95,6 +107,7 @@ public class AwkTuples implements Serializable {
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
 		}
 
+		@Override
 		public Object arg(int arg_idx) {
 			Class c = tuple.types[arg_idx];
 			if (c == Integer.class) {
@@ -113,6 +126,7 @@ public class AwkTuples implements Serializable {
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
 		}
 
+		@Override
 		public Address addressArg() {
 			assert tuple.address != null || tuple.has_func_addr != null : "tuple.address = " + tuple.address + ", tuple.has_func_addr = " + tuple.has_func_addr;
 			if (tuple.address != null) {
@@ -122,21 +136,25 @@ public class AwkTuples implements Serializable {
 			}
 		}
 
+		@Override
 		public Class classArg() {
 			//Tuple tuple = queue.get(idx);
 			assert tuple.cls != null;
 			return tuple.cls;
 		}
 
+		@Override
 		public int lineNumber() {
 			assert tuple.lineno != -1 : "The line number should have been set by queue.add(), but was not.";
 			return tuple.lineno;
 		}
 
+		@Override
 		public int current() {
 			return idx;
 		}
 
+		@Override
 		public void jump(int idx) {
 			tuple = queue.get(this.idx = idx);
 		}
@@ -253,8 +271,9 @@ public class AwkTuples implements Serializable {
 			this.lineno = lineno;
 		}
 
+		@Override
 		public String toString() {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append(toOpcodeString(opcode));
 			int idx = 0;
 			while (idx < types.length && types[idx] != null) {
@@ -477,7 +496,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _LENGTH_ = 271;	// 0 -> x or x1 -> x2
 	/**
-	 * Pop and concatinate two strings from the top-of-stack; push the result onto
+	 * Pop and concatenate two strings from the top-of-stack; push the result onto
 	 * the stack.
 	 * <p>
 	 * Stack before: x y ...<br>
@@ -589,7 +608,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _DIV_EQ_ = 281;	// x -> x
 	/**
-	 * Takes the modulues of the contents of the variable by an adjustment value;
+	 * Takes the modules of the contents of the variable by an adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
 	 * Argument 1: offset of the particular variable into the variable manager<br>
@@ -801,7 +820,8 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _COS_ = 303;	// x2, x1 -> x1, x2
 	/**
-	 * Built-in function that pops the first two items off the stack, calls the java.lang.Math.atan2 method
+	 * Built-in function that pops the first two items off the stack,
+	 * calls the java.lang.Math.atan2 method
 	 * with these as arguments, and places the result onto the stack.
 	 * <p>
 	 * Stack before: x1 x2 ...<br>
@@ -832,7 +852,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _INDEX_ = 306;	// x1, x2 -> x
 	/**
-	 * Built-in function that substitutes an occurance (or all occurances)
+	 * Built-in function that substitutes an occurrence (or all occurrences)
 	 * of a string in $0 and replaces it with another.
 	 * <p>
 	 * Argument: true if global sub, false otherwise.
@@ -842,7 +862,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _SUB_FOR_DOLLAR_0_ = 307;	// x -> 0
 	/**
-	 * Built-in function that substitutes an occurance (or all occurances)
+	 * Built-in function that substitutes an occurrence (or all occurrences)
 	 * of a string in a field reference and replaces it with another.
 	 * <p>
 	 * Argument: true if global sub, false otherwise.
@@ -852,7 +872,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _SUB_FOR_DOLLAR_REFERENCE_ = 308;	// x -> 0
 	/**
-	 * Built-in function that substitutes an occurance (or all occurances)
+	 * Built-in function that substitutes an occurrence (or all occurrences)
 	 * of a string in a particular variable and replaces it with another.
 	 * <p>
 	 * Argument 1: variable offset in variable manager<br>
@@ -864,7 +884,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _SUB_FOR_VARIABLE_ = 309;	// x -> 0
 	/**
-	 * Built-in function that substitutes an occurance (or all occurances)
+	 * Built-in function that substitutes an occurrence (or all occurrences)
 	 * of a string in a particular array cell and replaces it with another.
 	 * <p>
 	 * Argument 1: array map offset in variable manager<br>
@@ -904,12 +924,12 @@ public class AwkTuples implements Serializable {
 	 * <p>
 	 * If # of arguments is 2:
 	 * <blockquote>
-	 * Stack before: string startpos ...<br>
+	 * Stack before: string start-pos ...<br>
 	 * Stack after: substring ...
 	 * </blockquote>
 	 * else
 	 * <blockquote>
-	 * Stack before: string startpos endpos ...<br>
+	 * Stack before: string start-pos end-pos ...<br>
 	 * Stack after: substring ...
 	 * </blockquote>
 	 */
@@ -1073,7 +1093,7 @@ public class AwkTuples implements Serializable {
 	 */
 	public static final int _NOT_ = 330;	// x -> !x
 	/**
-	 * Evalutes the numerical NEGATION of the top stack element;
+	 * Evaluates the numerical NEGATION of the top stack element;
 	 * pushes the result onto the stack.
 	 * <p>
 	 * Stack before: x ...<br>
@@ -1128,7 +1148,7 @@ public class AwkTuples implements Serializable {
 	 * The Set is tagged with a KeyList interface.
 	 * <p>
 	 * Stack before: associative-array ...<br>
-	 * Stack after: keylist-set ...
+	 * Stack after: key-list-set ...
 	 */
 	public static final int _KEYLIST_ = 339;	// 0 -> {keylist}
 	/**
@@ -1137,14 +1157,14 @@ public class AwkTuples implements Serializable {
 	 * <p>
 	 * Argument: jump-address-if-empty
 	 * <p>
-	 * Stack before: keylist ...<br>
+	 * Stack before: key-list ...<br>
 	 * Stack after: ...
 	 */
 	public static final int _IS_EMPTY_KEYLIST_ = 340;	// {keylist} -> 0
 	/**
 	 * Removes an item from the KeyList (set) and pushes it onto the operand stack.
 	 * <p>
-	 * Stack before: keylist ...<br>
+	 * Stack before: key-list ...<br>
 	 * Stack after: 1st-item ...
 	 */
 	public static final int _GET_FIRST_AND_REMOVE_FROM_KEYLIST_ = 341;	// {keylist} -> x
@@ -1387,11 +1407,12 @@ public class AwkTuples implements Serializable {
 	public static final int _DELETE_ARRAY_ = 384;	// 0 -> 0
 
 	/**
-	 * add() subclassed to populate the line number for each tuple,
+	 * Override add() to populate the line number for each tuple,
 	 * rather than polluting all the constructors with this assignment.
 	 */
 	private java.util.List<Tuple> queue = new ArrayList<Tuple>(100) {
 
+		@Override
 		public boolean add(Tuple t) {
 			t.setLineNumber(lineno_stack.peek());
 			return super.add(t);
@@ -1978,7 +1999,7 @@ public class AwkTuples implements Serializable {
 	 * </ul>
 	 */
 	public void postProcess() {
-		assert queue.size() == 0 || queue.get(0).next == null : "postProcess() already executed";
+		assert queue.isEmpty() || queue.get(0).next == null : "postProcess() already executed";
 		// allocate nexts
 		for (int i = 0; i < queue.size() - 1; i++) {
 			queue.get(i).next = queue.get(i + 1);
@@ -2111,6 +2132,7 @@ public class AwkTuples implements Serializable {
 			oos.writeInt(INSTANCE_VERSION);
 		}
 
+		@Override
 		public String toString() {
 			return "intermediate file format version = " + INSTANCE_VERSION;
 		}

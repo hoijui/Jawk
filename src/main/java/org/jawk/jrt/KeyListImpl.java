@@ -23,10 +23,12 @@ public class KeyListImpl implements KeyList {
 		list = new ArrayList<Object>(set);
 	}
 
+	@Override
 	public final Object getFirstAndRemove() {
 		return list.remove(0);
 	}
 
+	@Override
 	public int size() {
 		return list.size();
 	}

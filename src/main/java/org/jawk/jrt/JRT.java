@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * The JRT services interpreted and compiled Jawk scripts, mainly
  * for IO and other non-CPU bound tasks.  The goal is to house
  * service functions into a Java-compiled class rather than
- * to hand-craft service functions in bytecode, or cut-paste
+ * to hand-craft service functions in byte-code, or cut-paste
  * compiled JVM code into the compiled AWK script.  Also,
  * since these functions are non-CPU bound, the need for
  * inlining is reduced.
@@ -101,12 +101,12 @@ public class JRT {
 	 * environment variables to an associative array
 	 * (in this case, to ENVIRON).
 	 *
-	 * @param aa The associatve array to populate with
+	 * @param aa The associative array to populate with
 	 * 	environment variables.  The module asserts that
 	 * 	the associative array is empty prior to population.
 	 */
-	public static final void assignEnvironmentVariables(AssocArray aa) {
-		assert aa.keySet().size() == 0;
+	public static void assignEnvironmentVariables(AssocArray aa) {
+		assert aa.keySet().isEmpty();
 		Map<String, String> env = System.getenv();
 		for (String key : env.keySet()) {
 			aa.put(key, env.get(key));
@@ -122,7 +122,7 @@ public class JRT {
 	 *
 	 * @return A String representation of o.
 	 */
-	public static final String toAwkString(Object o, String convfmt) {
+	public static String toAwkString(Object o, String convfmt) {
 		StringBuffer convfmt_sb = new StringBuffer();
 		//private String convfmt = "%.2g";
 		Formatter convfmt_formatter = new Formatter(convfmt_sb);
@@ -160,7 +160,7 @@ public class JRT {
 	 *
 	 * @return A String representation of o.
 	 */
-	public static final String toAwkStringForOutput(Object o, String ofmt) {
+	public static String toAwkStringForOutput(Object o, String ofmt) {
 		if (o instanceof Number) {
 			double d = ((Number) o).doubleValue();
 			if (d == (int) d) {
@@ -189,7 +189,7 @@ public class JRT {
 	 *
 	 * @return A String representation of o.
 	 */
-	public static final double toDouble(Object o) {
+	public static double toDouble(Object o) {
 		if (o instanceof Number) {
 			return ((Number) o).doubleValue();
 		} else {
@@ -214,7 +214,7 @@ public class JRT {
 	 * 	<li>&gt; 0 - Return true if o1 &gt; o2.
 	 * 	</ul>
 	 */
-	public static final boolean compare2(Object o1, Object o2, int mode) {
+	public static boolean compare2(Object o1, Object o2, int mode) {
 
 		// check for hybrid analysis
 
@@ -371,7 +371,7 @@ public class JRT {
 	 *
 	 * @return The number of parts resulting from this split operation.
 	 */
-	public static final int split(Object array, Object string, String convfmt) {
+	public static int split(Object array, Object string, String convfmt) {
 		return splitWorker(new StringTokenizer(toAwkString(string, convfmt)), (AssocArray) array);
 	}
 	/**
@@ -388,7 +388,7 @@ public class JRT {
 	 *
 	 * @return The number of parts resulting from this split operation.
 	 */
-	public static final int split(Object fs, Object array, Object string, String convfmt) {
+	public static int split(Object fs, Object array, Object string, String convfmt) {
 		String fs_string = toAwkString(fs, convfmt);
 		if (fs_string.equals(" ")) {
 			return splitWorker(new StringTokenizer(toAwkString(string, convfmt)), (AssocArray) array);
@@ -401,7 +401,7 @@ public class JRT {
 		}
 	}
 
-	private static final int splitWorker(Enumeration<Object> e, AssocArray aa) {
+	private static int splitWorker(Enumeration<Object> e, AssocArray aa) {
 		int cnt = 0;
 		aa.clear();
 		while (e.hasMoreElements()) {
@@ -458,7 +458,7 @@ public class JRT {
 				if (arglist_aa.isIn(i)) {
 					Object namevalue_or_filename_object = arglist_aa.get(i);
 					String namevalue_or_filename = toAwkString(namevalue_or_filename_object, vm.getCONVFMT().toString());
-					if (namevalue_or_filename.indexOf("=") == -1) {
+					if (namevalue_or_filename.indexOf('=') == -1) {
 						// filename!
 						has_filenames = true;
 						break;
@@ -569,7 +569,7 @@ public class JRT {
 		}
 	} // public boolean jrtConsumeInput(boolean for_getline) throws IOException
 
-	private final void setFilelistVariable(String name_value)
+	private void setFilelistVariable(String name_value)
 			throws IllegalArgumentException {
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
@@ -619,11 +619,11 @@ public class JRT {
 		recalculateNF();
 	}
 
-	private final void recalculateNF() {
+	private void recalculateNF() {
 		vm.setNF(Integer.valueOf(input_fields.size() - 1));
 	}
 
-	private static final int toFieldNumber(Object o) {
+	private static int toFieldNumber(Object o) {
 		int fieldnum;
 		if (o instanceof Number) {
 			fieldnum = ((Number) o).intValue();
@@ -640,7 +640,7 @@ public class JRT {
 	/**
 	 * Retrieve the contents of a particular input field.
 	 *
-	 * @param fieldnum_obj Object refering to the field number.
+	 * @param fieldnum_obj Object referring to the field number.
 	 *
 	 * @return Contents of the field.
 	 */
@@ -662,7 +662,7 @@ public class JRT {
 	 * Stores value_obj into an input field.
 	 *
 	 * @param value_obj The RHS of the assignment.
-	 * @param field_num Object refering to the field number.
+	 * @param field_num Object referring to the field number.
 	 *
 	 * @return A string representation of value_obj.
 	 */
@@ -689,8 +689,8 @@ public class JRT {
 		return value;
 	}
 
-	private final void rebuildDollarZeroFromFields() {
-		StringBuffer new_dollar_zero_sb = new StringBuffer();
+	private void rebuildDollarZeroFromFields() {
+		StringBuilder new_dollar_zero_sb = new StringBuilder();
 		String ofs = vm.getOFS().toString();
 		for (int i = 1; i < input_fields.size(); i++) {
 			if (i > 1) {
@@ -1186,7 +1186,7 @@ public class JRT {
 		}
 	}
 
-	public static final int timeSeed() {
+	public static int timeSeed() {
 		long l = (new java.util.Date()).getTime();
 		long l2 = (l % (1000 * 60 * 60 * 24));
 		int seed = (int) l2;

@@ -23,7 +23,7 @@ public class BlockManager {
 	 * <li>Wait for notification from any of the BlockThreads.
 	 * <li>Interrupt remaining block threads.
 	 * <li>Wait for each BlockThread to die.
-	 * <li>Return the block object notifier which satisified their block condition.
+	 * <li>Return the block object notifier which satisfied their block condition.
 	 * </ul>
 	 * <p>
 	 * And, the BlockThread algorithm is as follows:
@@ -84,6 +84,7 @@ public class BlockManager {
 		assert notifier != null;
 		return notifier;
 	}
+
 	private Object NOTIFIER_LOCK = "NOTIFIER_LOCK";
 	private String notifier = null;
 
@@ -96,6 +97,7 @@ public class BlockManager {
 			this.bo = bo;
 		}
 
+		@Override
 		public final void run() {
 			try {
 				bo.block();

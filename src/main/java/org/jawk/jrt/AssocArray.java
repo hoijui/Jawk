@@ -54,7 +54,7 @@ public class AssocArray implements Comparator<Object> {
 	 *   or MT_TREE.
 	 */
 	public void useMapType(int map_type) {
-		assert map.size() == 0;
+		assert map.isEmpty();
 		switch (map_type) {
 			case MT_HASH:
 				map = new HashMap<Object, Object>();
@@ -159,6 +159,7 @@ public class AssocArray implements Comparator<Object> {
 		return map.remove(key);
 	}
 
+	@Override
 	public String toString() {
 		throw new AwkRuntimeException("Cannot evaluate an unindexed array.");
 	}
@@ -167,8 +168,9 @@ public class AssocArray implements Comparator<Object> {
 	 * Comparator implementation used by the TreeMap
 	 * when keys are to be maintained in sorted order.
 	 */
+	@Override
 	public int compare(Object o1, Object o2) {
-		Object equiv_1, equiv_2;
+
 		if (o1 instanceof String || o2 instanceof String) {
 			// use string comparison
 			String s1 = o1.toString();

@@ -4,6 +4,7 @@ package org.jawk.jrt;
  * An item that blocks.
  */
 public interface Blockable {
+
 	/**
 	 * Polls whether the item will block or not.
 	 * The blocking mechanism should perform this once.

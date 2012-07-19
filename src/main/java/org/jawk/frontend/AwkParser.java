@@ -194,11 +194,11 @@ public class AwkParser {
 		BUILTIN_FUNC_NAMES.put("toupper", f_idx++);
 	}
 
-	private static final int sp_idx=257;
+	private static final int sp_idx = 257;
 	/**
 	 * Contains a mapping of Jawk special variables to their
 	 * variable token values.
-	 * As of this writing, they correpond exactly to
+	 * As of this writing, they correspond exactly to
 	 * standard AWK variables, no more, no less.
 	 * <p>
 	 * Keys are the variable names themselves, and values are the
@@ -1051,7 +1051,7 @@ public class AwkParser {
 	//   /  \
 	//  /    \
 	// a      b
-	private static final BinaryExpression_AST rearrange(BinaryExpression_AST b1, BinaryExpression_AST b2) {
+	private static BinaryExpression_AST rearrange(BinaryExpression_AST b1, BinaryExpression_AST b2) {
 
 		assert b1.ast2 == b2;
 
@@ -2041,6 +2041,7 @@ public class AwkParser {
 			throw new SemanticException(msg);
 		}
 
+		@Override
 		public String toString() {
 			return getClass().getName().replaceFirst(".*[$.]", "");
 		}
@@ -2051,7 +2052,9 @@ public class AwkParser {
 		protected ScalarExpression_AST(AST a1) { super(a1); }
 		protected ScalarExpression_AST(AST a1, AST a2) { super(a1,a2); }
 		protected ScalarExpression_AST(AST a1, AST a2, AST a3) { super(a1,a2,a3); }
+		@Override
 		public final boolean isArray() { return false; }
+		@Override
 		public final boolean isScalar() { return true; }
 	}
 
@@ -2144,6 +2147,7 @@ public class AwkParser {
 			super(rule, rest);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -2332,6 +2336,7 @@ public class AwkParser {
 			super(opt_expression, opt_rule);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (ast1 == null) // just indicate to execute the rule
@@ -2348,7 +2353,6 @@ public class AwkParser {
 			if (ast2 == null) {
 				if (no_input) {
 					// with -ni, no default blank rule of print $0
-					;
 				} else if (ast1 == null || ! ast1.isBegin() && ! ast1.isEnd()) {
 					// display $0
 					tuples.print(0);
@@ -2364,6 +2368,7 @@ public class AwkParser {
 			return 0;
 		}
 
+		@Override
 		public Address nextAddress() {
 			if (!isRule(this)) {
 				throw new SemanticException("Must call next within an input rule.");
@@ -2381,6 +2386,7 @@ public class AwkParser {
 			super(expr, b1, b2);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -2415,6 +2421,7 @@ public class AwkParser {
 			super(a1, a2, a3);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -2447,22 +2454,23 @@ public class AwkParser {
 		private Address break_address;
 		private Address continue_address;
 
-		// to satisfy the Breakable interface
+		private WhileStatement_AST(AST expr, AST block) {
+			super(expr, block);
+		}
+
+		@Override
 		public Address breakAddress() {
 			assert break_address != null;
 			return break_address;
 		}
 
-		// to satisfy the Continueable interface
+		@Override
 		public Address continueAddress() {
 			assert continue_address != null;
 			return continue_address;
 		}
 
-		private WhileStatement_AST(AST expr, AST block) {
-			super(expr, block);
-		}
-
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -2500,22 +2508,23 @@ public class AwkParser {
 		private Address break_address;
 		private Address continue_address;
 
-		// to satisfy the Breakable interface
+		private DoStatement_AST(AST block, AST expr) {
+			super(block, expr);
+		}
+
+		@Override
 		public Address breakAddress() {
 			assert break_address != null;
 			return break_address;
 		}
 
-		// to satisfy the Continueable interface
+		@Override
 		public Address continueAddress() {
 			assert continue_address != null;
 			return continue_address;
 		}
 
-		private DoStatement_AST(AST block, AST expr) {
-			super(block, expr);
-		}
-
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -2554,22 +2563,23 @@ public class AwkParser {
 		private Address break_address;
 		private Address continue_address;
 
-		// to satisfy the Breakable interface
+		private ForStatement_AST(AST expr1, AST expr2, AST expr3, AST block) {
+			super(expr1, expr2, expr3, block);
+		}
+
+		@Override
 		public Address breakAddress() {
 			assert break_address != null;
 			return break_address;
 		}
 
-		// to satisfy the Continueable interface
+		@Override
 		public Address continueAddress() {
 			assert continue_address != null;
 			return continue_address;
 		}
 
-		private ForStatement_AST(AST expr1, AST expr2, AST expr3, AST block) {
-			super(expr1, expr2, expr3, block);
-		}
-
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -2626,22 +2636,23 @@ public class AwkParser {
 		private Address break_address;
 		private Address continue_address;
 
-		// to satisfy the Breakable interface
+		private ForInStatement_AST(AST key_id_ast, AST array_id_ast, AST block) {
+			super(key_id_ast, array_id_ast, block);
+		}
+
+		@Override
 		public Address breakAddress() {
 			assert break_address != null;
 			return break_address;
 		}
 
-		// to satisfy the Continueable interface
+		@Override
 		public Address continueAddress() {
 			assert continue_address != null;
 			return continue_address;
 		}
 
-		private ForInStatement_AST(AST key_id_ast, AST array_id_ast, AST block) {
-			super(key_id_ast, array_id_ast, block);
-		}
-
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -2712,6 +2723,7 @@ public class AwkParser {
 			super();
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			// nothing to populate!
@@ -2731,6 +2743,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			int expr_count = ast1.populateTuples(tuples);
@@ -2757,10 +2770,12 @@ public class AwkParser {
 			this.text = text;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + op + "/" + text + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast2 != null;
@@ -2846,6 +2861,7 @@ public class AwkParser {
 			super(arg, arr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -2886,10 +2902,12 @@ public class AwkParser {
 			this.text = text;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + op + "/" + text + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -2945,10 +2963,12 @@ public class AwkParser {
 			this.text = text;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + op + "/" + text + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			// exhibit short-circuit behavior
@@ -2991,10 +3011,12 @@ public class AwkParser {
 			this.text = text;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + op + "/" + text + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			int ast1_result = ast1.populateTuples(tuples);
@@ -3021,6 +3043,7 @@ public class AwkParser {
 			super(lhs, rhs);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast2 != null;
@@ -3041,6 +3064,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -3058,6 +3082,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -3075,6 +3100,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -3092,6 +3118,7 @@ public class AwkParser {
 			super(expr_ast, next);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			AST ptr = this;
@@ -3129,6 +3156,7 @@ public class AwkParser {
 		 * Note: this should be reevaluated periodically in case the grammar
 		 * becomes linear again.
 		 */
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			// typical recursive processing of a list
@@ -3143,6 +3171,7 @@ public class AwkParser {
 			return 0;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " <" + ast1 + ">";
 		}
@@ -3161,6 +3190,7 @@ public class AwkParser {
 		private Address return_address;
 		// to satisfy the Returnable interface
 
+		@Override
 		public Address returnAddress() {
 			assert return_address != null;
 			return return_address;
@@ -3177,6 +3207,7 @@ public class AwkParser {
 			return function_address;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -3293,6 +3324,7 @@ public class AwkParser {
 		 * @throws SemanticException upon a failure of
 		 * any of the semantic checks specified above.
 		 */
+		@Override
 		public void semanticAnalysis()
 				throws SemanticException {
 			if (!function_proxy.isDefined()) {
@@ -3314,6 +3346,7 @@ public class AwkParser {
 			}
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (!function_proxy.isDefined()) {
@@ -3362,6 +3395,7 @@ public class AwkParser {
 			this.f_idx = BUILTIN_FUNC_NAMES.get(id);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (f_idx == BUILTIN_FUNC_NAMES.get("sprintf")) {
@@ -3625,6 +3659,7 @@ public class AwkParser {
 			super(expr, rest);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -3662,6 +3697,7 @@ public class AwkParser {
 		 *
 		 * @throws SemanticException upon a semantic error.
 		 */
+		@Override
 		public void semanticAnalysis()
 				throws SemanticException {
 
@@ -3706,10 +3742,12 @@ public class AwkParser {
 		private boolean is_scalar = false;
 		private Set<ID_AST> formal_parameters = new HashSet<ID_AST>();
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + id + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert offset != AVM.NULL_OFFSET : "offset = " + offset + " for " + this;
@@ -3718,10 +3756,12 @@ public class AwkParser {
 			return 1;
 		}
 
+		@Override
 		public final boolean isArray() {
 			return is_array;
 		}
 
+		@Override
 		public final boolean isScalar() {
 			return is_scalar;
 		}
@@ -3741,10 +3781,12 @@ public class AwkParser {
 			super(id_ast, idx_ast);
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + ast1 + " [...])";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -3769,10 +3811,12 @@ public class AwkParser {
 			this.I = I;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + I + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			tuples.push(I.intValue());
@@ -3798,10 +3842,12 @@ public class AwkParser {
 			}
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + D + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			tuples.push(D);
@@ -3823,10 +3869,12 @@ public class AwkParser {
 			this.S = str;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + S + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			tuples.push(S);
@@ -3844,10 +3892,12 @@ public class AwkParser {
 			this.regexp_str = regexp_str;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + regexp_str + ")";
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			tuples.regexp(regexp_str);
@@ -3862,6 +3912,7 @@ public class AwkParser {
 			super(regexp_ast_1, regexp_ast_2);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast2 != null;
@@ -3882,6 +3933,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			int ast1_result = ast1.populateTuples(tuples);
@@ -3898,6 +3950,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			int ast1_result = ast1.populateTuples(tuples);
@@ -3914,6 +3967,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			int ast1_result = ast1.populateTuples(tuples);
@@ -3931,6 +3985,7 @@ public class AwkParser {
 			is_begin = true;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			tuples.push(1);
@@ -3946,6 +4001,7 @@ public class AwkParser {
 			is_end = true;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			tuples.push(1);
@@ -3960,6 +4016,7 @@ public class AwkParser {
 			super(symbol_ast);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -4009,6 +4066,7 @@ public class AwkParser {
 			super(symbol_ast);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -4056,6 +4114,7 @@ public class AwkParser {
 			super(symbol_ast);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -4092,6 +4151,7 @@ public class AwkParser {
 			super(symbol_ast);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -4131,6 +4191,7 @@ public class AwkParser {
 			this.output_token = output_token;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -4175,6 +4236,7 @@ public class AwkParser {
 			this.extension_keyword = extension_keyword;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			int param_count;
@@ -4245,6 +4307,7 @@ public class AwkParser {
 			return cnt;
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + extension_keyword + ")";
 		}
@@ -4259,6 +4322,7 @@ public class AwkParser {
 			this.output_token = output_token;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 
@@ -4304,6 +4368,7 @@ public class AwkParser {
 			assert pipe_expr == null || in_redirect == null;
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (ast1 != null) {
@@ -4366,6 +4431,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			Returnable returnable = (Returnable) searchFor(Returnable.class);
@@ -4389,6 +4455,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (ast1 != null) {
@@ -4409,6 +4476,7 @@ public class AwkParser {
 			super(symbol_ast);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			assert ast1 != null;
@@ -4443,6 +4511,7 @@ public class AwkParser {
 
 	private class BreakStatement_AST extends AST {
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			Breakable breakable = (Breakable) searchFor(Breakable.class);
@@ -4462,6 +4531,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (ast1 == null) {
@@ -4482,6 +4552,7 @@ public class AwkParser {
 			super(expr);
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			if (ast1 == null) {
@@ -4510,6 +4581,7 @@ public class AwkParser {
 
 	private class NextStatement_AST extends AST {
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			Nextable nextable = (Nextable) searchFor(Nextable.class);
@@ -4529,6 +4601,7 @@ public class AwkParser {
 			super();
 		}
 
+		@Override
 		public int populateTuples(AwkTuples tuples) {
 			pushSourceLineNumber(tuples);
 			Continueable continueable = (Continueable) searchFor(Continueable.class);
@@ -4565,6 +4638,7 @@ public class AwkParser {
 			return function_def_ast != null;
 		}
 
+		@Override
 		public Address getFunctionAddress() {
 			return function_def_ast.getAddress();
 		}
@@ -4577,6 +4651,7 @@ public class AwkParser {
 			return function_def_ast.paramCount();
 		}
 
+		@Override
 		public String toString() {
 			return super.toString() + " (" + id + ")";
 		}

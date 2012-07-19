@@ -68,6 +68,7 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 
 		Thread getline_input_thread = new Thread("getline_input_thread") {
 
+			@Override
 			public final void run() {
 				try {
 					BufferedReader br = new BufferedReader(
@@ -102,10 +103,12 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 		getline_input_thread.start();
 	}
 
+	@Override
 	public String getExtensionName() {
 		return "Stdin Support";
 	}
 
+	@Override
 	public String[] extensionKeywords() {
 		return new String[] {
 					// keyboard stuff
@@ -115,6 +118,7 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 				};
 	}
 
+	@Override
 	public Object invoke(String keyword, Object[] args) {
 		if (false) {
 		} else if (keyword.equals("StdinHasInput")) {
@@ -140,7 +144,7 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 
 	private boolean is_eof = false;
 
-	private final int stdinhasinput() {
+	private int stdinhasinput() {
 		if (is_eof) {
 			// upon eof, always "don't block" !
 			return 1;
@@ -180,10 +184,12 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 	}
 	private BlockObject blocker = new BlockObject() {
 
+		@Override
 		public String getNotifierTag() {
 			return "Stdin";
 		}
 
+		@Override
 		public final void block()
 				throws InterruptedException {
 			synchronized (blocker) {
@@ -194,12 +200,12 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 		}
 	};
 
-	private final BlockObject stdinblock() {
+	private BlockObject stdinblock() {
 		blocker.clearNextBlockObject();
 		return blocker;
 	}
 
-	private final BlockObject stdinblock(BlockObject bo) {
+	private BlockObject stdinblock(BlockObject bo) {
 		assert bo != null;
 		blocker.setNextBlockObject(bo);
 		return blocker;

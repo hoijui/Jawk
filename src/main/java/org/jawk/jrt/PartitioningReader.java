@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * is to consume subsequent input until the match
  * does not occur at the end of the input buffer,
  * or no input is available.  However, this behavior
- * is not desireable in all cases (i.e., interactive
+ * is not desirable in all cases (i.e., interactive
  * input against some sort of ambiguous newline
  * regex).  To enable greedy RS regex consumption,
  * use <code>-Djawk.forceGreedyRS=true</code>.
@@ -103,6 +103,7 @@ public class PartitioningReader extends FilterReader {
 	private StringBuffer remaining = new StringBuffer();
 	private char[] read_buf = new char[4096];
 
+	@Override
 	public int read(char[] b, int start, int len)
 			throws IOException {
 		int ret_val = super.read(b, start, len);

@@ -77,7 +77,7 @@ public class AwkParameters {
 	/**
 	 * Dump usage to stderr; exit with a non-zero error code.
 	 */
-	private final void usage(PrintStream dest, String extension_description) {
+	private void usage(PrintStream dest, String extension_description) {
 		//String cls = Awk.class.getName();
 		String cls = mainclass.getName();
 		dest.println("usage:");
@@ -148,25 +148,28 @@ public class AwkParameters {
 	 * Provide text representation of the parameters to stdout.
 	 */
 	void dump() {
-		System.out.println("Awk Parameters");
-		System.out.println("--------------");
-		System.out.println("initial_variables = " + initial_variables);
-		System.out.println("name_value_filename_list = " + name_value_filename_list);
-		System.out.println("script_filename = " + script_filename);
-		System.out.println("script_reader = " + script_reader);
-		System.out.println("should_compile = " + should_compile);
-		System.out.println("should_compile_and_run = " + should_compile_and_run);
-		System.out.println("initial_fs_value = " + initial_fs_value);
-		System.out.println("dump_syntax_tree = " + dump_syntax_tree);
-		System.out.println("dump_intermediate_code = " + dump_intermediate_code);
-		System.out.println("additional_functions = " + additional_functions);
-		System.out.println("additional_type_functions = " + additional_type_functions);
-		System.out.println("sorted_array_keys = " + sorted_array_keys);
-		System.out.println("trap_illegal_format_exceptions = " + trap_illegal_format_exceptions);
-		System.out.println("write_to_intermediate_file = " + write_to_intermediate_file);
-		System.out.println("output_filename = " + output_filename);
-		System.out.println("dest_directory = " + dest_directory);
-		System.out.println();
+
+		PrintStream out = System.out;
+
+		out.println("Awk Parameters");
+		out.println("--------------");
+		out.println("initial_variables = " + initial_variables);
+		out.println("name_value_filename_list = " + name_value_filename_list);
+		out.println("script_filename = " + script_filename);
+		out.println("script_reader = " + script_reader);
+		out.println("should_compile = " + should_compile);
+		out.println("should_compile_and_run = " + should_compile_and_run);
+		out.println("initial_fs_value = " + initial_fs_value);
+		out.println("dump_syntax_tree = " + dump_syntax_tree);
+		out.println("dump_intermediate_code = " + dump_intermediate_code);
+		out.println("additional_functions = " + additional_functions);
+		out.println("additional_type_functions = " + additional_type_functions);
+		out.println("sorted_array_keys = " + sorted_array_keys);
+		out.println("trap_illegal_format_exceptions = " + trap_illegal_format_exceptions);
+		out.println("write_to_intermediate_file = " + write_to_intermediate_file);
+		out.println("output_filename = " + output_filename);
+		out.println("dest_directory = " + dest_directory);
+		out.println();
 	}
 
 	/**
@@ -227,7 +230,7 @@ public class AwkParameters {
 	 */
 	public boolean sorted_array_keys = false;
 	/**
-	 * Whether to trap illegalformatexceptions for [s]printf; true by default.
+	 * Whether to trap IllegalFormatExceptions for [s]printf; true by default.
 	 */
 	public boolean trap_illegal_format_exceptions = true;
 
