@@ -800,21 +800,29 @@ public class JRT {
 		}
 	}
 
+	private static Process spawnProcess(String cmd) throws IOException {
+
+		Process p;
+
+		if (IS_WINDOWS) {
+			// spawn the process!
+			ProcessBuilder pb = new ProcessBuilder(("cmd.exe /c " + cmd).split("[ \t]+"));
+			p = pb.start();
+		} else {
+			// spawn the process!
+			ProcessBuilder pb = new ProcessBuilder(cmd.split("[ \t]+"));
+			p = pb.start();
+		}
+
+		return p;
+	}
+
 	public boolean jrtConsumeCommandInput(String cmd)
 			throws IOException {
 		PartitioningReader pr = command_readers.get(cmd);
 		if (pr == null) {
 			try {
-				Process p;
-				if (IS_WINDOWS) {
-					// spawn the process!
-					ProcessBuilder pb = new ProcessBuilder(("cmd.exe /c " + cmd).split("[ \t]+"));
-					p = pb.start();
-				} else {
-					// spawn the process!
-					ProcessBuilder pb = new ProcessBuilder(cmd.split("[ \t]+"));
-					p = pb.start();
-				}
+				Process p = spawnProcess(cmd);
 				// no input to this process!
 				p.getOutputStream().close();
 				new DataPump(cmd, p.getErrorStream(), System.err);
@@ -858,15 +866,7 @@ public class JRT {
 		if (ps == null) {
 			Process p;
 			try {
-				if (IS_WINDOWS) {
-					// spawn the process!
-					ProcessBuilder pb = new ProcessBuilder(("cmd.exe /c " + cmd).split("[ \t]+"));
-					p = pb.start();
-				} else {
-					// spawn the process!
-					ProcessBuilder pb = new ProcessBuilder(cmd.split("[ \t]+"));
-					p = pb.start();
-				}
+				p = spawnProcess(cmd);
 				new DataPump(cmd, p.getErrorStream(), System.err);
 				new DataPump(cmd, p.getInputStream(), System.out);
 			} catch (IOException ioe) {
@@ -1015,15 +1015,7 @@ public class JRT {
 	 */
 	public static Integer jrtSystem(String cmd) {
 		try {
-			// spawn the process!
-			Process p;
-			if (IS_WINDOWS) {
-				ProcessBuilder pb = new ProcessBuilder(("cmd.exe /c " + cmd).split("[ \t]+"));
-				p = pb.start();
-			} else {
-				ProcessBuilder pb = new ProcessBuilder(cmd.split("[ \t]+"));
-				p = pb.start();
-			}
+			Process p = spawnProcess(cmd);
 			// no input to this process!
 			p.getOutputStream().close();
 			new DataPump(cmd, p.getErrorStream(), System.err);

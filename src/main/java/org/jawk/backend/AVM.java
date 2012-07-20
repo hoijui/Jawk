@@ -171,6 +171,63 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private Map<String,Boolean> global_variable_aarrays;
 	private Set<String> function_names;
 
+	private static int parseIntField(Object obj, PositionForInterpretation position) {
+
+		int fieldVal;
+
+		if (obj instanceof Number) {
+			fieldVal = ((Number) obj).intValue();
+		} else {
+			try {
+				fieldVal = (int) Double.parseDouble(obj.toString());
+			} catch (NumberFormatException nfe) {
+				throw new AwkRuntimeException(position.lineNumber(), "Field $(" + obj.toString() + ") is incorrect.");
+			}
+		}
+
+		return fieldVal;
+	}
+
+	private void setNumOnJRT(int fieldNum, double num) {
+
+		String numString;
+		if (num == (int) num) {
+			numString = Integer.toString((int) num);
+		} else {
+			numString = Double.toString(num);
+		}
+
+		// same code as _ASSIGN_AS_INPUT_FIELD_
+		if (fieldNum == 0) {
+			jrt.input_line = numString.toString();
+			jrt.jrtParseFields();
+		} else {
+			jrt.jrtSetInputField(numString, fieldNum);
+		}
+	}
+
+	private String execSubOrGSub(PositionForInterpretation position, int gsubArgPos) {
+
+		String newString;
+
+		// arg[gsubArgPos] = is_gsub
+		// stack[0] = ere
+		// stack[1] = replacement string
+		// stack[2] = original field value
+		boolean is_gsub = position.boolArg(gsubArgPos);
+		String convfmt = getCONVFMT().toString();
+		String ere = JRT.toAwkString(pop(), convfmt);
+		String repl = JRT.toAwkString(pop(), convfmt);
+		String orig = JRT.toAwkString(pop(), convfmt);
+		if (is_gsub) {
+			newString = replaceAll(orig, ere, repl);
+		} else {
+			newString = replaceFirst(orig, ere, repl);
+		}
+
+		return newString;
+	}
+
 	/**
 	 * Traverse the tuples, executing their associated opcodes to provide
 	 * an execution platform for Jawk scripts.
@@ -613,17 +670,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = inc value
 
 						// same code as _GET_INPUT_FIELD_:
-						Object o = pop();
-						int fieldnum;
-						if (o instanceof Number) {
-							fieldnum = ((Number) o).intValue();
-						} else {
-							try {
-								fieldnum = (int) Double.parseDouble(o.toString());
-							} catch (NumberFormatException nfe) {
-								throw new AwkRuntimeException(position.lineNumber(), "Field $(" + o.toString() + ") is incorrect.");
-							}
-						}
+						int fieldnum = parseIntField(pop(), position);
 						double incval = JRT.toDouble(pop());
 
 						// except here, get the number, and add the incvalue
@@ -651,20 +698,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 							default:
 								throw new Error("Invalid opcode here: " + opcode);
 						}
-						String num_string;
-						if (num == (int) num) {
-							num_string = Integer.toString((int) num);
-						} else {
-							num_string = Double.toString(num);
-						}
-
-						// same code as _ASSIGN_AS_INPUT_FIELD_
-						if (fieldnum == 0) {
-							jrt.input_line = num_string.toString();
-							jrt.jrtParseFields();
-						} else {
-							jrt.jrtSetInputField(num_string, fieldnum);
-						}
+						setNumOnJRT(fieldnum, num);
 
 						// put the result value on the stack
 						push(num);
@@ -733,35 +767,12 @@ public class AVM implements AwkInterpreter, VariableManager {
 					case AwkTuples._INC_DOLLAR_REF_: {
 						// stack[0] = dollar index (field number)
 						// same code as _GET_INPUT_FIELD_:
-						Object o = pop();
-						int fieldnum;
-						if (o instanceof Number) {
-							fieldnum = ((Number) o).intValue();
-						} else {
-							try {
-								fieldnum = (int) Double.parseDouble(o.toString());
-							} catch (NumberFormatException nfe) {
-								throw new AwkRuntimeException(position.lineNumber(), "Field $(" + o.toString() + ") is incorrect.");
-							}
-						}
+						int fieldnum = parseIntField(pop(), position);
 						// except here, get the number, and add one
 						//push(avmGetInputField(fieldnum));
 						Object num_obj = jrt.jrtGetInputField(fieldnum);
 						double num = JRT.toDouble(num_obj) + 1;
-						String num_string;
-						if (num == (int) num) {
-							num_string = Integer.toString((int) num);
-						} else {
-							num_string = Double.toString(num);
-						}
-
-						// same code as _ASSIGN_AS_INPUT_FIELD_
-						if (fieldnum == 0) {
-							jrt.input_line = num_string.toString();
-							jrt.jrtParseFields();
-						} else {
-							jrt.jrtSetInputField(num_string, fieldnum);
-						}
+						setNumOnJRT(fieldnum, num);
 
 						position.next();
 						break;
@@ -769,35 +780,12 @@ public class AVM implements AwkInterpreter, VariableManager {
 					case AwkTuples._DEC_DOLLAR_REF_: {
 						// stack[0] = dollar index (field number)
 						// same code as _GET_INPUT_FIELD_:
-						Object o = pop();
-						int fieldnum;
-						if (o instanceof Number) {
-							fieldnum = ((Number) o).intValue();
-						} else {
-							try {
-								fieldnum = (int) Double.parseDouble(o.toString());
-							} catch (NumberFormatException nfe) {
-								throw new AwkRuntimeException(position.lineNumber(), "Field $(" + o.toString() + ") is incorrect.");
-							}
-						}
+						int fieldnum = parseIntField(pop(), position);
 						// except here, get the number, and add one
 						//push(avmGetInputField(fieldnum));
 						Object num_obj = jrt.jrtGetInputField(fieldnum);
 						double num = JRT.toDouble(num_obj) - 1;
-						String num_string;
-						if (num == (int) num) {
-							num_string = Integer.toString((int) num);
-						} else {
-							num_string = Double.toString(num);
-						}
-
-						// same code as _ASSIGN_AS_INPUT_FIELD_
-						if (fieldnum == 0) {
-							jrt.input_line = num_string.toString();
-							jrt.jrtParseFields();
-						} else {
-							jrt.jrtSetInputField(num_string, fieldnum);
-						}
+						setNumOnJRT(fieldnum, num);
 
 						position.next();
 						break;
@@ -984,29 +972,15 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = ere
 						// stack[2] = replacement string
 						// stack[3] = original field value
-						boolean is_gsub = position.boolArg(0);
-						// top-of-stack = ere
-						// next = repl
 						// (use $field_num as orig)
-						int field_num = (int) JRT.toDouble(pop());
-						// discovered it already existed on the stack (see below)
-						//String orig = toAwkString(avmGetInputField(field_num));
-						String convfmt = getCONVFMT().toString();
-						String ere = JRT.toAwkString(pop(), convfmt);
-						String repl = JRT.toAwkString(pop(), convfmt);
-						String orig = JRT.toAwkString(pop(), convfmt);
-						String newstring;
-						if (is_gsub) {
-							newstring = replaceAll(orig, ere, repl);
-						} else {
-							newstring = replaceFirst(orig, ere, repl);
-						}
+						int fieldNum = (int) JRT.toDouble(pop());
+						String newString = execSubOrGSub(position, 0);
 						// assign it to "$0"
-						if (field_num == 0) {
-							jrt.input_line = newstring;
+						if (fieldNum == 0) {
+							jrt.input_line = newString;
 							jrt.jrtParseFields();
 						} else {
-							jrt.jrtSetInputField(newstring, field_num);
+							jrt.jrtSetInputField(newString, fieldNum);
 						}
 						position.next();
 						break;
@@ -1020,22 +994,9 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[2] = original variable value
 						int offset = position.intArg(0);
 						boolean is_global = position.boolArg(1);
-						boolean is_gsub = position.boolArg(2);
-						// top-of-stack = ere
-						// next = repl
-						// next = orig
-						String convfmt = getCONVFMT().toString();
-						String ere = JRT.toAwkString(pop(), convfmt);
-						String repl = JRT.toAwkString(pop(), convfmt);
-						String orig = JRT.toAwkString(pop(), convfmt);
-						String newstring;
-						if (is_gsub) {
-							newstring = replaceAll(orig, ere, repl);
-						} else {
-							newstring = replaceFirst(orig, ere, repl);
-						}
+						String newString = execSubOrGSub(position, 2);
 						// assign it to "offset/global"
-						assign(offset, newstring, is_global, position);
+						assign(offset, newString, is_global, position);
 						pop();
 						position.next();
 						break;
@@ -1051,24 +1012,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// ARRAY reference offset/is_global
 						int offset = position.intArg(0);
 						boolean is_global = position.boolArg(1);
-						boolean is_gsub = position.boolArg(2);
-						// top-of-stack = array index
-						// next = ere
-						// next = repl
-						// next = orig
 						Object arr_idx = pop();
-						String convfmt = getCONVFMT().toString();
-						String ere = JRT.toAwkString(pop(), convfmt);
-						String repl = JRT.toAwkString(pop(), convfmt);
-						String orig = JRT.toAwkString(pop(), convfmt);
-						String newstring;
-						if (is_gsub) {
-							newstring = replaceAll(orig, ere, repl);
-						} else {
-							newstring = replaceFirst(orig, ere, repl);
-						}
+						String newString = execSubOrGSub(position, 2);
 						// assign it to "offset/arr_idx/global"
-						assignArray(offset, arr_idx, newstring, is_global);
+						assignArray(offset, arr_idx, newString, is_global);
 						pop();
 						position.next();
 						break;
@@ -1615,17 +1562,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 					}
 					case AwkTuples._GET_INPUT_FIELD_: {
 						// stack[0] = field number
-						Object o = pop();
-						int fieldnum;
-						if (o instanceof Number) {
-							fieldnum = ((Number) o).intValue();
-						} else {
-							try {
-								fieldnum = (int) Double.parseDouble(o.toString());
-							} catch (NumberFormatException nfe) {
-								throw new AwkRuntimeException(position.lineNumber(), "Field $(" + o.toString() + ") is incorrect.");
-							}
-						}
+						int fieldnum = parseIntField(pop(), position);
 						push(jrt.jrtGetInputField(fieldnum));
 						position.next();
 						break;
