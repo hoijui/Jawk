@@ -553,8 +553,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 		il_main = new MyInstructionList();
 		mg_main = new MethodGen(ACC_PUBLIC | ACC_FINAL,
-				org.apache.bcel.generic.Type.INT,
-				new org.apache.bcel.generic.Type[] {getObjectType(AwkParameters.class)},
+				Type.INT,
+				new Type[] {getObjectType(AwkParameters.class)},
 				new String[] {"parameters"},
 				"ScriptMain",
 				classname,
@@ -567,8 +567,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 		il_reb = new MyInstructionList();
 		mg_reb = new MethodGen(ACC_PUBLIC,
-				org.apache.bcel.generic.Type.VOID,
-				new org.apache.bcel.generic.Type[] {}, // no args
+				Type.VOID,
+				new Type[] {}, // no args
 				new String[] {},
 				"runEndBlocks",
 				classname,
@@ -583,7 +583,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		InstructionHandle ih =
 				il_reb.append(factory.createNew("java.lang.StringBuffer"));
 		il_reb.append(InstructionConstants.DUP);
-		il_reb.append(factory.createInvoke("java.lang.StringBuffer", "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
+		il_reb.append(factory.createInvoke("java.lang.StringBuffer", "<init>", Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
 		il_reb.append(InstructionFactory.createStore(new ObjectType("java.lang.StringBuffer"), sb_reb.getIndex()));
 		dregister_reb.setStart(ih);
 		sb_reb.setStart(ih);
@@ -814,8 +814,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 		InstructionList il = new InstructionList();
 
 		MethodGen mg = new MethodGen(ACC_PUBLIC | ACC_STATIC,
-				org.apache.bcel.generic.Type.VOID,
-				new org.apache.bcel.generic.Type[] {new ArrayType(getObjectType(String.class), 1)},
+				Type.VOID,
+				new Type[] {new ArrayType(getObjectType(String.class), 1)},
 				new String[] {"args"},
 				"main",
 				classname,
@@ -826,8 +826,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 		// ..., mainclass, mainclass, mainclass
 		il.append(factory.createInvoke(classname, "<init>",
-				org.apache.bcel.generic.Type.VOID,
-				new org.apache.bcel.generic.Type[] {},
+				Type.VOID,
+				new Type[] {},
 				INVOKESPECIAL));
 		// ..., mainclass, mainclass
 
@@ -851,8 +851,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createFieldAccess(classname, "EXTENSION_DESCRIPTION", getObjectType(String.class), Constants.GETSTATIC));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class, args, desc
 		il.append(factory.createInvoke(AwkParameters.class.getName(), "<init>",
-				org.apache.bcel.generic.Type.VOID,
-				new org.apache.bcel.generic.Type[] {
+				Type.VOID,
+				new Type[] {
 					getObjectType(Class.class),
 					new ArrayType(getObjectType(String.class), 1),
 					getObjectType(String.class),},
@@ -864,7 +864,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(System.class.getName(), "exit", Type.VOID, new Type[] {Type.INT}, INVOKESTATIC));
 		// ??? the return (below) is required, even though we're exit()ing (above) ???
 		// ??? (missing return results in a VerifyError) ???
-		il.append(InstructionFactory.createReturn(org.apache.bcel.generic.Type.VOID));
+		il.append(InstructionFactory.createReturn(Type.VOID));
 
 		mg.setMaxStack();
 		mg.setMaxLocals();
@@ -2168,7 +2168,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 				il = new MyInstructionList();
 				mg = new MethodGen(ACC_PUBLIC,
-						org.apache.bcel.generic.Type.OBJECT,
+						Type.OBJECT,
 						params,
 						names,
 						"FUNC_" + func_name,
@@ -2209,7 +2209,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._RETURN_FROM_FUNCTION_: {
 				JVMTools_getLocalVariable(Object.class, "_return_value_");
-				il.append(InstructionFactory.createReturn(org.apache.bcel.generic.Type.OBJECT));
+				il.append(InstructionFactory.createReturn(Type.OBJECT));
 				break;
 			}
 			case AwkTuples._THIS_: {
@@ -3284,7 +3284,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	private void JVMTools_returnVoid() {
-		il.append(InstructionFactory.createReturn(org.apache.bcel.generic.Type.VOID));
+		il.append(InstructionFactory.createReturn(Type.VOID));
 	}
 
 	private void JVMTools_pushInteger(int i) {
@@ -3452,7 +3452,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private void JVMTools_new(String newtype) {
 		il.append(factory.createNew(newtype));
 		JVMTools_DUP();
-		il.append(factory.createInvoke(newtype, "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
+		il.append(factory.createInvoke(newtype, "<init>", Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
 	}
 
 	private void JVMTools_new(String newtype, Class paramtype) {
@@ -3463,7 +3463,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createNew(newtype));
 		il.append(InstructionConstants.DUP_X1);
 		il.append(InstructionConstants.SWAP);
-		il.append(factory.createInvoke(newtype, "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {paramtype}), INVOKESPECIAL));
+		il.append(factory.createInvoke(newtype, "<init>", Type.VOID, buildArgs(new Class[] {paramtype}), INVOKESPECIAL));
 	}
 
 	private void JVMTools_new(String newtype, Class paramtype1, Class paramtype2) {
@@ -3474,7 +3474,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		JVMTools_DUP_X2();
 		JVMTools_POP();
 		// ..., objref, objref, param1, param2
-		il.append(factory.createInvoke(newtype, "<init>", org.apache.bcel.generic.Type.VOID, buildArgs(new Class[] {paramtype1, paramtype2}), INVOKESPECIAL));
+		il.append(factory.createInvoke(newtype, "<init>", Type.VOID, buildArgs(new Class[] {paramtype1, paramtype2}), INVOKESPECIAL));
 	}
 
 	private void JVMTools_instanceOf(Class checkclass) {
@@ -3588,7 +3588,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(InstructionConstants.DUP);
 		il.append(new PUSH(cp, parameters.sorted_array_keys));	// false = not in sorted order
 		il.append(factory.createInvoke(AssocArrayClass.getName(), "<init>",
-				org.apache.bcel.generic.Type.VOID,
+				Type.VOID,
 				buildArgs(new Class[] {Boolean.TYPE}),
 				INVOKESPECIAL));
 	}
@@ -3682,43 +3682,43 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 	////////////////////////////////////////////////////////////////////////////////
 
-	private static org.apache.bcel.generic.Type getObjectType(Class cls) {
+	private static Type getObjectType(Class cls) {
 		if (cls.isArray()) {
 			return new ArrayType(getObjectType(cls.getComponentType()), 1);
 		} else if (cls == Boolean.TYPE) {
-			return org.apache.bcel.generic.Type.BOOLEAN;
+			return Type.BOOLEAN;
 		} else if (cls == Byte.TYPE) {
-			return org.apache.bcel.generic.Type.BYTE;
+			return Type.BYTE;
 		} else if (cls == Character.TYPE) {
-			return org.apache.bcel.generic.Type.CHAR;
+			return Type.CHAR;
 		} else if (cls == Double.TYPE) {
-			return org.apache.bcel.generic.Type.DOUBLE;
+			return Type.DOUBLE;
 		} else if (cls == Float.TYPE) {
-			return org.apache.bcel.generic.Type.FLOAT;
+			return Type.FLOAT;
 		} else if (cls == Integer.TYPE) {
-			return org.apache.bcel.generic.Type.INT;
+			return Type.INT;
 		} else if (cls == Long.TYPE) {
-			return org.apache.bcel.generic.Type.LONG;
+			return Type.LONG;
 		} else if (cls == Short.TYPE) {
-			return org.apache.bcel.generic.Type.SHORT;
+			return Type.SHORT;
 		} else if (cls == String.class) {
-			return org.apache.bcel.generic.Type.STRING;
+			return Type.STRING;
 		} else if (cls == StringBuffer.class) {
-			return org.apache.bcel.generic.Type.STRINGBUFFER;
+			return Type.STRINGBUFFER;
 		} else if (cls == Object.class) {
-			return org.apache.bcel.generic.Type.OBJECT;
+			return Type.OBJECT;
 		} else if (cls == Void.TYPE) {
-			return org.apache.bcel.generic.Type.VOID;
+			return Type.VOID;
 		} else {
 			return new ObjectType(cls.getName());
 		}
 	}
 
-	private static org.apache.bcel.generic.Type[] buildArgs(Class[] arguments) {
-		java.util.List<org.apache.bcel.generic.Type> arg_list = new ArrayList<org.apache.bcel.generic.Type>();
+	private static Type[] buildArgs(Class[] arguments) {
+		java.util.List<Type> arg_list = new ArrayList<Type>();
 		for (Class cls : arguments) {
 			arg_list.add(getObjectType(cls));
 		}
-		return arg_list.toArray(new org.apache.bcel.generic.Type[0]);
+		return arg_list.toArray(new Type[0]);
 	}
 } // public class AwkCompilerImpl [AwkCompiler]

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import java.util.HashSet;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -1179,14 +1181,14 @@ public class JRT {
 	}
 
 	public static int timeSeed() {
-		long l = (new java.util.Date()).getTime();
+		long l = (new Date()).getTime();
 		long l2 = (l % (1000 * 60 * 60 * 24));
 		int seed = (int) l2;
 		return seed;
 	}
 
-	public static java.util.Random newRandom(int seed) {
-		return new java.util.Random(seed);
+	public static Random newRandom(int seed) {
+		return new Random(seed);
 	}
 
 	public void applyRS(Object rs_obj) {

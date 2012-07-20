@@ -3,6 +3,7 @@ package org.jawk.backend;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jawk.ext.JawkExtension;
+import org.jawk.frontend.AwkSyntaxTree;
 import org.jawk.intermediate.Address;
 import org.jawk.intermediate.AwkTuples;
 import org.jawk.intermediate.Position;
@@ -1805,7 +1807,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 								parameters.no_input,
 								extensions);
 						try {
-							org.jawk.frontend.AwkSyntaxTree ast = ap.parse(new java.io.StringReader(awk_code));
+							AwkSyntaxTree ast = ap.parse(new StringReader(awk_code));
 							if (ast != null) {
 								ast.semanticAnalysis();
 								ast.semanticAnalysis();
