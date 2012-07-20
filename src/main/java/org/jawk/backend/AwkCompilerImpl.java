@@ -287,11 +287,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 			for (Field f : c.getDeclaredFields()) {
 				int mod = f.getModifiers();
 				// if a "private static final" member...
-				if (true
-						&& (mod & Modifier.PRIVATE) > 0
+				if (       (mod & Modifier.PRIVATE) > 0
 						&& (mod & Modifier.STATIC) > 0
 						&& (mod & Modifier.FINAL) > 0
-						&& f.getType() == Class.class) {
+						&& f.getType() == Class.class)
+				{
 					try {
 						// obtain the value of the field
 						// and apply it here!
@@ -317,20 +317,20 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private ConstantPoolGen cp;
 	private MyInstructionList il_main;
 	private MethodGen mg_main;
-	private Map<String,Integer> lv_main = new HashMap<String,Integer>();
+	private Map<String, Integer> lv_main = new HashMap<String,Integer>();
 	private MyInstructionList il_reb;	// reb = runEndBlocks
 	private MethodGen mg_reb;	// reb = runEndBlocks
-	private Map<String,Integer> lv_reb;	// reb = runEndBlocks
+	private Map<String, Integer> lv_reb;	// reb = runEndBlocks
 
 	private MyInstructionList il;	// active instructionlist
 	private MethodGen mg;	// active methodgen
-	private Map<String,Integer> local_vars;	// active localvars
+	private Map<String, Integer> local_vars;	// active localvars
 
 	private MethodGen mg_temp = null;
 	private MyInstructionList il_temp = null;
 	private Map<org.jawk.intermediate.Address, List<BranchHandle>> bhs_temp = null;
 	private Map<Integer, InstructionHandle> ihs_temp = null;
-	private Map<String,Integer> lvs_temp = null;
+	private Map<String, Integer> lvs_temp = null;
 
 	private AwkParameters parameters;
 
@@ -438,7 +438,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * not conform to the rules described above.
 	 */
 	private static void validateClassname(String classname)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException
+	{
 		// - check for non-null
 		assert classname != null;
 		// - check for non-blank classname
@@ -855,7 +856,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				new Type[] {
 					getObjectType(Class.class),
 					new ArrayType(getObjectType(String.class), 1),
-					getObjectType(String.class),},
+					getObjectType(String.class)},
 				INVOKESPECIAL));
 
 		// ..., mainclass, AwkParameters
@@ -1402,9 +1403,9 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private int argc_offset = -1;
 	private int rs_offset = -1;
 
-	private int ps_arg_idx=0;
-	private int fmt_arg_idx=0;
-	private int arr_idx_arg_idx=0;
+	private int ps_arg_idx = 0;
+	private int fmt_arg_idx = 0;
+	private int arr_idx_arg_idx = 0;
 
 	// tuples provided only in the event of dumping global variables to stdout
 	// via the _DUMP extension

@@ -86,9 +86,9 @@ public final class BulkBlockObject extends BlockObject {
 
 	@Override
 	public void block()
-			throws InterruptedException {
+			throws InterruptedException
+	{
 		synchronized (this) {
-
 			String handle = checkForNonblockHandle();
 
 			if (handle.equals(ALL_HANDLES_ARE_BLANK)) {
@@ -111,10 +111,8 @@ public final class BulkBlockObject extends BlockObject {
 		// cycle through all block_handles
 		// check if any of them has accepted sockets
 		for (String handle : handles) {
-			if (BYPASS_ALL_BLANK_HANDLES) {
-				if (handle.equals("")) {
-					continue;
-				}
+			if (BYPASS_ALL_BLANK_HANDLES && handle.equals("")) {
+				continue;
 			}
 			all_handles_are_blank = false;
 			Blockable blockable = blockables.get(handle);

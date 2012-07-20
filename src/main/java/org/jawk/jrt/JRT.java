@@ -345,7 +345,7 @@ public class JRT {
 		} else if (o instanceof Double) {
 			val = ((Double)o).doubleValue() != 0;
 		} else if (o instanceof String) {
-			val = (o.toString().length()>0);
+			val = (o.toString().length() > 0);
 		} else if (o instanceof Pattern) {
 			// match against $0
 			// ...
@@ -436,8 +436,7 @@ public class JRT {
 	 *
 	 * @throws IOException upon an IO error.
 	 */
-	public boolean jrtConsumeInput(boolean for_getline)
-			throws IOException {
+	public boolean jrtConsumeInput(boolean for_getline) throws IOException {
 		// first time!
 		if (arglist_aa == null) {
 			Object arglist_obj = vm.getARGV(); // vm.getVariable("argv_field", true);
@@ -484,7 +483,7 @@ public class JRT {
 							break;
 						}
 					}
-					if (! o.equals(BLANK)) {
+					if (!o.equals(BLANK)) {
 						String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
 						if (name_value_or_filename.indexOf('=') == -1) {
 							pr = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
@@ -500,14 +499,13 @@ public class JRT {
 								continue;
 							}
 						}
-					} else if (! has_filenames) {
+					} else if (!has_filenames) {
 						pr = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
 						vm.setFILENAME("");
 					} else {
 						return false;
 					}
-				} else {
-				if (input_line == null)
+				} else if (input_line == null) {
 					if (has_filenames) {
 						int argc = (int) toDouble(vm.getARGC());
 						Object o = BLANK;
@@ -518,7 +516,7 @@ public class JRT {
 								break;
 							}
 						}
-						if (! o.equals(BLANK)) {
+						if (!o.equals(BLANK)) {
 							String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
 							if (name_value_or_filename.indexOf('=') == -1) {
 								// true = from filename list
@@ -572,7 +570,8 @@ public class JRT {
 	} // public boolean jrtConsumeInput(boolean for_getline) throws IOException
 
 	private void setFilelistVariable(String name_value)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException
+	{
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
 		assert eq_idx >= 0;
@@ -778,8 +777,7 @@ public class JRT {
 		return ps;
 	}
 
-	public boolean jrtConsumeFileInput(String filename)
-			throws IOException {
+	public boolean jrtConsumeFileInput(String filename) throws IOException {
 		PartitioningReader pr = file_readers.get(filename);
 		if (pr == null) {
 			try {
@@ -819,8 +817,7 @@ public class JRT {
 		return p;
 	}
 
-	public boolean jrtConsumeCommandInput(String cmd)
-			throws IOException {
+	public boolean jrtConsumeCommandInput(String cmd) throws IOException {
 		PartitioningReader pr = command_readers.get(cmd);
 		if (pr == null) {
 			try {
@@ -1103,7 +1100,8 @@ public class JRT {
 	}
 
 	public static String sprintfFunctionNoCatch(Object[] arr, String fmt_arg)
-			throws IllegalFormatException {
+			throws IllegalFormatException
+	{
 		return String.format(fmt_arg, arr);
 	}
 

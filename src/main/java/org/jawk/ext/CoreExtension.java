@@ -217,22 +217,19 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 
 	@Override
 	public int[] getAssocArrayParameterPositions(String extension_keyword, int num_args) {
-		if ((false
-				|| extension_keyword.equals("Map")
+		if ((      extension_keyword.equals("Map")
 				|| extension_keyword.equals("HashMap")
 				|| extension_keyword.equals("LinkedMap")
-				|| extension_keyword.equals("TreeMap")) && num_args % 2 == 1) {
+				|| extension_keyword.equals("TreeMap")) && ((num_args % 2) == 1))
+		{
 			// first argument of a *Map() function
 			// must be an associative array
 			return new int[] {0};
-		} else if (false
-				|| extension_keyword.equals("Array"))
-		{
+		} else if (extension_keyword.equals("Array")) {
 			// first argument of Array must be
 			// an associative array
 			return new int[] {0};
-		} else if (false
-				|| extension_keyword.equals("NewReference")
+		} else if (extension_keyword.equals("NewReference")
 				|| extension_keyword.equals("NewRef"))
 		{
 			if (num_args == 1) {
@@ -287,12 +284,13 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 				throw new IllegalAwkArgumentException(keyword + " requires 1 or 3 arguments, not " + args.length);
 			}
 		} else if (keyword.equals("Dereference") || keyword.equals("DeRef")) {
-			if (args.length == 1)
+			if (args.length == 1) {
 				return resolve(dereference(args[0], vm), vm);
-			else if (args.length == 2)
+			} else if (args.length == 2) {
 				return resolve(dereference(toAwkString(args[0]), args[1], vm), vm);
-			else
-				throw new IllegalAwkArgumentException(keyword+" requires 1 or 2 arguments, not "+args.length);
+			} else {
+				throw new IllegalAwkArgumentException(keyword + " requires 1 or 2 arguments, not " + args.length);
+			}
 		} else if (keyword.equals("Unreference") || keyword.equals("UnRef")) {
 			checkNumArgs(args, 1);
 			return unreference(args[0], vm);
@@ -692,7 +690,8 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 
 		@Override
 		public final void block()
-				throws InterruptedException {
+				throws InterruptedException
+		{
 			synchronized (timeout_blocker) {
 				timeout_blocker.wait(wait_int);
 			}

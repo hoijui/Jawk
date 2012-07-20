@@ -277,7 +277,7 @@ public class AwkParameters {
 	 * @param extension_description a text description of extensions that
 	 *	are enabled (for compiled scripts)
 	 */
-	public AwkParameters(Class mainclass, String args[], String extension_description) {
+	public AwkParameters(Class mainclass, String[] args, String extension_description) {
 		this.mainclass = mainclass;
 		int arg_idx = 0;
 		try {
@@ -390,8 +390,9 @@ public class AwkParameters {
 	 * <li>additional assertions are performed.
 	 * </ul>
 	 */
-	private static void checkParameterHasArgument(String args[], int arg_idx)
-			throws IllegalArgumentException {
+	private static void checkParameterHasArgument(String[] args, int arg_idx)
+			throws IllegalArgumentException
+	{
 		assert arg_idx < args.length;
 		assert args[arg_idx].charAt(0) == '-';
 		if (arg_idx + 1 >= args.length) {
@@ -403,7 +404,8 @@ public class AwkParameters {
 	 * Makes sure the argument is of the form name=value.
 	 */
 	private static void checkInitialVariableFormat(String v_arg)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException
+	{
 		int equals_count = 0;
 		int length = v_arg.length();
 		for (int i = 0; equals_count <= 1 && i < length; i++) {

@@ -76,11 +76,11 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private MyStack<Object> operand_stack = new ArrayStackImpl<Object>();
 	private java.util.List<String> arguments;
 	private boolean sorted_array_keys;
-	private Map<String,Object> initial_variables;
+	private Map<String, Object> initial_variables;
 	private String initial_fs_value;
 	private boolean trap_illegal_format_exceptions;
 	private JRT jrt;
-	private Map<String,JawkExtension> extensions;
+	private Map<String, JawkExtension> extensions;
 
 	// stack methods
 	//private Object pop() { return operand_stack.removeFirst(); }
@@ -115,7 +115,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 *	interpreter.
 	 */
 	public AVM(AwkParameters parameters, Map<String, JawkExtension> extensions)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException
+	{
 		if (parameters == null) {
 			throw new IllegalArgumentException("AwkParameters argument cannot be null");
 		}
@@ -165,12 +166,12 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * It is useful when passing variable assignments from the file-list
 	 * portion of the command-line arguments.
 	 */
-	private Map<String,Integer> global_variable_offsets;
+	private Map<String, Integer> global_variable_offsets;
 	/**
 	 * Indicates whether the variable, by name, is a scalar
 	 * or not.  If not, then it is an Associative Array.
 	 */
-	private Map<String,Boolean> global_variable_aarrays;
+	private Map<String, Boolean> global_variable_aarrays;
 	private Set<String> function_names;
 
 	private static int parseIntField(Object obj, PositionForInterpretation position) {
@@ -439,7 +440,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						} else if (o instanceof Double) {
 							result = ((Double)o).doubleValue() != 0;
 						} else if (o instanceof String) {
-							result = (o.toString().length()>0);
+							result = (o.toString().length() > 0);
 						} else {
 							throw new Error("Unknown operand_stack type: "+o.getClass()+" for value "+o);
 						}
@@ -798,8 +799,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 						boolean is_global = position.boolArg(2);
 						Object o = runtime_stack.getVariable(position.intArg(0), is_global);
 						if (o == null) {
-							if (position.boolArg(1)) // is_array
-							{
+							if (position.boolArg(1)) {
+								// is_array
 								push(runtime_stack.setVariable(position.intArg(0), new AssocArray(sorted_array_keys), is_global));
 							} else {
 								push(runtime_stack.setVariable(position.intArg(0), BLANK, is_global));
@@ -1958,8 +1959,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 				String s = JRT.toAwkStringForOutput(pop(), getOFMT().toString());
 				ps.print(s);
 				// if more elements, display $FS
-				if (i < num_args - 1) // use $OFS to separate fields
-				{
+				if (i < num_args - 1) {
+					// use $OFS to separate fields
 					ps.print(ofs_string);
 				}
 			}
@@ -2120,7 +2121,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * @param name_value The variable assignment in <i>name=value</i> form.
 	 */
 	private void setFilelistVariable(String name_value)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException
+	{
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
 		assert eq_idx >= 0;
@@ -2233,7 +2235,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 	}
 
 	private boolean avmConsumeFileInput(String filename)
-			throws IOException {
+			throws IOException
+	{
 		boolean retval = jrt.jrtConsumeFileInput(filename);
 		if (retval) {
 			push(jrt.input_line);
@@ -2242,7 +2245,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 	}
 
 	private boolean avmConsumeCommandInput(String cmd)
-			throws IOException {
+			throws IOException
+	{
 		boolean retval = jrt.jrtConsumeCommandInput(cmd);
 		if (retval) {
 			push(jrt.input_line);
@@ -2251,7 +2255,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 	}
 
 	private boolean avmConsumeInput(boolean for_getline)
-			throws IOException {
+			throws IOException
+	{
 		boolean retval = jrt.jrtConsumeInput(for_getline);
 		if (retval && for_getline) {
 			push(jrt.input_line);

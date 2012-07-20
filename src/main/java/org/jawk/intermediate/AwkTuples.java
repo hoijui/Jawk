@@ -19,7 +19,7 @@ import org.jawk.util.MyStack;
 
 public class AwkTuples implements Serializable {
 
-	private static class AddressImpl implements Address, Serializable {
+	private static final class AddressImpl implements Address, Serializable {
 
 		private String lbl;
 		private int idx = -1;
@@ -161,7 +161,7 @@ public class AwkTuples implements Serializable {
 	}
 
 	// made public to access static members of AwkTuples via Java Reflection
-	private static class Tuple implements Serializable {
+	private static final class Tuple implements Serializable {
 
 		private int opcode;
 		private int[] ints = new int[4];
@@ -171,7 +171,7 @@ public class AwkTuples implements Serializable {
 		private Class[] types = new Class[4];
 		private Address address = null;
 		private Class cls = null;
-		transient private HasFunctionAddress has_func_addr = null;
+		private transient HasFunctionAddress has_func_addr = null;
 		// to avoid polluting the constructors,
 		// setLineNumber(int) populates this field
 		// (called by an anonymous inner subclass of ArrayList,
@@ -276,7 +276,7 @@ public class AwkTuples implements Serializable {
 			StringBuilder sb = new StringBuilder();
 			sb.append(toOpcodeString(opcode));
 			int idx = 0;
-			while (idx < types.length && types[idx] != null) {
+			while ((idx < types.length) && (types[idx] != null)) {
 				sb.append(", ");
 				Class type = types[idx];
 				if (type == Integer.class) {
@@ -288,16 +288,16 @@ public class AwkTuples implements Serializable {
 				} else if (type == String.class) {
 					sb.append('"').append(strings[idx]).append('"');
 				} else if (type == Address.class) {
-					assert(idx==0);
+					assert (idx == 0);
 					sb.append(address);
 				} else if (type == Class.class) {
-					assert(idx==0);
+					assert (idx == 0);
 					sb.append(cls);
 				} else if (type == HasFunctionAddress.class) {
-					assert(idx==0);
+					assert (idx == 0);
 					sb.append(has_func_addr);
 				} else {
-					throw new Error("Unknown param type ("+idx+"): "+type);
+					throw new Error("Unknown param type (" + idx + "): " + type);
 				}
 				++idx;
 			}
@@ -1462,8 +1462,8 @@ public class AwkTuples implements Serializable {
 		Integer I = address_label_counts.get(label);
 		if (I == null) {
 			I = 0;
-		} else //I = new Integer(I.intValue()+1);
-		{
+		} else {
+			//I = new Integer(I.intValue()+1);
 			I = I + 1;
 		}
 		address_label_counts.put(label, I);
@@ -2120,7 +2120,9 @@ public class AwkTuples implements Serializable {
 		 *	the class version
 		 */
 		private void readObject(ObjectInputStream ois)
-				throws IOException, ClassNotFoundException, InvalidClassException {
+				throws IOException, ClassNotFoundException,
+				InvalidClassException
+		{
 			INSTANCE_VERSION = ois.readInt();
 			if (INSTANCE_VERSION != CLASS_VERSION) {
 				throw new InvalidClassException("Invalid intermeidate file format (instance version " + INSTANCE_VERSION + " != class version " + CLASS_VERSION + ")");
@@ -2128,7 +2130,8 @@ public class AwkTuples implements Serializable {
 		}
 
 		private void writeObject(ObjectOutputStream oos)
-				throws IOException {
+				throws IOException
+		{
 			oos.writeInt(INSTANCE_VERSION);
 		}
 

@@ -78,7 +78,6 @@ public class Awk {
 	private static final boolean VERBOSE = (System.getProperty("jawk.verbose", null) != null);
 	private static final String EXTENSIONS_PREFIX = "org.jawk.ext.CoreExtension#org.jawk.ext.SocketExtension#org.jawk.ext.StdinExtension";
 
-
 	/**
 	 * The entry point to Jawk for the VM.
 	 * <p>
@@ -96,8 +95,9 @@ public class Awk {
 	 * @throws ClassNotFoundException if compilation is requested,
 	 *	but no compilation implementation class is found.
 	 */
-	public static void main(String args[])
-			throws IOException, ClassNotFoundException {
+	public static void main(String[] args)
+			throws IOException, ClassNotFoundException
+	{
 		System.exit(invoke(args));
 	}
 
@@ -116,8 +116,9 @@ public class Awk {
 	 * @throws ClassNotFoundException if compilation is requested,
 	 *	but no compilation implementation class is found.
 	 */
-	public static int invoke(String args[])
-			throws IOException, ClassNotFoundException {
+	public static int invoke(String[] args)
+			throws IOException, ClassNotFoundException
+	{
 		AVM avm = null;
 		try {
 			AwkParameters parameters = new AwkParameters(Awk.class, args, null);	// null = NO extension description ==> require awk script
@@ -240,8 +241,9 @@ public class Awk {
 	 * @param es The output stream to use as stderr.
 	 * @throws Exception enables exceptions to propagate to the callee.
 	 */
-	public Awk(String args[], InputStream is, PrintStream os, PrintStream es)
-			throws Exception {
+	public Awk(String[] args, InputStream is, PrintStream os, PrintStream es)
+			throws Exception
+	{
 		System.setIn(is);
 		System.setOut(os);
 		System.setErr(es);
@@ -345,7 +347,8 @@ public class Awk {
 	}
 
 	private static Object readObjectFromInputStream(InputStream is)
-			throws IOException, ClassNotFoundException {
+			throws IOException, ClassNotFoundException
+	{
 		ObjectInputStream ois = new ObjectInputStream(is);
 		Object retval = ois.readObject();
 		ois.close();
@@ -353,7 +356,8 @@ public class Awk {
 	}
 
 	private static void writeObjectToFile(Object object, String filename)
-			throws IOException {
+			throws IOException
+	{
 		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
 		oos.writeObject(object);
 		oos.close();
@@ -363,13 +367,12 @@ public class Awk {
 	 * Prohibit the instantiation of this class, other than the
 	 * way required by JSR 223.
 	 */
-	private Awk() {
-	}
+	private Awk() {}
 
 	private static Map<String, JawkExtension> getJawkExtensions() {
 		String extensions_string = System.getProperty("jawk.extensions", null);
-		if (extensions_string == null) //return Collections.emptyMap();
-		{
+		if (extensions_string == null) {
+			//return Collections.emptyMap();
 			extensions_string = EXTENSIONS_PREFIX;
 		} else {
 			extensions_string = EXTENSIONS_PREFIX + "#" + extensions_string;

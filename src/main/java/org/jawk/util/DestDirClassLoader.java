@@ -23,13 +23,15 @@ public final class DestDirClassLoader extends ClassLoader {
 
 	@Override
 	protected Class<?> findClass(String name)
-			throws ClassNotFoundException {
+			throws ClassNotFoundException
+	{
 		byte[] b = loadClassData(name);
 		return defineClass(name, b, 0, b.length);
 	}
 
 	private byte[] loadClassData(String name)
-			throws ClassNotFoundException {
+			throws ClassNotFoundException
+	{
 		String filename = dirname + File.separator + name + ".class";
 		try {
 			FileInputStream f = new FileInputStream(filename);

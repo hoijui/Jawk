@@ -649,7 +649,7 @@ class Threaded_IO_Style implements IO_Style {
 	 * This resolved the issue while losing some
 	 * compile-time type safety.
 	 */
-	private final Map<String,Closeable> consumers = new HashMap<String,Closeable>();
+	private final Map<String, Closeable> consumers = new HashMap<String, Closeable>();
 
 	/**
 	 * Map of "ServerSocket"/"CServerSocket" handles
@@ -661,7 +661,7 @@ class Threaded_IO_Style implements IO_Style {
 	 * The same applies for "accepters"'s generic
 	 * type choice for values of the Map.
 	 */
-	private final Map<String,Closeable> accepters = new HashMap<String,Closeable>();
+	private final Map<String, Closeable> accepters = new HashMap<String, Closeable>();
 
 	private final VariableManager vm;
 
@@ -951,7 +951,8 @@ class Threaded_IO_Style implements IO_Style {
 		}
 
 		private Accepter(String handle, ServerSocket ssocket)
-				throws IOException {
+				throws IOException
+		{
 			this.handle = handle;
 			//ssocket = ssockets.get(handle);
 			this.ssocket = ssocket;
@@ -988,7 +989,8 @@ class Threaded_IO_Style implements IO_Style {
 		// can be overridden
 
 		public String getSocket()
-				throws IOException, InterruptedException {
+				throws IOException, InterruptedException
+		{
 			Socket socket = queue.take();
 			// ... same as socket() method ...
 			String handle = createHandle(socket);
@@ -1006,7 +1008,8 @@ class Threaded_IO_Style implements IO_Style {
 
 		@Override
 		public final void close()
-				throws IOException {
+				throws IOException
+		{
 			ssocket.close();
 		}
 	}
@@ -1014,13 +1017,15 @@ class Threaded_IO_Style implements IO_Style {
 	private final class CAccepter extends Accepter {
 
 		private CAccepter(String handle, ServerSocket ssocket)
-				throws IOException {
+				throws IOException
+		{
 			super(handle, ssocket);
 		}
 
 		@Override
 		public String getSocket()
-				throws IOException, InterruptedException {
+				throws IOException, InterruptedException
+		{
 			Socket socket = queue.take();
 			// ... same as socket() method ...
 			String handle = createHandle(socket);
@@ -1083,7 +1088,8 @@ class Threaded_IO_Style implements IO_Style {
 		}
 
 		protected AbstractConsumer(String handle, Socket socket)
-				throws IOException {
+				throws IOException
+		{
 			this.handle = handle;
 			//socket = sockets.get(handle);
 			this.socket = socket;
@@ -1128,7 +1134,8 @@ class Threaded_IO_Style implements IO_Style {
 
 		@Override
 		public final String getInput()
-				throws InterruptedException {
+				throws InterruptedException
+		{
 			assert state != CLOSED_STATE;	// active or close_pending
 			String str = readFromQueue();
 			if (queue.size() == 0 && state == CLOSE_PENDING_STATE) {
@@ -1161,7 +1168,8 @@ class Threaded_IO_Style implements IO_Style {
 
 		@Override
 		public final void close()
-				throws IOException {
+				throws IOException
+		{
 			socket.close();
 		}
 	} // private abstract class AbstractConsumer<T> {Thread} [Consumer]
@@ -1175,20 +1183,23 @@ class Threaded_IO_Style implements IO_Style {
 		private final BufferedReader br;
 
 		private CharacterConsumer(String handle, Socket socket)
-				throws IOException {
+				throws IOException
+		{
 			super(handle, socket);	// constructs socket (protected field in AbstractConsumer)
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}
 
 		@Override
 		protected String readFromSocket()
-				throws IOException {
+				throws IOException
+		{
 			return br.readLine();
 		}
 
 		@Override
 		protected String readFromQueue()
-				throws InterruptedException {
+				throws InterruptedException
+		{
 			return queue.take();
 		}
 
@@ -1205,14 +1216,16 @@ class Threaded_IO_Style implements IO_Style {
 		private final byte[] buf = new byte[4096];
 
 		private ByteConsumer(String handle, Socket socket)
-				throws IOException {
+				throws IOException
+		{
 			super(handle, socket);	// constructs socket (protected field in AbstractConsumer)
 			bis = new BufferedInputStream(socket.getInputStream());
 		}
 
 		@Override
 		protected Integer readFromSocket()
-				throws IOException {
+				throws IOException
+		{
 			int len = bis.read(buf, 0, buf.length);
 			if (len < 0) {
 				return null;
@@ -1223,7 +1236,8 @@ class Threaded_IO_Style implements IO_Style {
 
 		@Override
 		protected String readFromQueue()
-				throws InterruptedException {
+				throws InterruptedException
+		{
 			int len = queue.take();
 			String str = new String(buf, 0, len);
 			return str;

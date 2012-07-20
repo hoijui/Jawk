@@ -64,8 +64,8 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 	private static final Object DONE = new Object();
 
 	public StdinExtension()
-			throws IOException {
-
+			throws IOException
+	{
 		Thread getline_input_thread = new Thread("getline_input_thread") {
 
 			@Override
@@ -191,7 +191,8 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 
 		@Override
 		public final void block()
-				throws InterruptedException {
+				throws InterruptedException
+		{
 			synchronized (blocker) {
 				if (stdinhasinput() == 0) {
 					blocker.wait();

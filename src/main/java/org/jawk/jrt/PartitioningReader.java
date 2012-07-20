@@ -104,8 +104,7 @@ public class PartitioningReader extends FilterReader {
 	private char[] read_buf = new char[4096];
 
 	@Override
-	public int read(char[] b, int start, int len)
-			throws IOException {
+	public int read(char[] b, int start, int len) throws IOException {
 		int ret_val = super.read(b, start, len);
 		if (ret_val >= 0) {
 			remaining.append(b, start, ret_val);
@@ -133,8 +132,7 @@ public class PartitioningReader extends FilterReader {
 	 *
 	 * @throws IOException upon an IO error
 	 */
-	public String readRecord()
-			throws IOException {
+	public String readRecord() throws IOException {
 
 		if (matcher == null) {
 			matcher = rs.matcher(remaining);

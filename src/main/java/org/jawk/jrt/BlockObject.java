@@ -77,7 +77,8 @@ public abstract class BlockObject {
 	 * 	chain contains a cycle.
 	 */
 	public List<BlockObject> getBlockObjects()
-			throws AwkRuntimeException {
+			throws AwkRuntimeException
+	{
 		List<BlockObject> retval = new LinkedList<BlockObject>();
 		Set<BlockObject> bo_set = new HashSet<BlockObject>();
 		BlockObject ref = this;

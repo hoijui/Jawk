@@ -88,7 +88,7 @@ public class BlockManager {
 	private Object NOTIFIER_LOCK = "NOTIFIER_LOCK";
 	private String notifier = null;
 
-	private class BlockThread extends Thread {
+	private final class BlockThread extends Thread {
 
 		private BlockObject bo;
 
