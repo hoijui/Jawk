@@ -332,7 +332,7 @@ public class AwkParser {
 		// should only contain nothing or =, depending on whether
 		// starting with /... or /=...
 		assert regexp.length() == 0 || regexp.length() == 1;
-		while (c >= 0 && c != '/' && c != '\n') {
+		while (c >= 0 && c != '\n' && (c != '/' || regexp.charAt(regexp.length() - 1) == '\\')) {
 			regexp.append((char) c);
 			c = reader.read();
 			// completely bypass \r's
