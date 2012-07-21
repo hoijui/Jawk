@@ -9,8 +9,9 @@ package org.jawk.jrt;
  * <p>
  * The getters/setters here do not access <strong>all</strong>
  * special AWK variables, such as <code>RSTART</code>
- * and <code>ENVIRON</code>.  That's because these variables
+ * and <code>ENVIRON</code>. That's because these variables
  * are not referred to within the JRT.
+ * </p>
  *
  * @see JRT
  * @see org.jawk.backend.AwkCompiler
@@ -58,7 +59,7 @@ public interface VariableManager {
 
 	/**
 	 * Set the contents of a user-defined AWK
-	 * variable.  Used when processing
+	 * variable. Used when processing
 	 * <em>name=value</em> command-line arguments
 	 * (either via -v or via ARGV).
 	 *
@@ -66,4 +67,4 @@ public interface VariableManager {
 	 * @param value The new contents of the variable.
 	 */
 	void assignVariable(String name, Object value);
-} // public interface VariableManager
+}

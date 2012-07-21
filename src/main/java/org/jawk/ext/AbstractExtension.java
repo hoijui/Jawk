@@ -8,8 +8,9 @@ import org.jawk.jrt.VariableManager;
  * Base class of various extensions.
  * <p>
  * Provides functionality common to most extensions,
- * such as vm and jrt variable management, and convenience
+ * such as VM and JRT variable management, and convenience
  * methods such as checkNumArgs() and toAwkString().
+ * </p>
  */
 public abstract class AbstractExtension implements JawkExtension {
 
@@ -28,7 +29,7 @@ public abstract class AbstractExtension implements JawkExtension {
 	 * @param obj The Jawk variable to convert to a Jawk string.
 	 *
 	 * @return A string representation of obj after CONVFMT
-	 * 	has been applied.
+	 *   has been applied.
 	 */
 	protected final String toAwkString(Object obj) {
 		return JRT.toAwkString(obj, vm.getCONVFMT().toString());
@@ -40,7 +41,7 @@ public abstract class AbstractExtension implements JawkExtension {
 	 *
 	 * @param extension_keyword The extension keyword to check.
 	 * @param arg_count The number of actual parameters used in this
-	 * 	extension invocation.
+	 *   extension invocation.
 	 */
 	@Override
 	public int[] getAssocArrayParameterPositions(String extension_keyword, int arg_count) {
@@ -56,7 +57,7 @@ public abstract class AbstractExtension implements JawkExtension {
 	 * @param expected_num The expected number of arguments.
 	 *
 	 * @throws IllegalAwkArgumentException if the number of arguments
-	 * 	do not match the expected number of arguments.
+	 *   do not match the expected number of arguments.
 	 */
 	protected static void checkNumArgs(Object[] arr, int expected_num) {
 		// some sanity checks on the arguments
@@ -70,4 +71,4 @@ public abstract class AbstractExtension implements JawkExtension {
 			throw new IllegalAwkArgumentException("Expecting " + expected_num + " arg(s), got " + arr.length);
 		}
 	}
-} // public abstract class AbstractExtension [JawkExtension]
+}

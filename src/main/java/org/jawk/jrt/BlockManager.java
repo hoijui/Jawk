@@ -18,31 +18,34 @@ public class BlockManager {
 	 * <p>
 	 * The algorithm is as follows:
 	 * <ul>
-	 * <li>Collect linked block objects into a List.
-	 * <li>Spawn a BlockThread for each block object.
-	 * <li>Wait for notification from any of the BlockThreads.
-	 * <li>Interrupt remaining block threads.
-	 * <li>Wait for each BlockThread to die.
-	 * <li>Return the block object notifier which satisfied their block condition.
+	 * <li>Collect linked block objects into a List.</li>
+	 * <li>Spawn a BlockThread for each block object.</li>
+	 * <li>Wait for notification from any of the BlockThreads.</li>
+	 * <li>Interrupt remaining block threads.</li>
+	 * <li>Wait for each BlockThread to die.</li>
+	 * <li>Return the block object notifier which satisfied their block condition.</li>
 	 * </ul>
+	 * </p>
 	 * <p>
 	 * And, the BlockThread algorithm is as follows:
+	 * </p>
 	 * <p>
 	 * <ul>
 	 * <li>try, catch for InterruptedException ...
-	 * 	<ul>
-	 * 	<li>Execute the BlockObject block segment.
-	 * 	<li>Assign the notifier from this BlockObject
-	 * 		if one isn't already assigned (to mitigate
-	 *	 	a race condition).
-	 * 	<li>Notify the BlockManager.
-	 * 	</ul>
-	 * <li>If interrupted, do nothing and return.
+	 *   <ul>
+	 *   <li>Execute the BlockObject block segment.</li>
+	 *   <li>Assign the notifier from this BlockObject
+	 *     if one isn't already assigned (to mitigate
+	 *     a race condition).</li>
+	 *   <li>Notify the BlockManager.</li>
+	 *   </ul></li>
+	 * <li>If interrupted, do nothing and return.</li>
 	 * </ul>
+	 * </p>
 	 *
-	 * @param bo BlockObject to employ.  Other block objects
-	 *	may be linked to this block object.  In this event,
-	 *	employ all block objects simultaneously.
+	 * @param bo BlockObject to employ. Other block objects
+	 *   may be linked to this block object. In this event,
+	 *   employ all block objects simultaneously.
 	 */
 	public String block(BlockObject bo) {
 		// get all block objects

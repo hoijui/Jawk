@@ -14,7 +14,7 @@ public class KeyListImpl implements KeyList {
 
 	/**
 	 * Convert the set to a KeyList.
-	 * We could have used an ArrayList directly.  However, tagging
+	 * We could have used an ArrayList directly. However, tagging
 	 * the implementation with a KeyList interface improves type
 	 * checking within the parsing / semantic analysis phase.
 	 */

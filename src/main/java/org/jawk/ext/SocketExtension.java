@@ -50,13 +50,14 @@ import org.jawk.jrt.VariableManager;
  * 	SocketWrite($2, input);	## do the echo
  * }
  * </pre></blockquote>
+ * </p>
  * <p>
  * The extension functions are as follows:
  * <ul>
  * <hr>
  * <li><strong><em><font size=+1>ServerSocket</font></em></strong> -<br>
  * Sets up a server socket to listen for incoming
- * connections.  SocketRead on Sockets accepted
+ * connections. SocketRead on Sockets accepted
  * by ServerSocket return arbitrary-length Strings
  * (bytes buffered by the input stream, converted
  * to a string).<br>
@@ -70,7 +71,7 @@ import org.jawk.jrt.VariableManager;
  * </ul><p>
  * <li><strong><em><font size=+1>CServerSocket</font></em></strong> -<br>
  * Sets up a server socket to listen for incoming
- * connections.  SocketRead on Sockets accepted
+ * connections. SocketRead on Sockets accepted
  * by CServerSocket return strings which terminate
  * by a newline, or text in the input buffer just
  * prior to the closing of the socket.<br>
@@ -85,7 +86,7 @@ import org.jawk.jrt.VariableManager;
  * <hr>
  * <li><strong><em><font size=+1>Socket</font></em></strong> -<br>
  * Create a Socket and connect it to a TCP socket
- * endpoint.  SocketRead on Sockets returned
+ * endpoint. SocketRead on Sockets returned
  * by Socket return arbitrary-length Strings
  * (bytes buffered by the input stream, converted
  * to a string).<br>
@@ -100,7 +101,7 @@ import org.jawk.jrt.VariableManager;
  * </ul><p>
  * <li><strong><em><font size=+1>CSocket</font></em></strong> -<br>
  * Create a Socket and connect it to a TCP socket
- * endpoint.  SocketRead on Sockets returned
+ * endpoint. SocketRead on Sockets returned
  * by Socket return strings which terminate
  * by a newline, or text in the input buffer just
  * prior to the closing of the socket.<br>
@@ -173,7 +174,7 @@ import org.jawk.jrt.VariableManager;
  * <hr>
  * <li><strong><em><font size=+1>SocketAccept</font></em></strong> -<br>
  * Accepts a Socket from a ServerSocket or
- * a CServerSocket.  The operation will
+ * a CServerSocket. The operation will
  * block if there is no Socket to accept.<br>
  * <strong>Parameters:</strong>
  * <ul>
@@ -186,8 +187,8 @@ import org.jawk.jrt.VariableManager;
  * <hr>
  * <li><strong><em><font size=+1>SocketRead</font></em></strong> -<br>
  * Reads input from the input stream of a Socket
- * or a CSocket.  For a Socket, the input length
- * is arbitrary.  For a CSocket, the input
+ * or a CSocket. For a Socket, the input length
+ * is arbitrary. For a CSocket, the input
  * length is bounded by a newline or upon
  * termination of the socket.
  * The operation will block if there is no input
@@ -212,7 +213,7 @@ import org.jawk.jrt.VariableManager;
  * <ul>
  * <li>Socket-or-CSocket handle - required
  * <li>msg - required - The string to write to
- * 	the Socket.  For a CSocket, a newline
+ * 	the Socket. For a CSocket, a newline
  * 	is added to it (via the
  * 	java.io.PrintStream.println() method).
  * </ul>
@@ -252,7 +253,7 @@ public class SocketExtension extends AbstractExtension {
 
 	/**
 	 * Either threaded or non-threaded (nio-style) socket
-	 * handling.  The threaded implementation is provided
+	 * handling. The threaded implementation is provided
 	 * upon initial release. Non-threaded
 	 * functionality will be available in a subsequent
 	 * release.
@@ -278,8 +279,8 @@ public class SocketExtension extends AbstractExtension {
 					"Socket", // i.e., s = Socket("localhost", 8080)
 					"CSocket", // i.e., cs = CSocket("localhost", 8080)
 					"SocketAcceptBlock", // i.e., $0 = SocketAcceptBlock(ss, css,
-					"SocketInputBlock", // i.e.,	SocketInputBlock(s, cs,
-					"SocketCloseBlock", // i.e.,	  SocketCloseBlock(ss,css, s,cs)));
+					"SocketInputBlock", // i.e., SocketInputBlock(s, cs,
+					"SocketCloseBlock", // i.e., SocketCloseBlock(ss,css, s,cs)));
 					"SocketAccept", // i.e., cs = SocketAccept(css)
 					"SocketRead", // i.e., buf = SocketRead(s) or line = SocketRead(cs)
 					"SocketWrite", // i.e., SocketWrite(s, "hi there\n") or SocketWrite(cs, "hi there")
@@ -361,7 +362,7 @@ public class SocketExtension extends AbstractExtension {
 			throw new NotImplementedError(method_name);
 		}
 	}
-} // public class SocketExtension {AbstractExtension}
+}
 
 //
 // INTERFACE TO DELEGATE
@@ -369,7 +370,7 @@ public class SocketExtension extends AbstractExtension {
 
 /**
  * Interface to the socket handling delegate which
- * does all the work.  The SocketExtension manager
+ * does all the work. The SocketExtension manager
  * class delegates all concrete socket IO
  * processing to an instance of this interface.
  */
@@ -377,13 +378,13 @@ interface IO_Style {
 
 	/**
 	 * Sets up a server socket to listen for incoming
-	 * connections.  SocketRead on sockets accepted
+	 * connections. SocketRead on sockets accepted
 	 * by ServerSocket return arbitrary-length Strings
 	 * (bytes buffered by the input stream, converted
 	 * to a string).
 	 *
 	 * @param hostname The host-name or IP address as a string.
-	 * 	host-name can be null.
+	 *   host-name can be null.
 	 * @param port The port number.
 	 *
 	 * @return A handle to a newly created ServerSocket.
@@ -392,13 +393,13 @@ interface IO_Style {
 
 	/**
 	 * Sets up a server socket to listen for incoming
-	 * connections.  SocketRead on sockets accepted
+	 * connections. SocketRead on sockets accepted
 	 * by CServerSocket return strings which terminate
 	 * by a newline, or text in the input buffer just
 	 * prior to the closing of the socket.
 	 *
 	 * @param hostname The host-name or IP address as a string.
-	 * 	host-name can be null.
+	 *   host-name can be null.
 	 * @param port The port number.
 	 *
 	 * @return A handle to a newly created CServerSocket.
@@ -407,13 +408,13 @@ interface IO_Style {
 
 	/**
 	 * Create a Socket and connect it to a TCP socket
-	 * endpoint.  SocketRead on sockets returned
+	 * endpoint. SocketRead on sockets returned
 	 * by Socket return arbitrary-length Strings
 	 * (bytes buffered by the input stream, converted
 	 * to a string).
 	 *
 	 * @param hostname The host-name or IP address as a string.
-	 * 	host-name can be null.
+	 *   host-name can be null.
 	 * @param port The port number.
 	 *
 	 * @return A handle to a newly created Socket.
@@ -422,13 +423,13 @@ interface IO_Style {
 
 	/**
 	 * Create a Socket and connect it to a TCP socket
-	 * endpoint.  SocketRead on sockets returned
+	 * endpoint. SocketRead on sockets returned
 	 * by Socket return strings which terminate
 	 * by a newline, or text in the input buffer just
 	 * prior to the closing of the socket.
 	 *
 	 * @param hostname The host-name or IP address as a string.
-	 * 	host-name can be null.
+	 *   host-name can be null.
 	 * @param port The port number.
 	 *
 	 * @return A handle to a newly created CSocket.
@@ -440,18 +441,18 @@ interface IO_Style {
 	 * is ready to accept a connecting socket.
 	 *
 	 * @param args An array of
-	 * ServerSocket or CServerSocket handles
-	 * and/or associative arrays whose keys
-	 * are ServerSocket or CServerSocket handles.
-	 * The last argument can optionally be
-	 * another block call for block chaining.
+	 *   ServerSocket or CServerSocket handles
+	 *   and/or associative arrays whose keys
+	 *   are ServerSocket or CServerSocket handles.
+	 *   The last argument can optionally be
+	 *   another block call for block chaining.
 	 *
 	 * @return A block object conditioned
-	 * to block on the acceptance of
-	 * socket connections from any of
-	 * the ServerSockets / CServerSockets
-	 * referred to by the handles passed
-	 * in to the object array.
+	 *   to block on the acceptance of
+	 *   socket connections from any of
+	 *   the ServerSockets / CServerSockets
+	 *   referred to by the handles passed
+	 *   in to the object array.
 	 */
 	BlockObject socketacceptblock(Object[] args);
 
@@ -495,22 +496,22 @@ interface IO_Style {
 
 	/**
 	 * Accepts a socket from a ServerSocket or
-	 * a CServerSocket.  The operation will
+	 * a CServerSocket. The operation will
 	 * block if there is no socket to accept.
 	 *
 	 * @param handle A string handle to a ServerSocket
-	 * or CServerSocket.
+	 *   or CServerSocket.
 	 *
 	 * @return A handle to a socket or CSocket that
-	 * has connected to the ServerSocket / CServerSocket
-	 * referred to by the handle argument.
+	 *   has connected to the ServerSocket / CServerSocket
+	 *   referred to by the handle argument.
 	 */
 	String socketaccept(String handle);
 
 	/**
 	 * Reads input from the input stream of a socket
-	 * or a CSocket.  For a socket, the input length
-	 * is arbitrary.  For a CSocket, the input
+	 * or a CSocket. For a socket, the input length
+	 * is arbitrary. For a CSocket, the input
 	 * length is bounded by a newline or upon
 	 * termination of the socket.
 	 * The operation will block if there is no input
@@ -537,23 +538,23 @@ interface IO_Style {
 	 * underlying socket's PrintStream.
 	 *
 	 * @param handle A string handle to a socket
-	 * or CSocket.
+	 *   or CSocket.
 	 * @param buf The string containing the
-	 * bytes to write.  SocketWrite writes
-	 * the contents of the resulting buf.getBytes()
-	 * call to the socket.
+	 *   bytes to write. SocketWrite writes
+	 *   the contents of the resulting buf.getBytes()
+	 *   call to the socket.
 	 *
 	 * @param handle A String handle to a socket
-	 * or CSocket.
+	 *   or CSocket.
 	 * @param buf A string containing a block of
-	 * bytes to write to a socket (via
-	 * java.lang.String.getBytes()) if handle
-	 * refers to a socket.  If handle refers
-	 * to a CSocket, the line of text to write
-	 * via PrintStream.println(String).
+	 *   bytes to write to a socket (via
+	 *   {@see java.lang.String#getBytes()}) if handle
+	 *   refers to a socket. If handle refers
+	 *   to a CSocket, the line of text to write
+	 *   via {@see PrintStream#println(String)}.
 	 *
 	 * @return 1 upon a successful write,
-	 * 0 upon an IO exception/error.
+	 *   0 upon an IO exception/error.
 	 */
 	int socketwrite(String handle, String buf);
 
@@ -626,19 +627,19 @@ class Threaded_IO_Style implements IO_Style {
 	 * <p>
 	 * <strong>Note:</strong>
 	 * "consumers" originally was of type
-	 * Map<String,Consumer>, but changed to ...,Closeable.
+	 * <code>Map<String, Consumer></code>, but changed to ...,Closeable.
 	 * (Likewise, "accepters" was originally ...,Accepter,
 	 * but then changed to ...,Closeable.)
-	 * Why?  Because MapUnion could not infer that "Consumer"
+	 * Why? Because MapUnion could not infer that "Consumer"
 	 * nor "Accepter" were extensions of "Blockable".
 	 * MapUnion originally accepted 3 generic parameters:
 	 * K, V1 extends Blockable, and V2 extends Blockable.
 	 * And, close_blocker's BulkBlockObject Map parameter was:
-	 * new MapUnion<String,Accepter,Consumer>(accepters,consumers).
+	 * <code>new MapUnion<String, Accepter, Consumer>(accepters, consumers)</code>.
 	 * But, it wouldn't compile.
 	 * The resulting warning/error messages stated that
 	 * "capture #XXX of ? extends Blockable" does not
-	 * match "? extends Blockable".  I believe the error
+	 * match "? extends Blockable". I believe the error
 	 * results from Blockable being compiled against
 	 * Java 1.5.x and extensions being developed against
 	 * Java 1.6.x, and that they don't grok one another
@@ -648,6 +649,7 @@ class Threaded_IO_Style implements IO_Style {
 	 * specific "Accepter" and "Consumer" functionality.
 	 * This resolved the issue while losing some
 	 * compile-time type safety.
+	 * </p>
 	 */
 	private final Map<String, Closeable> consumers = new HashMap<String, Closeable>();
 
@@ -800,7 +802,7 @@ class Threaded_IO_Style implements IO_Style {
 		public String isBlockHandleValid(String handle) {
 			Closeable closeable = consumers.get(handle);
 			if (closeable == null) {
-				return "Invalid socket handle.  (Could have already been closed?)";
+				return "Invalid socket handle. (Could have already been closed?)";
 			}
 			if (closeable.isClosed()) {
 				return "Socket is closed.";
@@ -819,7 +821,7 @@ class Threaded_IO_Style implements IO_Style {
 				closeable = consumers.get(handle);
 			}
 			if (closeable == null) {
-				return "Invalid socket handle.  (Could have already been closed?)";
+				return "Invalid socket handle. (Could have already been closed?)";
 			}
 			if (closeable.isClosed()) {
 				return "Socket is already closed.";
@@ -1172,7 +1174,7 @@ class Threaded_IO_Style implements IO_Style {
 		{
 			socket.close();
 		}
-	} // private abstract class AbstractConsumer<T> {Thread} [Consumer]
+	}
 
 	private static final int ACTIVE_STATE = 1;
 	private static final int CLOSE_PENDING_STATE = 2;
@@ -1256,4 +1258,4 @@ class Threaded_IO_Style implements IO_Style {
 			}
 		}
 	}
-} // class Threaded_IO_Style [IO_Style]
+}

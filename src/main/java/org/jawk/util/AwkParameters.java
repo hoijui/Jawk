@@ -13,62 +13,64 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Awk Parameters.  It manages the command-line parameters accepted by Jawk.
+ * Manages the command-line parameters accepted by Jawk.
  * The parameters and their meanings are provided below:
  *
  * <ul>
- * <li>-v name=val [-v name=val] ... <br>
- * Variable assignments prior to execution of the script.
- * <li>-F regexp <br>
- * Field separator (FS).
- * <li>-f filename <br>
+ * <li>-v name=val [-v name=val] ... <br/>
+ * Variable assignments prior to execution of the script.</li>
+ * <li>-F regexp <br/>
+ * Field separator (FS).</li>
+ * <li>-f filename <br/>
  * Use the text contained in filename as the script rather than
- * obtaining it from the command-line.
- * <li><i>Extension</i> -c <br>
- * Write intermediate file.  Intermediate file can be used as
- * an argument to -f.
- * <li><i>Extension</i> -o filename <br>
- * Output filename for intermediate file, tuples, or syntax tree.
- * <li><i>Extension</i> -z <br>
- * Compile to JVM rather than interpret it.
- * <li><i>Extension</i> -Z <br>
- * Compile to JVM rather and execute it.
- * <li><i>Extension</i> -d <br>
- * Compile results to destination directory instead of current working dir.
- * <li><i>Extension</i> -s <br>
- * Dump the intermediate code.
- * <li><i>Extension</i> -S <br>
- * Dump the syntax tree.
- * <li><i>Extension</i> -x <br>
- * Enables _sleep, _dump, and exec keywords/functions.
- * <li><i>Extension</i> -y <br>
- * Enables _INTEGER, _DOUBLE, and _STRING type casting keywords.
- * <li><i>Extension</i> -t <br>
- * Maintain array keys in sorted order (using a TreeMap instead of a HashMap)
- * <li><i>Extension</i> -r <br>
- * Do NOT trap for IllegalFormatException when using java.util.Formatter
- * for sprintf and printf.
- * <li><i>Extension</i> -ext <br>
- * Enabled user-defined extensions.  Works together with the
+ * obtaining it from the command-line.</li>
+ * <li><i>Extension</i> -c <br/>
+ * Write intermediate file. Intermediate file can be used as
+ * an argument to -f.</li>
+ * <li><i>Extension</i> -o filename <br/>
+ * Output filename for intermediate file, tuples, or syntax tree.</li>
+ * <li><i>Extension</i> -z <br/>
+ * Compile to JVM rather than interpret it.</li>
+ * <li><i>Extension</i> -Z <br/>
+ * Compile to JVM rather and execute it.</li>
+ * <li><i>Extension</i> -d <br/>
+ * Compile results to destination directory instead of current working dir.</li>
+ * <li><i>Extension</i> -s <br/>
+ * Dump the intermediate code.</li>
+ * <li><i>Extension</i> -S <br/>
+ * Dump the syntax tree.</li>
+ * <li><i>Extension</i> -x <br/>
+ * Enables _sleep, _dump, and exec keywords/functions.</li>
+ * <li><i>Extension</i> -y <br/>
+ * Enables _INTEGER, _DOUBLE, and _STRING type casting keywords.</li>
+ * <li><i>Extension</i> -t <br/>
+ * Maintain array keys in sorted order (using a TreeMap instead of a HashMap)</li>
+ * <li><i>Extension</i> -r <br/>
+ * Do NOT error for <code>IllegalFormatException</code> when using
+ * <code>java.util.Formatter</code> for <code>sprintf</code>
+ * and <code>printf</code>.</li>
+ * <li><i>Extension</i> -ext <br/>
+ * Enabled user-defined extensions. Works together with the
  * -Djava.extensions property.
- * It also disables blank rule as mapping to a print $0 statement.
- * <li><i>Extension</i> -ni <br>
+ * It also disables blank rule as mapping to a print $0 statement.</li>
+ * <li><i>Extension</i> -ni <br/>
  * Do NOT consume stdin or files from ARGC/V through input rules.
  * The motivation is to leave input rules for blocking extensions
- * (i.e., Sockets, Dialogs, etc).
+ * (i.e., Sockets, Dialogs, etc).</li>
  * </ul>
  * followed by the script (if -f is not provided), then followed
  * by a list containing zero or more of the following parameters:
  * <ul>
- * <li>name=val <br>
+ * <li>name=val <br/>
  * Variable assignments occurring just prior to receiving input
- * (but after the BEGIN blocks, if any).
- * <li>filename <br>
- * Filenames to treat as input to the script.
+ * (but after the BEGIN blocks, if any).</li>
+ * <li>filename <br/>
+ * Filenames to treat as input to the script.</li>
  * </ul>
  * <p>
  * If no filenames are provided, stdin is used as input
  * to the script (but only if there are input rules).
+ * </p>
  */
 public class AwkParameters {
 
@@ -115,7 +117,7 @@ public class AwkParameters {
 			dest.println(" -o = (extension) Specify output file.");
 			dest.println(" -z = (extension) | Compile for JVM. (default: AwkScript.class)");
 			dest.println(" -Z = (extension) | Compile for JVM and execute it. (default: AwkScript.class)");
-			dest.println(" -d = (extension) | Compile to destination directory.  (default: pwd)");
+			dest.println(" -d = (extension) | Compile to destination directory. (default: <CWD>)");
 			dest.println(" -S = (extension) Write the syntax tree to file. (default: syntax_tree.lst)");
 			dest.println(" -s = (extension) Write the intermediate code to file. (default: avm.lst)");
 			dest.println(" -x = (extension) Enable _sleep, _dump as keywords, and exec as a builtin func.");
@@ -139,7 +141,8 @@ public class AwkParameters {
 		dest.println(" -h or -? = (extension) This help screen.");
 		if (dest == System.out) {
 			System.exit(0);
-		} else { // invalid usage ... return a non-zero error code
+		} else {
+			// invalid usage ... return a non-zero error code
 			System.exit(1);
 		}
 	}
@@ -266,16 +269,17 @@ public class AwkParameters {
 	 * The command-line argument semantics are as follows:
 	 * <ul>
 	 * <li>First, "-" arguments are processed until first non-"-" argument
-	 *	is encountered, or the "-" itself is provided.
-	 * <li>Next, a script is expected (unless the -f argument was provided).
+	 *	is encountered, or the "-" itself is provided.</li>
+	 * <li>Next, a script is expected (unless the -f argument was provided).</li>
 	 * <li>Then, subsequent parameters are passed into the script
-	 *	via the ARGC/ARGV variables.
+	 *	via the ARGC/ARGV variables.</li>
 	 * </ul>
+	 * </p>
 	 *
 	 * @param mainclass The main class to print when displaying usage.
 	 * @param args The command-line arguments provided by the user.
 	 * @param extension_description a text description of extensions that
-	 *	are enabled (for compiled scripts)
+	 *   are enabled (for compiled scripts)
 	 */
 	public AwkParameters(Class mainclass, String[] args, String extension_description) {
 		this.mainclass = mainclass;
@@ -443,17 +447,17 @@ public class AwkParameters {
 
 	/**
 	 * Determine if the -f optarg is an intermediate file.
-	 * Intermediate files end with the .ai extension.  No other
+	 * Intermediate files end with the .ai extension. No other
 	 * determination is made whether the file is an intermediate
-	 * file or not.  That is, the content of the file is not checked.
+	 * file or not. That is, the content of the file is not checked.
 	 *
 	 * @return true if the -f optarg is an intermediate file (a file
 	 *   ending in .ai), false otherwise.
 	 */
-  public boolean isIntermediateFile() { return is_intermediate_file; }
+	public boolean isIntermediateFile() { return is_intermediate_file; }
 
 	/**
-	 * Obtain the Reader containing the script.  This returns non-null
+	 * Obtain the Reader containing the script. This returns non-null
 	 * only if the -f argument is utilized.
 	 *
 	 * @return The reader which contains the script, null if no script

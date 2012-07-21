@@ -2,7 +2,7 @@ package org.jawk.jrt;
 
 // There must be NO imports to org.jawk.*,
 // other than org.jawk.jrt which occurs by
-// default.  We wish to house all
+// default. We wish to house all
 // required runtime classes in jrt.jar,
 // not have to refer to jawk.jar!
 
@@ -29,16 +29,17 @@ import java.util.regex.Pattern;
 /**
  * The Jawk runtime coordinator.
  * The JRT services interpreted and compiled Jawk scripts, mainly
- * for IO and other non-CPU bound tasks.  The goal is to house
+ * for IO and other non-CPU bound tasks. The goal is to house
  * service functions into a Java-compiled class rather than
  * to hand-craft service functions in byte-code, or cut-paste
- * compiled JVM code into the compiled AWK script.  Also,
+ * compiled JVM code into the compiled AWK script. Also,
  * since these functions are non-CPU bound, the need for
  * inlining is reduced.
  * <p>
  * Variable access is achieved through the VariableManager interface.
  * The constructor requires a VariableManager instance (which, in
  * this case, is the compiled Jawk class itself).
+ * </p>
  * <p>
  * Main services include:
  * <ul>
@@ -50,12 +51,14 @@ import java.util.regex.Pattern;
  * <li>Random number engine management.
  * <li>Input field ($0, $1, ...) management.
  * </ul>
+ * </p>
  * <p>
  * All static and non-static service methods should be package-private
- * to the resultant AWK script class rather than public.  However,
- * the resultant script class is not in the org.jawk.jrt package
+ * to the resultant AWK script class rather than public. However,
+ * the resultant script class is not in the <code>org.jawk.jrt</code> package
  * by default, and the user may reassign the resultant script class
- * to another package.  Therefore, all accessed methods are public.
+ * to another package. Therefore, all accessed methods are public.
+ * </p>
  *
  * @see VariableManager
  */
@@ -88,7 +91,7 @@ public class JRT {
 	 * Assign all -v variables.
 	 *
 	 * @param initial_var_map A map containing all initial variable
-	 * 	names and their values.
+	 *   names and their values.
 	 */
 	public final void assignInitialVariables(Map<String, Object> initial_var_map) {
 		assert initial_var_map != null;
@@ -104,8 +107,8 @@ public class JRT {
 	 * (in this case, to ENVIRON).
 	 *
 	 * @param aa The associative array to populate with
-	 * 	environment variables.  The module asserts that
-	 * 	the associative array is empty prior to population.
+	 *   environment variables. The module asserts that
+	 *   the associative array is empty prior to population.
 	 */
 	public static void assignEnvironmentVariables(AssocArray aa) {
 		assert aa.keySet().isEmpty();
@@ -151,10 +154,10 @@ public class JRT {
 		}
 	}
 
-  // not static to use CONVFMT (& possibly OFMT later)
+	// not static to use CONVFMT (& possibly OFMT later)
 	/**
 	 * Convert a String, Integer, or Double to String
-	 * based on the OFMT variable contents.  Jawk will
+	 * based on the OFMT variable contents. Jawk will
 	 * subsequently use this String for output via print().
 	 *
 	 * @param o Object to convert.
@@ -204,17 +207,17 @@ public class JRT {
 	}
 
 	/**
-	 * Compares two objects.  Whether to employ less-than, equals, or
+	 * Compares two objects. Whether to employ less-than, equals, or
 	 * greater-than checks depends on the mode chosen by the callee.
 	 * It handles Awk variable rules and type conversion semantics.
 	 *
 	 * @param o1 The 1st object.
 	 * @param o2 the 2nd object.
 	 * @param mode <ul>
-	 * 	<li>&lt; 0 - Return true if o1 &lt; o2.
-	 * 	<li>0 - Return true if o1 == o2.
-	 * 	<li>&gt; 0 - Return true if o1 &gt; o2.
-	 * 	</ul>
+	 *   <li>&lt; 0 - Return true if o1 &lt; o2.</li>
+	 *   <li>0 - Return true if o1 == o2.</li>
+	 *   <li>&gt; 0 - Return true if o1 &gt; o2.</li>
+	 *   </ul>
 	 */
 	public static boolean compare2(Object o1, Object o2, int mode) {
 
@@ -254,16 +257,16 @@ public class JRT {
 
 	/**
 	 * Return an object which is numerically equivalent to
-	 * one plus a given object.  For Integers and Doubles,
-	 * this is similar to o+1.  For Strings, attempts are
-	 * made to convert it to a double first.  If the
+	 * one plus a given object. For Integers and Doubles,
+	 * this is similar to o+1. For Strings, attempts are
+	 * made to convert it to a double first. If the
 	 * String does not represent a valid Double, 1 is returned.
 	 *
 	 * @param o The object to increase.
 	 *
 	 * @return o+1 if o is an Integer or Double object, or
 	 *   if o is a String object and represents a double.
-	 * 	 Otherwise, 1 is returned.  If the return value
+	 *   Otherwise, 1 is returned. If the return value
 	 *   is an integer, an Integer object is returned.
 	 *   Otherwise, a Double object is returned.
 	 */
@@ -288,18 +291,18 @@ public class JRT {
 
 	/**
 	 * Return an object which is numerically equivalent to
-	 * one minus a given object.  For Integers and Doubles,
-	 * this is similar to o-1.  For Strings, attempts are
-	 * made to convert it to a double first.  If the
+	 * one minus a given object. For Integers and Doubles,
+	 * this is similar to o-1. For Strings, attempts are
+	 * made to convert it to a double first. If the
 	 * String does not represent a valid Double, -1 is returned.
 	 *
 	 * @param o The object to increase.
 	 *
 	 * @return o-1 if o is an Integer or Double object, or
-	 * 	 if o is a String object and represents a double.
-	 * 	 Otherwise, -1 is returned.  If the return value
-	 * 	 is an integer, an Integer object is returned.
-	 * 	 Otherwise, a Double object is returned.
+	 *   if o is a String object and represents a double.
+	 *   Otherwise, -1 is returned. If the return value
+	 *   is an integer, an Integer object is returned.
+	 *   Otherwise, a Double object is returned.
 	 */
 	public static Object dec(Object o) {
 		double ans;
@@ -550,7 +553,7 @@ public class JRT {
 					if (for_getline) {
 						// TRUE
 						// leave result on the stack
-						// DO NOTHING!  The callee will re-acquire $0
+						// DO NOTHING! The callee will re-acquire $0
 					} else {
 						// FALSE
 						// leave the stack alone ...
@@ -567,7 +570,7 @@ public class JRT {
 				continue;
 			}
 		}
-	} // public boolean jrtConsumeInput(boolean for_getline) throws IOException
+	}
 
 	private void setFilelistVariable(String name_value)
 			throws IllegalArgumentException
@@ -884,9 +887,10 @@ public class JRT {
 	 * <p>
 	 * The specification did not describe AWK behavior
 	 * when attempting to close streams/processes with
-	 * the same file/command name.  In this case,
+	 * the same file/command name. In this case,
 	 * <em>all</em> open streams with this name
 	 * are closed.
+	 * </p>
 	 *
 	 * @param filename The filename/command process to close.
 	 *
@@ -1010,7 +1014,7 @@ public class JRT {
 	 * @param cmd The command to execute.
 	 *
 	 * @return Integer(return_code) of the created
-	 *   process.  Integer(-1) is returned on an IO error.
+	 *   process. Integer(-1) is returned on an IO error.
 	 */
 	public static Integer jrtSystem(String cmd) {
 		try {
@@ -1196,4 +1200,4 @@ public class JRT {
 			pr.RS(rs_obj.toString());
 		}
 	}
-} // public class JRT
+}

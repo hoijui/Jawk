@@ -7,12 +7,13 @@ import java.util.regex.Pattern;
  * previous text has matched the first regex, but not the
  * second regex.
  * When text matches the second regex, it is still considered
- * a match.  However, subsequent matching attempts are false
+ * a match. However, subsequent matching attempts are false
  * unless the first regex is matched again.
  * <p>
  * If text matches both the first and second regex, the entry
  * is considered a match, but subsequent entries are not considered
  * matched (unless the text matches the first regex).
+ * </p>
  */
 public class PatternPair {
 
@@ -31,11 +32,12 @@ public class PatternPair {
 	 * the text is matched against the second regex.
 	 * <p>
 	 * @param str Text to match against the first and second
-	 *  regular expressions.
+	 *   regular expressions.
 	 * @return true if this or previous text matches the first regex,
-	 * 	 up until text matches the second regex, which is still considered
-	 * 	 a match, but subsequent text is not considered a match
-	 * 	 (unless, of course, the text matches the first regex).
+	 *   up until text matches the second regex, which is still considered
+	 *   a match, but subsequent text is not considered a match
+	 *   (unless, of course, the text matches the first regex).
+	 * </p>
 	 */
 	public boolean matches(String str) {
 		if (p1.matcher(str).find()) {

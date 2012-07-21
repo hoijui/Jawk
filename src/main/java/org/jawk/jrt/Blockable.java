@@ -9,7 +9,7 @@ public interface Blockable {
 	 * Polls whether the item will block or not.
 	 * The blocking mechanism should perform this once.
 	 * If blocking will occur, then the blocking mechanism
-	 * will enter into a wait() state.  Otherwise,
+	 * will enter into a wait() state. Otherwise,
 	 * the item is in a non-blocking state, waiting to
 	 * be processed by the client.
 	 *
@@ -19,4 +19,4 @@ public interface Blockable {
 	 *   available), false otherwise
 	 */
 	boolean willBlock(BlockObject bo);
-} // public interface Blockable
+}

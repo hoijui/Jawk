@@ -47,21 +47,24 @@ import org.jawk.util.MyStack;
  * The interpreter consists of an instruction processor (interpreter),
  * a runtime stack, and machinery to support the instruction set
  * contained within the tuples.
+ * </p>
  * <p>
  * The interpreter runs completely independent of the frontend/intermediate step.
  * In fact, an intermediate file produced by Jawk is sufficient to
- * execute on this interpreter.  The binding data-structure is
+ * execute on this interpreter. The binding data-structure is
  * the AwkParameters, which can contain options pertinent to
- * the interpreter.  For example, the interpreter must know about
+ * the interpreter. For example, the interpreter must know about
  * the -v command line arguments, as well as the file/variable list
  * parameters (ARGC/ARGV) after the script on the command line.
  * However, if programmatic access to the AVM is required, meaningful
  * AwkParameters are not required.
+ * </p>
  * <p>
  * Semantic analysis has occurred prior to execution of the interpreter.
  * Therefore, the interpreter throws AwkRuntimeExceptions upon most
- * errors/conditions.  It can also throw a <code>java.lang.Error</code> if an
+ * errors/conditions. It can also throw a <code>java.lang.Error</code> if an
  * interpreter error is encountered.
+ * </p>
  */
 public class AVM implements AwkInterpreter, VariableManager {
 
@@ -95,6 +98,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * <p>
 	 * Provided to allow programmatic construction of the interpreter
 	 * outside of the framework which is used by Jawk.
+	 * </p>
 	 */
 	public AVM() {
 		parameters = null;
@@ -156,7 +160,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private int oldseed;
 
 	private Address exit_address = null;
-	/** True if execution position is within an END block; false otherwise.  */
+	/**
+	 * <code>true</code> if execution position is within an END block;
+	 * <code>false</code> otherwise.
+	 */
 	private boolean within_end_blocks = false;
 	// use a return code of 0 by default
 	private int exit_code = 0;
@@ -169,7 +176,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private Map<String, Integer> global_variable_offsets;
 	/**
 	 * Indicates whether the variable, by name, is a scalar
-	 * or not.  If not, then it is an Associative Array.
+	 * or not. If not, then it is an Associative Array.
 	 */
 	private Map<String, Boolean> global_variable_aarrays;
 	private Set<String> function_names;
@@ -1041,7 +1048,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						} else if (numargs == 3) {
 							fs_string = JRT.toAwkString(pop(), convfmt);
 						} else {
-							throw new Error("Invalid # of args.  split() tequires 2 or 3.  Got: " + numargs);
+							throw new Error("Invalid # of args. split() tequires 2 or 3. Got: " + numargs);
 						}
 						Enumeration<Object> tokenizer;
 						if (numargs == 2 && fs_string.equals(" ")) {
@@ -1080,7 +1087,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 							} else if (numargs == 3) {
 								pop();
 							} else {
-								throw new Error("numargs for _SUBSTR_ must be 2 or 3.  It is " + numargs);
+								throw new Error("numargs for _SUBSTR_ must be 2 or 3. It is " + numargs);
 							}
 							push(BLANK);
 						} else if (numargs == 2) {
@@ -1096,7 +1103,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 								push(s.substring(m - 1, m + n - 1));
 							}
 						} else {
-							throw new Error("numargs for _SUBSTR_ must be 2 or 3.  It is " + numargs);
+							throw new Error("numargs for _SUBSTR_ must be 2 or 3. It is " + numargs);
 						}
 						position.next();
 						break;
@@ -1329,7 +1336,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						Object o = pop();
 						assert o != null;
 						if (!(o instanceof AssocArray)) {
-							throw new AwkRuntimeException(position.lineNumber(), "Cannot get a keylist (via 'in') of a non associative array.  arg = " + o.getClass() + ", " + o);
+							throw new AwkRuntimeException(position.lineNumber(), "Cannot get a keylist (via 'in') of a non associative array. arg = " + o.getClass() + ", " + o);
 						}
 						AssocArray aa = (AssocArray) o;
 						push(new KeyListImpl(aa.keySet()));
@@ -1341,7 +1348,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[0] = KeyList
 						Object o = pop();
 						if (o == null || !(o instanceof KeyList)) {
-							throw new AwkRuntimeException(position.lineNumber(), "Cannot get a keylist (via 'in') of a non associative array.  arg = " + o.getClass() + ", " + o);
+							throw new AwkRuntimeException(position.lineNumber(), "Cannot get a keylist (via 'in') of a non associative array. arg = " + o.getClass() + ", " + o);
 						}
 						KeyList keylist = (KeyList) o;
 						if (keylist.size() == 0) {
@@ -1355,7 +1362,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[0] = KeyList
 						Object o = pop();
 						if (o == null || !(o instanceof KeyList)) {
-							throw new AwkRuntimeException(position.lineNumber(), "Cannot get a keylist (via 'in') of a non associative array.  arg = " + o.getClass() + ", " + o);
+							throw new AwkRuntimeException(position.lineNumber(), "Cannot get a keylist (via 'in') of a non associative array. arg = " + o.getClass() + ", " + o);
 						}
 						// pop off and return the head of the key set
 						KeyList keylist = (KeyList) o;
@@ -1369,7 +1376,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[0] = item to check
 						Object o = pop();
 						if (!(position.classArg().isInstance(o))) {
-							throw new AwkRuntimeException(position.lineNumber(), "Verification failed.  Top-of-stack = " + o.getClass() + " isn't an instance of " + position.classArg());
+							throw new AwkRuntimeException(position.lineNumber(), "Verification failed. Top-of-stack = " + o.getClass() + " isn't an instance of " + position.classArg());
 						}
 						push(o);
 						position.next();
@@ -1386,8 +1393,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 								position.jump(position.addressArg());
 							}
 						} catch (IOException ioe) {
-							//assert false : "Should not throw io exception here.  ioe = "+ioe;
-							throw new Error("Should not throw io exception here.  ioe = " + ioe);
+							//assert false : "Should not throw io exception here. ioe = "+ioe;
+							throw new Error("Should not throw io exception here. ioe = " + ioe);
 						}
 						break;
 					}
@@ -1796,7 +1803,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 					case AwkTuples._EXEC_: {
 						// stack[0] = Jawk code
 
-						// First attempt.  It is not complete by a long-shot.
+						// First attempt. It is not complete by a long-shot.
 						// Use at your own risk.
 
 						String awk_code = JRT.toAwkString(pop(), getCONVFMT().toString());
@@ -1856,7 +1863,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 
 						// block if necessary
 						// (convert retval into the return value
-						//  from the block operation ...)
+						// from the block operation ...)
 						if (is_initial && retval != null && retval instanceof BlockObject) {
 							retval = new BlockManager().block((BlockObject) retval);
 						}
@@ -1885,7 +1892,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 				}
 			}
 			jrt.jrtCloseAll();
-			assert operand_stack.size() == 0 : "operand stack is NOT empty upon script termination.  operand_stack (size=" + operand_stack.size() + ") = " + operand_stack;
+			assert operand_stack.size() == 0 : "operand stack is NOT empty upon script termination. operand_stack (size=" + operand_stack.size() + ") = " + operand_stack;
 			return exit_code;
 		} catch (RuntimeException re) {
 			System.out.println("Runtime Exception: " + re);
@@ -1914,9 +1921,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 			}
 			throw ae;
 		} finally {
-			//assert operand_stack.size() == 0 : "operand stack is NOT empty upon script termination.  operand_stack (size="+operand_stack.size()+") = "+operand_stack;
-			// if (operand_stack.size() != 0)
-			// 	throw new Error("operand stack is NOT empty upon script termination.  operand_stack (size="+operand_stack.size()+") = "+operand_stack);
+//			assert operand_stack.size() == 0 : "operand stack is NOT empty upon script termination. operand_stack (size="+operand_stack.size()+") = "+operand_stack;
+//			if (operand_stack.size() != 0) {
+//				throw new Error("operand stack is NOT empty upon script termination. operand_stack (size=" + operand_stack.size() + ") = " + operand_stack);
+//			}
 		}
 	}
 
@@ -2262,7 +2270,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 			push(jrt.input_line);
 		}
 		return retval;
-	} // private boolean avmConsumeInput(boolean for_getline) throws IOException
+	}
 
 	@Override
 	public Object getFS() {
@@ -2441,6 +2449,5 @@ public class AVM implements AwkInterpreter, VariableManager {
 			return_value = null;
 			return retval;
 		}
-		// private methods
-	} // static class RuntimeStack
-} // public class AVM
+	}
+}

@@ -25,12 +25,14 @@ public class SingleCharacterTokenizer implements Enumeration<Object> {
 		this.split_char = split_char;
 	}
 
+	@Override
 	public boolean hasMoreElements() {
 		return idx < input.length();
 	}
 
 	private StringBuffer sb = new StringBuffer();
 
+	@Override
 	public Object nextElement() {
 		sb.setLength(0);
 		while (idx < input.length()) {

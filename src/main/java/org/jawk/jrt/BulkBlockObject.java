@@ -10,7 +10,7 @@ import java.util.Set;
  * with data (i.e., will not block).
  * It's like BlockObject in that this is returned
  * to the AVM/AwkScript for execution by
- * the BlockManager.  Unlike the BlockObject, however,
+ * the BlockManager. Unlike the BlockObject, however,
  * it implements the block() and getNotifierTag()
  * to manage blocking for a collection of Blockables.
  *
@@ -68,6 +68,7 @@ public final class BulkBlockObject extends BlockObject {
 	 * <pre>
 	 * prefix OFS handle
 	 * </pre>
+	 * </p>
 	 *
 	 * @return The client string containing the handle of the
 	 * non-blocking object.
@@ -202,4 +203,4 @@ public final class BulkBlockObject extends BlockObject {
 
 		return blocker;
 	}
-} // public final class BulkBlockObject {BlockObject}
+}

@@ -29,17 +29,17 @@ import org.jawk.util.DestDirClassLoader;
  * <p>
  * The overall process to execute a Jawk script is as follows:
  * <ul>
- * <li>Parse the Jawk script, producing an abstract syntax tree.
+ * <li>Parse the Jawk script, producing an abstract syntax tree.</li>
  * <li>Traverse the abstract syntax tree, producing a list of
- *	instruction tuples for the interpreter.
+ *	 instruction tuples for the interpreter.</li>
  * <li>Either:
  *   <ul>
  *   <li>Traverse the list of tuples, providing a runtime which
- *	 ultimately executes the Jawk script, <strong>or</strong>
+ *	   ultimately executes the Jawk script, <strong>or</strong></li>
  *   <li>Translate the list of tuples into JVM code, providing
- *       a compiled representation of the script to JVM.
- *    </ul>
- *    Command-line parameters dictate which action is to take place.
+ *     a compiled representation of the script to JVM.</li>
+ *   </ul>
+ *   Command-line parameters dictate which action is to take place.</li>
  * </ul>
  * Two additional semantic checks on the syntax tree are employed
  * (both to resolve function calls for defined functions).
@@ -50,22 +50,26 @@ import org.jawk.util.DestDirClassLoader;
  * interpretation, and two times for compilation (once for
  * global variable arrangement, and the second time for
  * translation to byte-code).
+ * </p>
  * <p>
  * By default a minimal set of extensions are automatically
- * included.  Please refer to the EXTENSION_PREFIX static field
- * contents for an up-to-date list.  As of the initial release
+ * included. Please refer to the EXTENSION_PREFIX static field
+ * contents for an up-to-date list. As of the initial release
  * of the extension system, the prefix defines the following
  * extensions:
  * <ul>
- * <li>CoreExtension
- * <li>SocketExtension
- * <li>StdinExtension
+ * <li>CoreExtension</li>
+ * <li>SocketExtension</li>
+ * <li>StdinExtension</li>
  * </ul>
+ * </p>
  * <p>
  * <strong>Note:</strong> Compilation requires the installation of
- * <a href="http://jakarta.apache.org/bcel/" target=_TOP>The Apache Byte Code Engineering Library (BCEL)</a>.
+ * <a href="http://jakarta.apache.org/bcel/" target=_TOP>
+ * The Apache Byte Code Engineering Library (BCEL)</a>.
  * Please see the AwkCompilerImpl JavaDocs or the
  * project web page for more details.
+ * </p>
  *
  * @see org.jawk.backend.AVM
  * @see org.jawk.backend.AwkCompilerImpl
@@ -88,12 +92,13 @@ public class Awk {
 	 * System.exit(invoke(args));
 	 * </pre>
 	 * </blockquote>
+	 * </p>
 	 *
 	 * @param args Command line arguments to the VM.
 	 *
 	 * @throws IOException upon an IO error.
 	 * @throws ClassNotFoundException if compilation is requested,
-	 *	but no compilation implementation class is found.
+	 *	 but no compilation implementation class is found.
 	 */
 	public static void main(String[] args)
 			throws IOException, ClassNotFoundException
@@ -110,11 +115,11 @@ public class Awk {
 	 * @param args Command line arguments to the VM.
 	 *
 	 * @return The exit code to the script if interpreted, or exit code
-	 * 	of the compiler.
+	 * 	 of the compiler.
 	 *
 	 * @throws IOException upon an IO error.
 	 * @throws ClassNotFoundException if compilation is requested,
-	 *	but no compilation implementation class is found.
+	 *	 but no compilation implementation class is found.
 	 */
 	public static int invoke(String[] args)
 			throws IOException, ClassNotFoundException
@@ -396,7 +401,7 @@ public class Awk {
 					throw new ClassNotFoundException(cls + " does not implement JawkExtension");
 				}
 				if (extension_classes.contains(c)) {
-					System.err.println("Warning: " + cls + " multiply referred in extension class list.  Skipping.");
+					System.err.println("Warning: " + cls + " multiply referred in extension class list. Skipping.");
 					continue;
 				} else {
 					extension_classes.add(c);
@@ -427,4 +432,4 @@ public class Awk {
 
 		return retval;
 	}
-} // public class Awk
+}

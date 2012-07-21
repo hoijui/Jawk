@@ -58,6 +58,7 @@ public interface Position {
 	 * <p>
 	 * This is a special form in that the tuple
 	 * has only the address argument, and nothing else.
+	 * </p>
 	 */
 	Address addressArg();
 
@@ -66,6 +67,7 @@ public interface Position {
 	 * <p>
 	 * This is a special form in that the tuple
 	 * has only the class argument, and nothing else.
+	 * </p>
 	 */
 	Class classArg();
 

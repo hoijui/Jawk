@@ -7,14 +7,16 @@ package org.jawk.intermediate;
  * <p>
  * Addresses have the following properties:
  * <ul>
- * <li>A name (label).
- * <li>An index into the tuple queue.
+ * <li>A name (label).</li>
+ * <li>An index into the tuple queue.</li>
  * </ul>
  * An address may not necessarily have an index assigned upon creation.
  * However, upon tuple traversal, all address indexes must
  * point to a valid tuple.
+ * </p>
  * <p>
  * All addresses should have a meaningful label.
+ * </p>
  */
 public interface Address {
 

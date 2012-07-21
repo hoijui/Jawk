@@ -27,12 +27,12 @@ import org.jawk.jrt.VariableManager;
  * <li><strong>Array</strong> - <code><font size=+1>Array(array,1,3,5,7,9)</font></code><br>
  * Inserts elements into an associative array whose keys
  * are ordered non-negative integers, and the values
- * are the arguments themselves.  The first argument is
+ * are the arguments themselves. The first argument is
  * the associative array itself.
  * <li><strong>Map/HashMap/TreeMap/LinkedMap</strong> - <code><font size=+1>Map(map,k1,v1,k2,v2,...,kN,vN)</font></code>,
  * or <code><font size=+1>Map(k1,v1,k2,v2,...,kN,vN)</font></code>.<br>
  * Build an associative array with its keys/values as
- * parameters.  The odd parameter count version takes
+ * parameters. The odd parameter count version takes
  * the map name as the first parameter, while the even
  * parameter count version returns an anonymous associative
  * array for the purposes of providing a map by function
@@ -71,7 +71,7 @@ import org.jawk.jrt.VariableManager;
  * block processing.
  * <li><strong>Timeout</strong> - <code><font size=+1>r = Timeout(300)</font></code><br>
  * A blocking function which waits N milliseconds
- * before unblocking (continuing).  This is useful in scripts which
+ * before unblocking (continuing). This is useful in scripts which
  * employ blocking, but occasionally needs to break out
  * of the block to perform some calculation, polling, etc.
  * <li><strong>Throw</strong> - <code><font size=+1>Throw("this is an awkruntimeexception")</font></code><br>
@@ -86,6 +86,7 @@ import org.jawk.jrt.VariableManager;
  * Reference Management Functions.</font></code><br>
  * These are described in detail below.
  * </ul>
+ * </p>
  * <p>
  * <h1>Reference Management</h1>
  * AWK's memory model provides only 4 types of variables
@@ -96,7 +97,7 @@ import org.jawk.jrt.VariableManager;
  * <li>String
  * <li>Associative Array
  * </ul>
- * Variables can hold any of these types.  However, unlike
+ * Variables can hold any of these types. However, unlike
  * for scalar types (integer/double/string), AWK applies
  * the following restrictions with regard to associative
  * arrays:
@@ -109,9 +110,10 @@ import org.jawk.jrt.VariableManager;
  * to extensions because associative arrays are excellent vehicles
  * for configuration and return values for user extensions.
  * Plus, associative arrays can be overriden, which can be used
- * to enforce type safety within user extensions.  Unfortunately, the
+ * to enforce type safety within user extensions. Unfortunately, the
  * memory model restrictions make using associative arrays in this
  * capacity very difficult.
+ * </p>
  * <p>
  * We attempt to alleviate these difficulties by adding references
  * to Jawk via the CoreExtension module.
@@ -123,11 +125,12 @@ import org.jawk.jrt.VariableManager;
  * functions to perform common associative array operations, such as
  * associative array cell lookup and assignment, key existence
  * check, and key iteration.
+ * </p>
  * <p>
  * The reference model functions are explained below:
  * <ul>
  * <li><strong>NewRef / NewReference</strong> - <code><font size=+1>handle = NewRef(assocarray)</font></code><br>
- * Store map into reference cache.  Return the unique string handle
+ * Store map into reference cache. Return the unique string handle
  * for this associative array.
  * <li><strong>DeRef / Dereference</strong> - <code><font size=+1>val = DeRef(handle, key)</font></code><br>
  * Return the cell value of the associative array referenced by the key.
@@ -147,13 +150,13 @@ import org.jawk.jrt.VariableManager;
  * handle in the reference cache.
  * <br>
  * <strong>Warning:</strong> unlike the IN keyword, InRef
- * will maintain state regardless of scope.  That is,
+ * will maintain state regardless of scope. That is,
  * if one were to break; out of the while loop above,
  * the next call to InRef() will be the next anticipated
  * element of the <code>assoc</code> array.
  * <li><strong>IsInRef</strong> - <code><font size=+1>b = IsInRef(handle, key)</font></code><br>
  * Checks whether the associative array in the reference cache
- * contains the key.  This is similar to:
+ * contains the key. This is similar to:
  * <blockquote><pre>
  * if (key in assocarray)
  *	...</pre></blockquote>
@@ -162,6 +165,7 @@ import org.jawk.jrt.VariableManager;
  * <li><strong>DumpRefs</strong> - <code><font size=+1>DumpRefs()</font></code><br>
  * Dumps the reference cache to stdout.
  * </ul>
+ * </p>
  */
 public class CoreExtension extends AbstractExtension implements JawkExtension {
 
@@ -173,7 +177,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 			if (instance == null) {
 				instance = this;
 			} else {
-				System.err.println("Warning : Multiple CoreExtension instances in this VM.  Using original instance.");
+				System.err.println("Warning : Multiple CoreExtension instances in this VM. Using original instance.");
 			}
 		}
 	}
@@ -186,32 +190,32 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	@Override
 	public String[] extensionKeywords() {
 		return new String[] {
-				"Array",	// i.e.  Array(array,1,3,5,7,9,11)
-				"Map",		// i.e.  Map(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-				"HashMap",	// i.e.  HashMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-				"TreeMap",	// i.e.  TreeMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-				"LinkedMap",	// i.e.  LinkedMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-				"MapUnion",	// i.e.  MapUnion(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
-				"MapCopy",	// i.e.  cnt = MapCopy(aa_target, aa_source)
-				"TypeOf",	// i.e.  typestring = TypeOf(item)
-				"String",	// i.e.  str = String(3)
-				"Double",	// i.e.  dbl = Double(3)
-				"Halt",		// i.e.  Halt()
-				"Dereference",	// i.e.  f(Dereference(r1))
-				"DeRef",	// i.e.  	(see above, but replace Dereference with DeRef)
-				"NewReference",	// i.e.  ref = NewReference(Map("hi","there"))
-				"NewRef",	// i.e.  	(see above, but replace Reference with Ref)
-				"Unreference",	// i.e.  b = Unreference(ref)
-				"UnRef",	// i.e.  	(see above, but replace Unreference with UnRef)
-				"InRef",	// i.e.  while(k = InRef(r2)) [ same as for(k in assocarr) ]
-				"IsInRef",	// i.e.  if (IsInRef(r1, "key")) [ same as if("key" in assocarr) ]
-				"DumpRefs",	// i.e.  DumpRefs()
-				"Timeout",	// i.e.  r = Timeout(300)
-				"Throw",	// i.e.  Throw("this is an awkruntimeexception")
-				"Version",	// i.e.  print Version(aa)
+				"Array",	// i.e. Array(array,1,3,5,7,9,11)
+				"Map",		// i.e. Map(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"HashMap",	// i.e. HashMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"TreeMap",	// i.e. TreeMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"LinkedMap",	// i.e. LinkedMap(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"MapUnion",	// i.e. MapUnion(assocarray, "hi", "there", "testing", 3, 5, Map("item1", "item2", "i3", 4))
+				"MapCopy",	// i.e. cnt = MapCopy(aa_target, aa_source)
+				"TypeOf",	// i.e. typestring = TypeOf(item)
+				"String",	// i.e. str = String(3)
+				"Double",	// i.e. dbl = Double(3)
+				"Halt",		// i.e. Halt()
+				"Dereference",	// i.e. f(Dereference(r1))
+				"DeRef",	// i.e. 	(see above, but replace Dereference with DeRef)
+				"NewReference",	// i.e. ref = NewReference(Map("hi","there"))
+				"NewRef",	// i.e. 	(see above, but replace Reference with Ref)
+				"Unreference",	// i.e. b = Unreference(ref)
+				"UnRef",	// i.e. 	(see above, but replace Unreference with UnRef)
+				"InRef",	// i.e. while(k = InRef(r2)) [ same as for(k in assocarr) ]
+				"IsInRef",	// i.e. if (IsInRef(r1, "key")) [ same as if("key" in assocarr) ]
+				"DumpRefs",	// i.e. DumpRefs()
+				"Timeout",	// i.e. r = Timeout(300)
+				"Throw",	// i.e. Throw("this is an awkruntimeexception")
+				"Version",	// i.e. print Version(aa)
 
-				"Date",		// i.e.  str = Date()
-				"FileExists",	// i.e.  b = FileExists("/a/b/c")
+				"Date",		// i.e. str = Date()
+				"FileExists",	// i.e. b = FileExists("/a/b/c")
 				};
 	}
 
@@ -440,7 +444,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		}
 		Object o = reference_map.get(arg_check);
 		if (!(o instanceof AssocArray)) {
-			throw new IllegalAwkArgumentException("Reference not an assoc array.  ref.class = " + o.getClass().getName());
+			throw new IllegalAwkArgumentException("Reference not an assoc array. ref.class = " + o.getClass().getName());
 		}
 
 		AssocArray aa = (AssocArray) o;
@@ -737,4 +741,4 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 			return ZERO;
 		}
 	}
-} // public class CoreExtension {AbstractExtension} [JawkExtension]
+}

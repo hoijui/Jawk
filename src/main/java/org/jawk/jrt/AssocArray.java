@@ -12,11 +12,12 @@ import java.util.TreeMap;
  * <p>
  * The implementation requires the ability to choose,
  * at runtime, whether the keys are to be maintained in
- * sorted order or not.  Therefore, the implementation
+ * sorted order or not. Therefore, the implementation
  * contains a reference to a Map (either TreeMap or
  * HashMap, depending on whether to maintain keys in
  * sorted order or not) and delegates calls to it
  * accordingly.
+ * </p>
  */
 public class AssocArray implements Comparator<Object> {
 

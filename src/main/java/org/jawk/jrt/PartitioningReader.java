@@ -13,13 +13,14 @@ import java.util.regex.Pattern;
  * <h3>Greedy Regex Matching</h3>
  * The current implementation matches RS against
  * contents of an input buffer (the underlying input
- * stream filling the input buffer).  Records are
+ * stream filling the input buffer). Records are
  * split against the matched regular expression
  * input, treating the regular expression as a
  * record separator.
+ * </p>
  * <p>
  * By default, greedy regular expression matching
- * for RS is turned off.  It is assumed
+ * for RS is turned off. It is assumed
  * the user will employ a non-ambiguous regex for RS.
  * For example, ab*c is a non-ambiguous regex,
  * but ab?c?b is an ambiguous regex because
@@ -28,11 +29,12 @@ import java.util.regex.Pattern;
  * The implemented way to employ greedy regex matching
  * is to consume subsequent input until the match
  * does not occur at the end of the input buffer,
- * or no input is available.  However, this behavior
+ * or no input is available. However, this behavior
  * is not desirable in all cases (i.e., interactive
  * input against some sort of ambiguous newline
- * regex).  To enable greedy RS regex consumption,
+ * regex). To enable greedy RS regex consumption,
  * use <code>-Djawk.forceGreedyRS=true</code>.
+ * </p>
  */
 public class PartitioningReader extends FilterReader {
 
@@ -188,4 +190,4 @@ public class PartitioningReader extends FilterReader {
 		}
 		return ret_val;
 	}
-} // public class PartitioningReader {FilterReader}
+}

@@ -7,6 +7,7 @@ package org.jawk.util;
  * therefore, needlessly synchronized in a non-multi-threaded
  * environment. As a result, it was necessary to re-implement the
  * stack in this manner by using a non-synchronized list.
+ * </p>
  */
 public interface MyStack<E> {
 

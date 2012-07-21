@@ -12,6 +12,7 @@ import java.io.IOException;
  * and it would not make sense to deviate from that directory.
  * <p>
  * For Jawk, this is used when the -d argument is present.
+ * </p>
  */
 public final class DestDirClassLoader extends ClassLoader {
 
@@ -49,4 +50,4 @@ public final class DestDirClassLoader extends ClassLoader {
 			throw new ClassNotFoundException("Could not load " + filename + ": " + ioe);
 		}
 	}
-} // private static final class DestDirClassLoader {ClassLoader}
+}

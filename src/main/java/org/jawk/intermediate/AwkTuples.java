@@ -267,7 +267,7 @@ public class AwkTuples implements Serializable {
 		}
 
 		private void setLineNumber(int lineno) {
-			assert this.lineno == -1 : "The line number was already set to " + this.lineno + ".  Later lineno = " + lineno + ".";
+			assert this.lineno == -1 : "The line number was already set to " + this.lineno + ". Later lineno = " + lineno + ".";
 			this.lineno = lineno;
 		}
 
@@ -310,10 +310,12 @@ public class AwkTuples implements Serializable {
 		 * <p>
 		 * The address will be updated only if there exists a HasFunctionAddress
 		 * argument for this tuple.
+		 * </p>
 		 * <p>
 		 * This is executed after the tuples are constructed so that function address
-		 * references can be resolved.  Otherwise, forward declared functions will
+		 * references can be resolved. Otherwise, forward declared functions will
 		 * not be resolved in the Tuple list.
+		 * </p>
 		 */
 		public void touch(java.util.List<Tuple> queue) {
 			assert lineno != -1 : "The line number should have been set by queue.add(), but was not.";
@@ -330,7 +332,7 @@ public class AwkTuples implements Serializable {
 				}
 			}
 		}
-	} // private static class Tuple
+	}
 
 	public static String toOpcodeString(int opcode) {
 		Class c = AwkTuples.class;
@@ -354,15 +356,17 @@ public class AwkTuples implements Serializable {
 	/**
 	 * Pops an item off the operand stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _POP_ = 257;	// x -> 0
 	/**
 	 * Pushes an item onto the operand stack.
 	 * <p>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: x ...
+	 * </p>
 	 */
 	public static final int _PUSH_ = 258;	// 0 -> x
 	/**
@@ -370,16 +374,19 @@ public class AwkTuples implements Serializable {
 	 * false, it jumps to a specified address.
 	 * <p>
 	 * Argument: address
+	 * </p>
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _IFFALSE_ = 259;	// x -> 0
 	/**
 	 * Converts the top-of-stack to a number.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: x (as a number)
+	 * </p>
 	 */
 	public static final int _TO_NUMBER_ = 260;	// x1 -> x2
 	/**
@@ -387,18 +394,20 @@ public class AwkTuples implements Serializable {
 	 * true, it jumps to a specified address.
 	 * <p>
 	 * Argument: address
+	 * </p>
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _IFTRUE_ = 261;	// x -> 0
 	/**
-	 * Jumps to a specified address.  The operand stack contents
+	 * Jumps to a specified address. The operand stack contents
 	 * are unaffected.
 	 */
 	public static final int _GOTO_ = 262;	// 0 -> 0
 	/**
-	 * A no-operation.  The operand stack contents are
+	 * A no-operation. The operand stack contents are
 	 * unaffected.
 	 */
 	public static final int _NOP_ = 263;	// 0 -> 0
@@ -407,22 +416,26 @@ public class AwkTuples implements Serializable {
 	 * The number of items are passed in as a tuple argument.
 	 * <p>
 	 * Argument: # of items (N)
+	 * </p>
 	 * <p>
-	 * Stack before: x1 x2 x3 .. xN ...<br>
+	 * Stack before: x1 x2 x3 .. xN ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _PRINT_ = 264;	// x1, x2, ... xn -> 0
 	/**
 	 * Prints N number of items that are on the operand stack to
-	 * a specified file.  The file is passed in on the stack.
+	 * a specified file. The file is passed in on the stack.
 	 * The number of items are passed in as a tuple argument,
 	 * as well as whether to overwrite the file or not (append mode).
 	 * <p>
-	 * Argument 1: # of items (N)<br>
+	 * Argument 1: # of items (N)<br/>
 	 * Argument 2: true = append, false = overwrite
+	 * </p>
 	 * <p>
-	 * Stack before: x1 x2 x3 .. xN filename ...<br>
+	 * Stack before: x1 x2 x3 .. xN filename ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _PRINT_TO_FILE_ = 265;	// x1, x2, ... xn -> 0
 	/**
@@ -432,9 +445,11 @@ public class AwkTuples implements Serializable {
 	 * The number of items are passed in as a tuple argument.
 	 * <p>
 	 * Argument: # of items (N)
+	 * </p>
 	 * <p>
-	 * Stack before: x1 x2 x3 .. xN command-string ...<br>
+	 * Stack before: x1 x2 x3 .. xN command-string ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _PRINT_TO_PIPE_ = 266;	// x1, x2, ... xn -> 0
 	/**
@@ -442,22 +457,26 @@ public class AwkTuples implements Serializable {
 	 * The number of items are passed in as a tuple argument.
 	 * <p>
 	 * Argument: # of items (N)
+	 * </p>
 	 * <p>
-	 * Stack before: x1 x2 x3 .. xN ...<br>
+	 * Stack before: x1 x2 x3 .. xN ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _PRINTF_ = 267;	// x1, x2, ... xn -> 0
 	/**
 	 * Performs a formatted print of N items that are on the operand stack to
-	 * a specified file.  The file is passed in on the stack.
+	 * a specified file. The file is passed in on the stack.
 	 * The number of items are passed in as a tuple argument,
 	 * as well as whether to overwrite the file or not (append mode).
 	 * <p>
-	 * Argument 1: # of items (N)<br>
+	 * Argument 1: # of items (N)<br/>
 	 * Argument 2: true = append, false = overwrite
+	 * </p>
 	 * <p>
-	 * Stack before: x1 x2 x3 .. xN filename ...<br>
+	 * Stack before: x1 x2 x3 .. xN filename ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _PRINTF_TO_FILE_ = 268;	// x1, x2, ... xn -> 0
 	/**
@@ -467,9 +486,11 @@ public class AwkTuples implements Serializable {
 	 * The number of items are passed in as a tuple argument.
 	 * <p>
 	 * Argument: # of items (N)
+	 * </p>
 	 * <p>
-	 * Stack before: x1 x2 x3 .. xN command-string ...<br>
+	 * Stack before: x1 x2 x3 .. xN command-string ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _PRINTF_TO_PIPE_ = 269;	// x1, x2, ... xn -> 0
 	public static final int _SPRINTF_ = 270;	// x1, x2, ... xn -> 0
@@ -480,68 +501,77 @@ public class AwkTuples implements Serializable {
 	 * <p>
 	 * The input field length evaluation mode is provided to support backward
 	 * compatibility with the deprecated usage of length (i.e., no arguments).
+	 * </p>
 	 * <p>
 	 * Argument: 0 to use $0, use top-of-stack otherwise
+	 * </p>
 	 * <p>
 	 * If argument is 0:
 	 * <blockquote>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: length-of-$0 ...
 	 * </blockquote>
 	 * else
 	 * <blockquote>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: length-of-x ...
 	 * </blockquote>
+	 * </p>
 	 */
 	public static final int _LENGTH_ = 271;	// 0 -> x or x1 -> x2
 	/**
 	 * Pop and concatenate two strings from the top-of-stack; push the result onto
 	 * the stack.
 	 * <p>
-	 * Stack before: x y ...<br>
+	 * Stack before: x y ...<br/>
 	 * Stack after: x-concatenated-with-y ...
+	 * </p>
 	 */
 	public static final int _CONCAT_ = 272;	// x2, x1 -> x1x2
 	/**
-	 * Assigns the top-of-stack to a variable.  The contents of the stack
+	 * Assigns the top-of-stack to a variable. The contents of the stack
 	 * are unaffected.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: x ...
+	 * </p>
 	 */
 	public static final int _ASSIGN_ = 273;	// x -> 0
 	/**
-	 * Assigns an item to an array element.  The item remains on the stack.
+	 * Assigns an item to an array element. The item remains on the stack.
 	 * <p>
-	 * Argument 1: offset of the particular associative array into the variable manager<br>
+	 * Argument 1: offset of the particular associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: index-into-array item ...<br>
+	 * Stack before: index-into-array item ...<br/>
 	 * Stack after: item ...
+	 * </p>
 	 */
 	public static final int _ASSIGN_ARRAY_ = 274;	// x2, x1 -> 0
 	/**
-	 * Assigns the top-of-stack to $0.  The contents of the stack are unaffected.
+	 * Assigns the top-of-stack to $0. The contents of the stack are unaffected.
 	 * Upon assignment, individual field variables are recalculated.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: x ...
+	 * </p>
 	 */
 	public static final int _ASSIGN_AS_INPUT_ = 275;	// x -> 0
 	/**
 	 * Assigns an item as a particular input field; the field number can be 0.
-	 * Upon assignment, associating input fields are affected.  For example, if
+	 * Upon assignment, associating input fields are affected. For example, if
 	 * the following assignment were made:
 	 * <blockquote>
 	 * <pre>
 	 * $3 = "hi"
 	 * </pre>
 	 * </blockquote>
-	 * $0 would be recalculated.  Likewise, if the following assignment were made:
+	 * $0 would be recalculated. Likewise, if the following assignment were made:
 	 * <blockquote>
 	 * <pre>
 	 * $0 = "hello there"
@@ -549,274 +579,316 @@ public class AwkTuples implements Serializable {
 	 * </blockquote>
 	 * $1, $2, ... would be recalculated.
 	 * <p>
-	 * Stack before: field-num x ...<br>
+	 * Stack before: field-num x ...<br/>
 	 * Stack after: x ...
+	 * </p>
 	 */
 	public static final int _ASSIGN_AS_INPUT_FIELD_ = 276;	// x, y -> x
 	/**
 	 * Obtains an item from the variable manager and push it onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: x ...
+	 * </p>
 	 */
 	public static final int _DEREFERENCE_ = 277;	// 0 -> x
 	/**
 	 * Increase the contents of the variable by an adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: n ...<br>
+	 * Stack before: n ...<br/>
 	 * Stack after: x+n ...
+	 * </p>
 	 */
 	public static final int _PLUS_EQ_ = 278;	// x -> x
 	/**
 	 * Decreases the contents of the variable by an adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: n ...<br>
+	 * Stack before: n ...<br/>
 	 * Stack after: x-n ...
+	 * </p>
 	 */
 	public static final int _MINUS_EQ_ = 279;	// x -> x
 	/**
 	 * Multiplies the contents of the variable by an adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: n ...<br>
+	 * Stack before: n ...<br/>
 	 * Stack after: x*n ...
+	 * </p>
 	 */
 	public static final int _MULT_EQ_ = 280;	// x -> x
 	/**
 	 * Divides the contents of the variable by an adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: n ...<br>
+	 * Stack before: n ...<br/>
 	 * Stack after: x/n ...
+	 * </p>
 	 */
 	public static final int _DIV_EQ_ = 281;	// x -> x
 	/**
 	 * Takes the modules of the contents of the variable by an adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: n ...<br>
+	 * Stack before: n ...<br/>
 	 * Stack after: x%n ...
+	 * </p>
 	 */
 	public static final int _MOD_EQ_ = 282;	// x -> x
 	/**
 	 * Raises the contents of the variable to the power of the adjustment value;
 	 * assigns the result to the variable and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: n ...<br>
+	 * Stack before: n ...<br/>
 	 * Stack after: x^n ...
+	 * </p>
 	 */
 	public static final int _POW_EQ_ = 283;	// x -> x
 	/**
 	 * Increase the contents of an indexed array by an adjustment value;
 	 * assigns the result to the array and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx n ...<br>
+	 * Stack before: array-idx n ...<br/>
 	 * Stack after: x+n ...
+	 * </p>
 	 */
 	public static final int _PLUS_EQ_ARRAY_ = 284;	// x -> x
 	/**
 	 * Decreases the contents of an indexed array by an adjustment value;
 	 * assigns the result to the array and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx n ...<br>
+	 * Stack before: array-idx n ...<br/>
 	 * Stack after: x-n ...
+	 * </p>
 	 */
 	public static final int _MINUS_EQ_ARRAY_ = 285;	// x -> x
 	/**
 	 * Multiplies the contents of an indexed array by an adjustment value;
 	 * assigns the result to the array and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx n ...<br>
+	 * Stack before: array-idx n ...<br/>
 	 * Stack after: x*n ...
+	 * </p>
 	 */
 	public static final int _MULT_EQ_ARRAY_ = 286;	// x -> x
 	/**
 	 * Divides the contents of an indexed array by an adjustment value;
 	 * assigns the result to the array and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx n ...<br>
+	 * Stack before: array-idx n ...<br/>
 	 * Stack after: x/n ...
+	 * </p>
 	 */
 	public static final int _DIV_EQ_ARRAY_ = 287;	// x -> x
 	/**
 	 * Takes the modulus of the contents of an indexed array by an adjustment value;
 	 * assigns the result to the array and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx n ...<br>
+	 * Stack before: array-idx n ...<br/>
 	 * Stack after: x%n ...
+	 * </p>
 	 */
 	public static final int _MOD_EQ_ARRAY_ = 288;	// x -> x
 	/**
 	 * Raises the contents of an indexed array to the power of an adjustment value;
 	 * assigns the result to the array and pushes the result onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx n ...<br>
+	 * Stack before: array-idx n ...<br/>
 	 * Stack after: x^n ...
+	 * </p>
 	 */
 	public static final int _POW_EQ_ARRAY_ = 289;	// x -> x
 	/**
 	 * Increases the contents of an input field by an adjustment value;
 	 * assigns the result to the input field and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: input-field_number n ...<br>
+	 * Stack before: input-field_number n ...<br/>
 	 * Stack after: x+n ...
+	 * </p>
 	 */
 	public static final int _PLUS_EQ_INPUT_FIELD_ = 290;	// x1,x2 -> x
 	/**
 	 * Decreases the contents of an input field by an adjustment value;
 	 * assigns the result to the input field and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: input-field_number n ...<br>
+	 * Stack before: input-field_number n ...<br/>
 	 * Stack after: x-n ...
+	 * </p>
 	 */
 	public static final int _MINUS_EQ_INPUT_FIELD_ = 291;	// x1,x2 -> x
 	/**
 	 * Multiplies the contents of an input field by an adjustment value;
 	 * assigns the result to the input field and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: input-field_number n ...<br>
+	 * Stack before: input-field_number n ...<br/>
 	 * Stack after: x*n ...
+	 * </p>
 	 */
 	public static final int _MULT_EQ_INPUT_FIELD_ = 292;	// x1,x2 -> x
 	/**
 	 * Divides the contents of an input field by an adjustment value;
 	 * assigns the result to the input field and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: input-field_number n ...<br>
+	 * Stack before: input-field_number n ...<br/>
 	 * Stack after: x/n ...
+	 * </p>
 	 */
 	public static final int _DIV_EQ_INPUT_FIELD_ = 293;	// x1,x2 -> x
 	/**
 	 * Takes the modulus of the contents of an input field by an adjustment value;
 	 * assigns the result to the input field and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: input-field_number n ...<br>
+	 * Stack before: input-field_number n ...<br/>
 	 * Stack after: x%n ...
+	 * </p>
 	 */
 	public static final int _MOD_EQ_INPUT_FIELD_ = 294;	// x1,x2 -> x
 	/**
 	 * Raises the contents of an input field to the power of an adjustment value;
 	 * assigns the result to the input field and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: input-field_number n ...<br>
+	 * Stack before: input-field_number n ...<br/>
 	 * Stack after: x^n ...
+	 * </p>
 	 */
 	public static final int _POW_EQ_INPUT_FIELD_ = 295;	// x1,x2 -> x
 
 	/**
-	 * Seeds the random number generator.  If there are no arguments, the current
-	 * time (as a long value) is used as the seed.  Otherwise, the top-of-stack is
+	 * Seeds the random number generator. If there are no arguments, the current
+	 * time (as a long value) is used as the seed. Otherwise, the top-of-stack is
 	 * popped and used as the seed value.
 	 * <p>
 	 * Argument: # of arguments
+	 * </p>
 	 * <p>
 	 * If # of arguments is 0:
 	 * <blockquote>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: old-seed ...
 	 * </blockquote>
 	 * else
 	 * <blockquote>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: old-seed ...
 	 * </blockquote>
+	 * </p>
 	 */
 	public static final int _SRAND_ = 296;	// x2, x1 -> x1, x2
 	/**
 	 * Obtains the next random number from the random number generator
 	 * and push it onto the stack.
 	 * <p>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: random-number ...
+	 * </p>
 	 */
 	public static final int _RAND_ = 297;	// x2, x1 -> x1, x2
 	/**
 	 * Built-in function that pops the top-of-stack, removes its fractional part,
 	 * if any, and places the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: (int)x ...
+	 * </p>
 	 */
 	public static final int _INTFUNC_ = 298;	// x2, x1 -> x1, x2
 	/**
 	 * Built-in function that pops the top-of-stack, takes its square root,
 	 * and places the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: sqrt(x) ...
+	 * </p>
 	 */
 	public static final int _SQRT_ = 299;	// x2, x1 -> x1, x2
 	/**
 	 * Built-in function that pops the top-of-stack, calls the java.lang.Math.log method
 	 * with the top-of-stack as the argument, and places the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: log(x) ...
+	 * </p>
 	 */
 	public static final int _LOG_ = 300;	// x2, x1 -> x1, x2
 	/**
 	 * Built-in function that pops the top-of-stack, calls the java.lang.Math.exp method
 	 * with the top-of-stack as the argument, and places the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: exp(x) ...
+	 * </p>
 	 */
 	public static final int _EXP_ = 301;	// x2, x1 -> x1, x2
 	/**
 	 * Built-in function that pops the top-of-stack, calls the java.lang.Math.sin method
 	 * with the top-of-stack as the argument, and places the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: sin(x) ...
+	 * </p>
 	 */
 	public static final int _SIN_ = 302;	// x2, x1 -> x1, x2
 	/**
 	 * Built-in function that pops the top-of-stack, calls the java.lang.Math.cos method
 	 * with the top-of-stack as the argument, and places the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: cos(x) ...
+	 * </p>
 	 */
 	public static final int _COS_ = 303;	// x2, x1 -> x1, x2
 	/**
@@ -824,8 +896,9 @@ public class AwkTuples implements Serializable {
 	 * calls the java.lang.Math.atan2 method
 	 * with these as arguments, and places the result onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: atan2(x1,x2) ...
+	 * </p>
 	 */
 	public static final int _ATAN2_ = 304;	// x2, x1 -> x1, x2
 	/**
@@ -838,17 +911,19 @@ public class AwkTuples implements Serializable {
 	 * If no match is found, RSTART (and return value) is set to
 	 * 0 and RLENGTH is set to -1.
 	 * <p>
-	 * Stack before: string regexp ...<br>
+	 * Stack before: string regexp ...<br/>
 	 * Stack after: RSTART ...
+	 * </p>
 	 */
 	public static final int _MATCH_ = 305;	// x1, x2 -> x
 	/**
 	 * Built-in function that locates a substring within a source string
-	 * and pushes the location onto the stack.  If the substring is
+	 * and pushes the location onto the stack. If the substring is
 	 * not found, 0 is pushed onto the stack.
 	 * <p>
-	 * Stack before: string substring ...<br>
+	 * Stack before: string substring ...<br/>
 	 * Stack after: location-index ...
+	 * </p>
 	 */
 	public static final int _INDEX_ = 306;	// x1, x2 -> x
 	/**
@@ -856,9 +931,11 @@ public class AwkTuples implements Serializable {
 	 * of a string in $0 and replaces it with another.
 	 * <p>
 	 * Argument: true if global sub, false otherwise.
+	 * </p>
 	 * <p>
-	 * Stack before: regexp replacement-string ...<br>
+	 * Stack before: regexp replacement-string ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _SUB_FOR_DOLLAR_0_ = 307;	// x -> 0
 	/**
@@ -866,33 +943,39 @@ public class AwkTuples implements Serializable {
 	 * of a string in a field reference and replaces it with another.
 	 * <p>
 	 * Argument: true if global sub, false otherwise.
+	 * </p>
 	 * <p>
-	 * Stack before: field-num regexp replacement-string ...<br>
+	 * Stack before: field-num regexp replacement-string ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _SUB_FOR_DOLLAR_REFERENCE_ = 308;	// x -> 0
 	/**
 	 * Built-in function that substitutes an occurrence (or all occurrences)
 	 * of a string in a particular variable and replaces it with another.
 	 * <p>
-	 * Argument 1: variable offset in variable manager<br>
-	 * Argument 2: is global variable<br>
+	 * Argument 1: variable offset in variable manager<br/>
+	 * Argument 2: is global variable<br/>
 	 * Argument 3: is global sub
+	 * </p>
 	 * <p>
-	 * Stack before: regexp replacement-string orig-string ...<br>
+	 * Stack before: regexp replacement-string orig-string ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _SUB_FOR_VARIABLE_ = 309;	// x -> 0
 	/**
 	 * Built-in function that substitutes an occurrence (or all occurrences)
 	 * of a string in a particular array cell and replaces it with another.
 	 * <p>
-	 * Argument 1: array map offset in variable manager<br>
-	 * Argument 2: is global array map<br>
+	 * Argument 1: array map offset in variable manager<br/>
+	 * Argument 2: is global array map<br/>
 	 * Argument 3: is global sub
+	 * </p>
 	 * <p>
-	 * Stack before: array-index regexp replacement-string orig-string ...<br>
+	 * Stack before: array-index regexp replacement-string orig-string ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _SUB_FOR_ARRAY_REFERENCE_ = 310;	// x -> 0
 	/**
@@ -900,17 +983,19 @@ public class AwkTuples implements Serializable {
 	 * components into an array.
 	 * <p>
 	 * Argument: # of arguments (parameters on stack)
+	 * </p>
 	 * <p>
 	 * If # of arguments is 2:
 	 * <blockquote>
-	 * Stack before: string array ...<br>
+	 * Stack before: string array ...<br/>
 	 * Stack after: n ...
 	 * </blockquote>
 	 * else
 	 * <blockquote>
-	 * Stack before: string array regexp ...<br>
+	 * Stack before: string array regexp ...<br/>
 	 * Stack after: n ...
 	 * </blockquote>
+	 * </p>
 	 */
 	public static final int _SPLIT_ = 311;	// x1 -> x2
 	/**
@@ -921,49 +1006,55 @@ public class AwkTuples implements Serializable {
 	 * up to the end-of-string.
 	 * <p>
 	 * Argument: # of arguments
+	 * </p>
 	 * <p>
 	 * If # of arguments is 2:
 	 * <blockquote>
-	 * Stack before: string start-pos ...<br>
+	 * Stack before: string start-pos ...<br/>
 	 * Stack after: substring ...
 	 * </blockquote>
 	 * else
 	 * <blockquote>
-	 * Stack before: string start-pos end-pos ...<br>
+	 * Stack before: string start-pos end-pos ...<br/>
 	 * Stack after: substring ...
 	 * </blockquote>
+	 * </p>
 	 */
 	public static final int _SUBSTR_ = 312;	// x1 -> x2
 	/**
 	 * Built-in function that converts all the letters in the top-of-stack
 	 * to lower case and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: STRING-ARGUMENT ...<br>
+	 * Stack before: STRING-ARGUMENT ...<br/>
 	 * Stack after: string-argument ...
+	 * </p>
 	 */
 	public static final int _TOLOWER_ = 313;	// x1 -> x2
 	/**
 	 * Built-in function that converts all the letters in the top-of-stack
 	 * to upper case and pushes the result onto the stack.
 	 * <p>
-	 * Stack before: string-argument ...<br>
+	 * Stack before: string-argument ...<br/>
 	 * Stack after: STRING-ARGUMENT ...
+	 * </p>
 	 */
 	public static final int _TOUPPER_ = 314;	// x1 -> x2
 	/**
 	 * Built-in function that executes the top-of-stack as a system command
 	 * and pushes the return code onto the stack.
 	 * <p>
-	 * Stack before: cmd ...<br>
+	 * Stack before: cmd ...<br/>
 	 * Stack after: return-code ...
+	 * </p>
 	 */
 	public static final int _SYSTEM_ = 315;	// x1 -> x2
 
 	/**
 	 * Swaps the top two elements of the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x2 x1 ...
+	 * </p>
 	 */
 	public static final int _SWAP_ = 316;	// x2, x1 -> x1, x2
 
@@ -971,48 +1062,54 @@ public class AwkTuples implements Serializable {
 	 * Numerically adds the top two elements of the stack with the result
 	 * pushed onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1+x2 ...
+	 * </p>
 	 */
 	public static final int _ADD_ = 317;	// x2, x1 -> x1+x2
 	/**
 	 * Numerically subtracts the top two elements of the stack with the result
 	 * pushed onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1-x2 ...
+	 * </p>
 	 */
 	public static final int _SUBTRACT_ = 318;	// x2, x1 -> x1-x2
 	/**
 	 * Numerically multiplies the top two elements of the stack with the result
 	 * pushed onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1*x2 ...
+	 * </p>
 	 */
 	public static final int _MULTIPLY_ = 319;	// x2, x1 -> x1*x2
 	/**
 	 * Numerically divides the top two elements of the stack with the result
 	 * pushed onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1/x2 ...
+	 * </p>
 	 */
 	public static final int _DIVIDE_ = 320;	// x2, x1 -> x1/x2
 	/**
 	 * Numerically takes the modulus of the top two elements of the stack with the result
 	 * pushed onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1%x2 ...
+	 * </p>
 	 */
 	public static final int _MOD_ = 321;	// x2, x1 -> x1/x2
 	/**
 	 * Numerically raises the top element to the power of the next element with the result
 	 * pushed onto the stack.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1^x2 ...
+	 * </p>
 	 */
 	public static final int _POW_ = 322;	// x2, x1 -> x1/x2
 
@@ -1020,122 +1117,140 @@ public class AwkTuples implements Serializable {
 	 * Increases the variable reference by one; pushes the result
 	 * onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: x+1 ...
+	 * </p>
 	 */
 	public static final int _INC_ = 323;	// 0 -> x
 	/**
 	 * Decreases the variable reference by one; pushes the result
 	 * onto the stack.
 	 * <p>
-	 * Argument 1: offset of the particular variable into the variable manager<br>
+	 * Argument 1: offset of the particular variable into the variable manager<br/>
 	 * Argument 2: whether the variable is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: x-1 ...
+	 * </p>
 	 */
 	public static final int _DEC_ = 324;	// 0 -> x
 	/**
 	 * Increases the array element reference by one; pushes the result
 	 * onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx ...<br>
+	 * Stack before: array-idx ...<br/>
 	 * Stack after: x+1 ...
+	 * </p>
 	 */
 	public static final int _INC_ARRAY_REF_ = 325;	// x -> x
 	/**
 	 * Decreases the array element reference by one; pushes the result
 	 * onto the stack.
 	 * <p>
-	 * Argument 1: offset of the associative array into the variable manager<br>
+	 * Argument 1: offset of the associative array into the variable manager<br/>
 	 * Argument 2: whether the associative array is global or local
+	 * </p>
 	 * <p>
-	 * Stack before: array-idx ...<br>
+	 * Stack before: array-idx ...<br/>
 	 * Stack after: x-1 ...
+	 * </p>
 	 */
 	public static final int _DEC_ARRAY_REF_ = 326;	// x -> x
 	/**
 	 * Increases the input field variable by one; pushes the result
 	 * onto the stack.
 	 * <p>
-	 * Stack before: field-idx ...<br>
+	 * Stack before: field-idx ...<br/>
 	 * Stack after: x+1
+	 * </p>
 	 */
 	public static final int _INC_DOLLAR_REF_ = 327;	// x -> x
 	/**
 	 * Decreases the input field variable by one; pushes the result
 	 * onto the stack.
 	 * <p>
-	 * Stack before: field-idx ...<br>
+	 * Stack before: field-idx ...<br/>
 	 * Stack after: x-1
+	 * </p>
 	 */
 	public static final int _DEC_DOLLAR_REF_ = 328;	// x -> x
 
 	/**
 	 * Duplicates the top-of-stack on the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: x x ...
+	 * </p>
 	 */
 	public static final int _DUP_ = 329;	// x -> x, x
 	/**
 	 * Evaluates the logical NOT of the top stack element;
 	 * pushes the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: !x ...
+	 * </p>
 	 */
 	public static final int _NOT_ = 330;	// x -> !x
 	/**
 	 * Evaluates the numerical NEGATION of the top stack element;
 	 * pushes the result onto the stack.
 	 * <p>
-	 * Stack before: x ...<br>
+	 * Stack before: x ...<br/>
 	 * Stack after: -x ...
+	 * </p>
 	 */
 	public static final int _NEGATE_ = 331;	// x -> -x
 
 	/**
 	 * Compares the top two stack elements; pushes 1 onto the stack if equal, 0 if not equal.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1==x2
+	 * </p>
 	 */
 	public static final int _CMP_EQ_ = 332;	// x2, x1 -> x1 == x2
 	/**
 	 * Compares the top two stack elements; pushes 1 onto the stack if x1 &lt; x2, 0 if not equal.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1&lt;x2
+	 * </p>
 	 */
 	public static final int _CMP_LT_ = 333;	// x2, x1 -> x1 < x2
 	/**
 	 * Compares the top two stack elements; pushes 1 onto the stack if x1 &gt; x2, 0 if not equal.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: x1&gt;x2
+	 * </p>
 	 */
 	public static final int _CMP_GT_ = 334;	// x2, x1 -> x1 < x2
 	/**
 	 * Applies a regular expression to the top stack element; pushes 1 if it matches,
 	 * 0 if it does not match.
 	 * <p>
-	 * Stack before: x1 x2 ...<br>
+	 * Stack before: x1 x2 ...<br/>
 	 * Stack after: (x1 ~ /x2/) ...
+	 * </p>
 	 */
 	public static final int _MATCHES_ = 335;	// x2, x1 -> x1 ~ x2
 
 	/**
 	 * <strong>Extension:</strong> Pauses the execution thread by N number of seconds.
 	 * <p>
-	 * Stack before: N ...<br>
+	 * Stack before: N ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _SLEEP_ = 336;	// x -> 0
 	public static final int _DUMP_ = 337;	// x -> 0
@@ -1147,8 +1262,9 @@ public class AwkTuples implements Serializable {
 	 * Retrieves and pushes a Set of keys from an associative array onto the stack.
 	 * The Set is tagged with a KeyList interface.
 	 * <p>
-	 * Stack before: associative-array ...<br>
+	 * Stack before: associative-array ...<br/>
 	 * Stack after: key-list-set ...
+	 * </p>
 	 */
 	public static final int _KEYLIST_ = 339;	// 0 -> {keylist}
 	/**
@@ -1156,16 +1272,19 @@ public class AwkTuples implements Serializable {
 	 * address if empty, steps to the next instruction if not.
 	 * <p>
 	 * Argument: jump-address-if-empty
+	 * </p>
 	 * <p>
-	 * Stack before: key-list ...<br>
+	 * Stack before: key-list ...<br/>
 	 * Stack after: ...
+	 * </p>
 	 */
 	public static final int _IS_EMPTY_KEYLIST_ = 340;	// {keylist} -> 0
 	/**
 	 * Removes an item from the KeyList (set) and pushes it onto the operand stack.
 	 * <p>
-	 * Stack before: key-list ...<br>
+	 * Stack before: key-list ...<br/>
 	 * Stack after: 1st-item ...
+	 * </p>
 	 */
 	public static final int _GET_FIRST_AND_REMOVE_FROM_KEYLIST_ = 341;	// {keylist} -> x
 
@@ -1176,9 +1295,11 @@ public class AwkTuples implements Serializable {
 	 * The stack remains unchanged upon a successful check.
 	 * <p>
 	 * Argument: class-type (i.e., KeyList.class)
+	 * </p>
 	 * <p>
-	 * Stack before: obj ...<br>
+	 * Stack before: obj ...<br/>
 	 * Stack after: obj ...
+	 * </p>
 	 */
 	public static final int _CHECK_CLASS_ = 342;	// {class} -> 0
 
@@ -1187,16 +1308,17 @@ public class AwkTuples implements Serializable {
 	/**
 	 * Push an input field onto the stack.
 	 * <p>
-	 * Stack before: field-id ...<br>
+	 * Stack before: field-id ...<br/>
 	 * Stack after: x ...
+	 * </p>
 	 */
 	public static final int _GET_INPUT_FIELD_ = 343;	// 0 -> x
 	/**
 	 * Consume next line of input; assigning $0 and recalculating $1, $2, etc.
 	 * The input can come from the following sources:
 	 * <ul>
-	 * <li>stdin
-	 * <li>filename arguments
+	 * <li>stdin</li>
+	 * <li>filename arguments</li>
 	 * </ul>
 	 * The operand stack is unaffected.
 	 */
@@ -1208,12 +1330,14 @@ public class AwkTuples implements Serializable {
 	 * assignment as a regular expression.
 	 * <p>
 	 * If there is input available, the input string and a return code
-	 * of 1 is pushed.  If EOF is reached, a blank (null) string ("")
-	 * is pushed along with a 0 return code.  Upon an IO error,
+	 * of 1 is pushed. If EOF is reached, a blank (null) string ("")
+	 * is pushed along with a 0 return code. Upon an IO error,
 	 * a blank string and a -1 is pushed onto the operand stack.
+	 * </p>
 	 * <p>
-	 * Stack before: ...<br>
+	 * Stack before: ...<br/>
 	 * Stack after: input-string return-code ...
+	 * </p>
 	 */
 	public static final int _GETLINE_INPUT_ = 345;	// 0 -> x
 	/**
@@ -1224,16 +1348,19 @@ public class AwkTuples implements Serializable {
 	 * <p>
 	 * Upon initial execution, the file is opened and the handle
 	 * is maintained until it is explicitly closed, or until
-	 * the VM exits.  Subsequent calls will obtain subsequent
+	 * the VM exits. Subsequent calls will obtain subsequent
 	 * lines (records) of input until no more records are available.
+	 * </p>
 	 * <p>
 	 * If there is input available, the input string and a return code
-	 * of 1 is pushed.  If EOF is reached, a blank (null) string ("")
-	 * is pushed along with a 0 return code.  Upon an IO error,
+	 * of 1 is pushed. If EOF is reached, a blank (null) string ("")
+	 * is pushed along with a 0 return code. Upon an IO error,
 	 * a blank string and a -1 is pushed onto the operand stack.
+	 * </p>
 	 * <p>
-	 * Stack before: filename ...<br>
+	 * Stack before: filename ...<br/>
 	 * Stack after: input-string return-code ...
+	 * </p>
 	 */
 	public static final int _USE_AS_FILE_INPUT_ = 346;	// x1 -> x2
 	/**
@@ -1245,123 +1372,141 @@ public class AwkTuples implements Serializable {
 	 * Upon initial execution, the a process is spawned to execute
 	 * the specified command and the process reference
 	 * is maintained until it is explicitly closed, or until
-	 * the VM exits.  Subsequent calls will obtain subsequent
+	 * the VM exits. Subsequent calls will obtain subsequent
 	 * lines (records) of input until no more records are available.
+	 * </p>
 	 * <p>
 	 * If there is input available, the input string and a return code
-	 * of 1 is pushed.  If EOF is reached, a blank (null) string ("")
-	 * is pushed along with a 0 return code.  Upon an IO error,
+	 * of 1 is pushed. If EOF is reached, a blank (null) string ("")
+	 * is pushed along with a 0 return code. Upon an IO error,
 	 * a blank string and a -1 is pushed onto the operand stack.
+	 * </p>
 	 * <p>
-	 * Stack before: command-line ...<br>
+	 * Stack before: command-line ...<br/>
 	 * Stack after: input-string return-code ...
+	 * </p>
 	 */
 	public static final int _USE_AS_COMMAND_INPUT_ = 347;	// x1 -> x2
 
 	// variable housekeeping
 	/**
-	 * Assign the NF variable offset.  This is important for the
+	 * Assign the NF variable offset. This is important for the
 	 * AVM to set the variables as new input lines are processed.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _NF_OFFSET_ = 348;	// 0 -> 0
 	/**
-	 * Assign the NR variable offset.  This is important for the
+	 * Assign the NR variable offset. This is important for the
 	 * AVM to increase the record number as new input lines received.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _NR_OFFSET_ = 349;	// 0 -> 0
 	/**
-	 * Assign the FNR variable offset.  This is important for the
+	 * Assign the FNR variable offset. This is important for the
 	 * AVM to increase the "file" record number as new input lines are received.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _FNR_OFFSET_ = 350;	// 0 -> 0
 	/**
-	 * Assign the FS variable offset.  This is important for the
+	 * Assign the FS variable offset. This is important for the
 	 * AVM to know how to split fields upon incoming records of input.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _FS_OFFSET_ = 351;	// 0 -> 0
 	/**
-	 * Assign the RS variable offset.  This is important for the
+	 * Assign the RS variable offset. This is important for the
 	 * AVM to know how to create records from the stream(s) of input.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _RS_OFFSET_ = 352;	// 0 -> 0
 	/**
-	 * Assign the OFS variable offset.  This is important for the
+	 * Assign the OFS variable offset. This is important for the
 	 * AVM to use when outputting expressions via PRINT.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _OFS_OFFSET_ = 353;	// 0 -> 0
 	/**
-	 * Assign the RSTART variable offset.  The AVM sets this variable while
+	 * Assign the RSTART variable offset. The AVM sets this variable while
 	 * executing the match() builtin function.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _RSTART_OFFSET_ = 354;	// 0 -> 0
 	/**
-	 * Assign the RLENGTH variable offset.  The AVM sets this variable while
+	 * Assign the RLENGTH variable offset. The AVM sets this variable while
 	 * executing the match() builtin function.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _RLENGTH_OFFSET_ = 355;	// 0 -> 0
 	/**
-	 * Assign the FILENAME variable offset.  The AVM sets this variable while
+	 * Assign the FILENAME variable offset. The AVM sets this variable while
 	 * processing files from the command-line for input.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _FILENAME_OFFSET_ = 356;	// 0 -> 0
 	/**
-	 * Assign the SUBSEP variable offset.  The AVM uses this variable while
+	 * Assign the SUBSEP variable offset. The AVM uses this variable while
 	 * building an index of a multi-dimensional array.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _SUBSEP_OFFSET_ = 357;	// 0 -> 0
 	/**
-	 * Assign the CONVFMT variable offset.  The AVM uses this variable while
+	 * Assign the CONVFMT variable offset. The AVM uses this variable while
 	 * converting numbers to strings.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _CONVFMT_OFFSET_ = 358;	// 0 -> 0
 	/**
-	 * Assign the OFMT variable offset.  The AVM uses this variable while
+	 * Assign the OFMT variable offset. The AVM uses this variable while
 	 * converting numbers to strings for printing.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _OFMT_OFFSET_ = 359;	// 0 -> 0
 	/**
-	 * Assign the ENVIRON variable offset.  The AVM provides environment
+	 * Assign the ENVIRON variable offset. The AVM provides environment
 	 * variables through this array.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _ENVIRON_OFFSET_ = 360;	// 0 -> 0
 	/**
-	 * Assign the ARGC variable offset.  The AVM provides the number of
+	 * Assign the ARGC variable offset. The AVM provides the number of
 	 * arguments via this variable.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _ARGC_OFFSET_ = 361;	// 0 -> 0
 	/**
-	 * Assign the ARGV variable offset.  The AVM provides command-line
+	 * Assign the ARGV variable offset. The AVM provides command-line
 	 * arguments via this variable.
 	 * <p>
 	 * The operand stack is unaffected.
+	 * </p>
 	 */
 	public static final int _ARGV_OFFSET_ = 362;	// 0 -> 0
 
@@ -1371,6 +1516,7 @@ public class AwkTuples implements Serializable {
 	 * records.
 	 * <p>
 	 * The stack remains unaffected.
+	 * </p>
 	 */
 	public static final int _APPLY_RS_ = 363;	// 0 -> 0
 
@@ -1438,7 +1584,7 @@ public class AwkTuples implements Serializable {
 		} else if (o instanceof Double) {
 			queue.add(new Tuple(_PUSH_, (Double) o));
 		} else {
-			assert false : "Invalid type for "+o+", "+o.getClass();
+			assert false : "Invalid type for " + o + ", "+o.getClass();
 		}
 	}
 
@@ -2027,7 +2173,7 @@ public class AwkTuples implements Serializable {
 	}
 
 	/**
-	 * Accept a set of function names from the parser.  This is
+	 * Accept a set of function names from the parser. This is
 	 * useful for invalidating name=value assignments from the
 	 * command line parameters, either via -v arguments or
 	 * passed into ARGV.
@@ -2037,7 +2183,7 @@ public class AwkTuples implements Serializable {
 	public void setFunctionNameSet(Set<String> function_names) {
 		// setFunctionNameSet is called with a keySet from
 		// a HashMap as a parameter, which is NOT
-		// Serializable.  Creating a new HashSet around
+		// Serializable. Creating a new HashSet around
 		// the parameter resolves the issue.
 		// Otherwise, attempting to serialize this
 		// object results in a NotSerializableEexception
@@ -2059,14 +2205,14 @@ public class AwkTuples implements Serializable {
 		return function_names;
 	}
 
-  // linenumber stack ...
+	// linenumber stack ...
 
 	private MyStack<Integer> lineno_stack = new LinkedListStackImpl<Integer>();
 
 	/**
 	 * Push the current line number onto the line number stack.
 	 * This is called by the parser to keep track of the
-	 * current source line number.  Keeping track of line
+	 * current source line number. Keeping track of line
 	 * numbers this way allows the runtime to report
 	 * more meaningful errors by providing source line numbers
 	 * within error reports.
@@ -2084,7 +2230,7 @@ public class AwkTuples implements Serializable {
 
 
 	/**
-	 * Intermediate file version manager.  Ensures the AwkTuples
+	 * Intermediate file version manager. Ensures the AwkTuples
 	 * class version matches the version supported by the interpreter/compiler.
 	 */
 	private static class VersionManager implements Serializable {
@@ -2096,9 +2242,10 @@ public class AwkTuples implements Serializable {
 		 * or if instruction codes are removed.
 		 * <p>
 		 * <ul>
-		 * <li> Version 1 - Initial release.
-		 * <li> Version 2 - Changes to support compilation to JVM.
+		 * <li> Version 1 - Initial release.</li>
+		 * <li> Version 2 - Changes to support compilation to JVM.</li>
 		 * </ul>
+		 * </p>
 		 */
 		private static final int CLASS_VERSION = 2;
 
@@ -2141,4 +2288,4 @@ public class AwkTuples implements Serializable {
 		}
 	}
 	private VersionManager version_manager = new VersionManager();
-} // public class AwkTuples [Serializable]
+}

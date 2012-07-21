@@ -19,11 +19,11 @@ import org.jawk.intermediate.HasFunctionAddress;
 import org.jawk.jrt.KeyList;
 
 /**
- * AwkParser - converts the AWK script into a syntax tree
- * useful to either backend that compiles the script or interprets
- * the script.
+ * Converts the AWK script into a syntax tree,
+ * which is useful the backend that either compiles or interprets the script.
  * <p>
  * It contains the internal state of the parser and the lexer.
+ * </p>
  */
 public class AwkParser {
 
@@ -122,11 +122,13 @@ public class AwkParser {
 	 * <p>
 	 * Keys are the keywords themselves, and values are the
 	 * token values (equivalent to yytok values in lex/yacc).
+	 * </p>
 	 * <p>
 	 * <strong>Note:</strong> whether built-in AWK function names
 	 * and special AWK variable names are formally keywords or not,
-	 * they are not stored in this map.  They are separated
+	 * they are not stored in this map. They are separated
 	 * into other maps.
+	 * </p>
 	 */
 	private static final Map<String, Integer> KEYWORDS = new HashMap<String, Integer>();
 	static {
@@ -166,8 +168,9 @@ public class AwkParser {
 	 * function token values.
 	 * <p>
 	 * <strong>Note:</strong> these are not lexer token
-	 * values.  Lexer token values are for keywords and
+	 * values. Lexer token values are for keywords and
 	 * operators.
+	 * </p>
 	 */
 	private static final Map<String, Integer> BUILTIN_FUNC_NAMES = new HashMap<String, Integer>();
 	static {
@@ -203,6 +206,7 @@ public class AwkParser {
 	 * <p>
 	 * Keys are the variable names themselves, and values are the
 	 * variable token values.
+	 * </p>
 	 */
 	private static final Map<String, Integer> SPECIAL_VAR_NAMES = new HashMap<String, Integer>();
 	static {
@@ -265,7 +269,7 @@ public class AwkParser {
 		}
 		// Special handling for exec().
 		// Need to keep "extensions" around only
-		// for exec().  But, must assign it regardless
+		// for exec(). But, must assign it regardless
 		// even if "additional_functions" is not true
 		// because it is a final field variable.
 		this.extensions = extensions;
@@ -297,7 +301,7 @@ public class AwkParser {
 	}
 
 	/**
-	 * Parse the script streamed by script_reader.  Build and return the
+	 * Parse the script streamed by script_reader. Build and return the
 	 * root of the abstract syntax tree which represents the Jawk script.
 	 *
 	 * @param script_reader The Reader streaming the script to parse.
@@ -378,7 +382,7 @@ public class AwkParser {
 		assert assertOneLexerThread();
 
 		if (token != expected_token) {
-			throw new ParserException("Expecting " + expected_token + " " + toTokenString(expected_token) + ".  Found: " + token + " " + toTokenString(token) + " (" + text + ")");
+			throw new ParserException("Expecting " + expected_token + " " + toTokenString(expected_token) + ". Found: " + token + " " + toTokenString(token) + " (" + text + ")");
 		}
 		return lexer();
 	}
@@ -706,7 +710,7 @@ public class AwkParser {
 		 */
 
 		throw new LexerException("Invalid character (" + c + "): " + ((char) c));
-	} // private int lexer() throws IOException
+	}
 
 	// SUPPORTING FUNCTIONS/METHODS
 	private void terminator()
@@ -714,7 +718,7 @@ public class AwkParser {
 	{
 		// like opt_terminator, except error if no terminator was found
 		if (!opt_terminator()) {
-			throw new ParserException("Expecting statement terminator.  Got (" + token + "): " + text);
+			throw new ParserException("Expecting statement terminator. Got (" + token + "): " + text);
 		}
 	}
 
@@ -790,7 +794,7 @@ public class AwkParser {
 			function_name = text.toString();
 			lexer();
 		} else {
-			throw new ParserException("Expecting function name.  Got (" + token + "): " + text);
+			throw new ParserException("Expecting function name. Got (" + token + "): " + text);
 		}
 		symbol_table.setFunctionName(function_name);
 		lexer(_OPEN_PAREN_);
@@ -1385,7 +1389,7 @@ public class AwkParser {
 			throws IOException
 	{
 		if (token != _ID_ && token != _FUNC_ID_ && token != _BUILTIN_FUNC_NAME_ && token != _EXTENSION_) {
-			throw new ParserException("Expecting an ID.  Got (" + token + "): " + text);
+			throw new ParserException("Expecting an ID. Got (" + token + "): " + text);
 		}
 		int id_token = token;
 		String id = text.toString();
@@ -1659,18 +1663,18 @@ public class AwkParser {
 		// branch here if we expect a for(... in ...) statement
 		if (token == KEYWORDS.get("in")) {
 			if (expr1.ast1 == null || expr1.ast2 != null) {
-				throw new ParserException("Invalid expression prior to 'in' statement.  Got : " + expr1);
+				throw new ParserException("Invalid expression prior to 'in' statement. Got : " + expr1);
 			}
 			expr1 = expr1.ast1;
 			// analyze expr1 to make sure it's a singleton ID_AST
 			if (expr1 == null || !(expr1 instanceof ID_AST)) {
-				throw new ParserException("Expecting an ID for 'in' statement.  Got : " + expr1);
+				throw new ParserException("Expecting an ID for 'in' statement. Got : " + expr1);
 			}
 			// in
 			lexer();
 			// id
 			if (token != _ID_) {
-				throw new ParserException("Expecting an ARRAY ID for 'in' statement.  Got (" + token + "): " + text);
+				throw new ParserException("Expecting an ARRAY ID for 'in' statement. Got (" + token + "): " + text);
 			}
 			String arr_id = text.toString();
 
@@ -1687,7 +1691,7 @@ public class AwkParser {
 		if (token == _SEMICOLON_) {
 			lexer();
 		} else {
-			throw new ParserException("Expecting ;.  Got (" + token + "): " + text);
+			throw new ParserException("Expecting ;. Got (" + token + "): " + text);
 		}
 		if (token != _SEMICOLON_) {
 			expr2 = ASSIGNMENT_EXPRESSION(true, true, false);	// allow comparators, allow IN keyword, do NOT allow multidim indices expressions
@@ -1695,7 +1699,7 @@ public class AwkParser {
 		if (token == _SEMICOLON_) {
 			lexer();
 		} else {
-			throw new ParserException("Expecting ;.  Got (" + token + "): " + text);
+			throw new ParserException("Expecting ;. Got (" + token + "): " + text);
 		}
 		if (token != _CLOSE_PAREN_) {
 			expr3 = OPT_SIMPLE_STATEMENT(true);	// true = "allow the in keyword"
@@ -1953,7 +1957,7 @@ public class AwkParser {
 		if (token == KEYWORDS.get(keyword)) {
 			lexer();
 		} else {
-			throw new ParserException("Expecting " + keyword + ".  Got (" + token + "): " + text);
+			throw new ParserException("Expecting " + keyword + ". Got (" + token + "): " + text);
 		}
 	}
 
@@ -2038,12 +2042,12 @@ public class AwkParser {
 		/**
 		 * Dump a meaningful text representation of this
 		 * abstract syntax tree node to the output (print)
-		 * stream.  Either it is called directly by the
+		 * stream. Either it is called directly by the
 		 * application program, or it is called by the
 		 * parent node of this tree node.
 		 *
 		 * @param ps The print stream to dump the text
-		 *	representation.
+		 *   representation.
 		 */
 		@Override
 		public void dump(PrintStream ps) {
@@ -2071,7 +2075,7 @@ public class AwkParser {
 		}
 
 		/**
-		 * Apply semantic checks to this node.  The default
+		 * Apply semantic checks to this node. The default
 		 * implementation is to simply call semanticAnalysis()
 		 * on all the children of this abstract syntax tree node.
 		 * Therefore, this method must be overridden to provide
@@ -2099,19 +2103,21 @@ public class AwkParser {
 
 		/**
 		 * Appends tuples to the AwkTuples list
-		 * for this abstract syntax tree node.  Subclasses
+		 * for this abstract syntax tree node. Subclasses
 		 * must implement this method.
 		 * <p>
 		 * This is called either by the main program to generate a full
 		 * list of tuples for the abstract syntax tree, or it is called
 		 * by other abstract syntax tree nodes in response to their
 		 * attempt at populating tuples.
+		 * </p>
 		 *
 		 * @param tuples The tuples to populate.
 		 *
 		 * @return The number of items left on the stack after
 		 *	these tuples have executed.
 		 */
+		@Override
 		public abstract int populateTuples(AwkTuples tuples);
 
 		protected final void pushSourceLineNumber(AwkTuples tuples) {
@@ -2203,7 +2209,7 @@ public class AwkParser {
 		public String toString() {
 			return getClass().getName().replaceFirst(".*[$.]", "");
 		}
-	} // abstract class AST [AwkSyntaxTree]
+	}
 
 	private abstract class ScalarExpression_AST extends AST {
 
@@ -2240,7 +2246,7 @@ public class AwkParser {
 
 	/**
 	 * Inspects the action rule condition whether it contains
-	 * extensions.  It does a superficial check of
+	 * extensions. It does a superficial check of
 	 * the abstract syntax tree of the action rule.
 	 * In other words, it will not examine whether user-defined
 	 * functions within the action rule contain extensions.
@@ -2532,7 +2538,8 @@ public class AwkParser {
 				} else if (ast1 == null || !ast1.isBegin() && !ast1.isEnd()) {
 					// display $0
 					tuples.print(0);
-				} // else, don't populate it with anything
+				}
+				// else, don't populate it with anything
 				// (i.e., blank BEGIN/END rule)
 			} else {
 				// execute it, and leave nothing on the stack
@@ -2960,7 +2967,7 @@ public class AwkParser {
 			if (ast1 instanceof ID_AST) {
 				ID_AST id_ast = (ID_AST) ast1;
 				if (id_ast.isArray()) {
-					throw new SemanticException("Cannot use " + id_ast + " as a scalar.  It is an array.");
+					throw new SemanticException("Cannot use " + id_ast + " as a scalar. It is an array.");
 				}
 				id_ast.setScalar(true);
 				if        (op == _EQUALS_) {
@@ -2994,7 +3001,7 @@ public class AwkParser {
 				// push the array ref itself
 				ID_AST id_ast = (ID_AST) arr.ast1;
 				if (id_ast.isScalar()) {
-					throw new SemanticException("Cannot use " + id_ast + " as an array.  It is a scalar.");
+					throw new SemanticException("Cannot use " + id_ast + " as an array. It is a scalar.");
 				}
 				id_ast.setArray(true);
 				if        (op == _EQUALS_) {
@@ -3058,11 +3065,11 @@ public class AwkParser {
 			assert ast1 != null;
 			assert ast2 != null;
 			if (!(ast2 instanceof ID_AST)) {
-				throw new SemanticException("Expecting an array for rhs of IN.  Got an expression.");
+				throw new SemanticException("Expecting an array for rhs of IN. Got an expression.");
 			}
 			ID_AST arr_ast = (ID_AST) ast2;
 			if (arr_ast.isScalar()) {
-				throw new SemanticException("Expecting an array for rhs of IN.  Got a scalar.");
+				throw new SemanticException("Expecting an array for rhs of IN. Got a scalar.");
 			}
 			arr_ast.setArray(true);
 
@@ -3348,11 +3355,13 @@ public class AwkParser {
 		/**
 		 * Recursively process statements within this statement list.
 		 * <p>
-		 * It originally was done linearly.  However, quirks in the grammar required
+		 * It originally was done linearly. However, quirks in the grammar required
 		 * a more general, recursive approach to processing this "list".
+		 * </p>
 		 * <p>
 		 * Note: this should be reevaluated periodically in case the grammar
 		 * becomes linear again.
+		 * </p>
 		 */
 		@Override
 		public int populateTuples(AwkTuples tuples) {
@@ -3485,7 +3494,7 @@ public class AwkParser {
 				f_ptr = (FunctionDefParamList_AST) f_ptr.ast1;
 			}
 		}
-	} // private class FunctionDef_AST {AST} [Returnable]
+	}
 
 	private final class FunctionCall_AST extends ScalarExpression_AST {
 
@@ -3502,21 +3511,22 @@ public class AwkParser {
 		 * <p>
 		 * The checks performed are:
 		 * <ul>
-		 * <li>Make sure the function is defined.
-		 * <li>The number of actual parameters does not
-		 * exceed the number of formal parameters.
+		 * <li>Make sure the function is defined.</li>
+		 * <li>The number of actual parameters does not</li>
+		 *   exceed the number of formal parameters.
 		 * <li>Matches actual parameters to formal parameter
-		 * usage with respect to whether they are
-		 * scalars, arrays, or either.
-		 * (This determination is based on how
-		 * the formal parameters are used within
-		 * the function block.)
+		 *   usage with respect to whether they are
+		 *   scalars, arrays, or either.
+		 *   (This determination is based on how
+		 *   the formal parameters are used within
+		 *   the function block.)</li>
 		 * </ul>
 		 * A failure of any one of these checks
 		 * results in a SemanticException.
+		 * </p>
 		 *
 		 * @throws SemanticException upon a failure of
-		 * any of the semantic checks specified above.
+		 *   any of the semantic checks specified above.
 		 */
 		@Override
 		public void semanticAnalysis()
@@ -3918,7 +3928,7 @@ public class AwkParser {
 	 * Unknown for certain, but I think this is done
 	 * to avoid partial variable assignment mistakes.
 	 * For example, instead of a=3, the programmer
-	 * inadvertently places the a on the line.  If ID_ASTs
+	 * inadvertently places the a on the line. If ID_ASTs
 	 * were not tagged with NonStatement_AST, then the
 	 * incomplete assignment would parse properly, and
 	 * the developer might remain unaware of this issue.
@@ -4101,7 +4111,7 @@ public class AwkParser {
 			popSourceLineNumber(tuples);
 			return 1;
 		}
-	} // private class Regexp_AST {AST}
+	}
 
 	private final class RegexpPair_AST extends ScalarExpression_AST {
 
@@ -4399,7 +4409,7 @@ public class AwkParser {
 				param_count = ast1.populateTuples(tuples);
 				assert param_count >= 0;
 				if (param_count == 0) {
-					throw new SemanticException("Cannot print the result.  The expression doesn't return anything.");
+					throw new SemanticException("Cannot print the result. The expression doesn't return anything.");
 				}
 			}
 
@@ -4530,7 +4540,7 @@ public class AwkParser {
 				param_count = ast1.populateTuples(tuples);
 				assert param_count >= 0;
 				if (param_count == 0) {
-					throw new SemanticException("Cannot printf the result.  The expression doesn't return anything.");
+					throw new SemanticException("Cannot printf the result. The expression doesn't return anything.");
 				}
 			}
 
@@ -4856,7 +4866,7 @@ public class AwkParser {
 		private void checkActualToFormalParameters(AST actual_params) {
 			function_def_ast.checkActualToFormalParameters(actual_params);
 		}
-	} // private static class FunctionProxy
+	}
 
 	/**
 	 * Adds {var_name -&gt; offset} mappings to the tuples so that global variables
@@ -4872,7 +4882,7 @@ public class AwkParser {
 		for (String varname : symbol_table.global_ids.keySet()) {
 			ID_AST id_ast = symbol_table.global_ids.get(varname);
 			// The last arg originally was ", id_ast.is_scalar", but this is not set true
-			// if the variable use is ambiguous.  Therefore, assume it is a scalar
+			// if the variable use is ambiguous. Therefore, assume it is a scalar
 			// if it's NOT used as an array.
 			tuples.addGlobalVariableNameToOffsetMapping(varname, id_ast.offset, id_ast.is_array);
 		}
@@ -5063,7 +5073,7 @@ public class AwkParser {
 		AST addREGEXP(String regexp) {
 			return new Regexp_AST(regexp);
 		}
-	} // private class AwkSymbolTableImpl
+	}
 
 	private class ParserException extends RuntimeException {
 
@@ -5071,4 +5081,4 @@ public class AwkParser {
 			super(msg + " (line " + reader.getLineNumber() + ")");
 		}
 	}
-} // public class AwkParser
+}

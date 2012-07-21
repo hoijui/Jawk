@@ -2,7 +2,7 @@ package org.jawk;
 
 /**
  * A placeholder for blocks of code which are not
- * implemented.  If this is thrown, then it is the
+ * implemented. If this is thrown, then it is the
  * author's intention to complete the section at
  * a later date.
  */

@@ -54,24 +54,25 @@ import org.jawk.util.AwkParameters;
 /**
  * The reference implementation of the Jawk compiler.
  * Jawk intermediate code is analyzed and converted to
- * appropriate Java bytecode for execution on a modern
+ * appropriate Java byte-code for execution on a modern
  * JVM.
  * <a href="http://jakarta.apache.org/bcel/" target=_TOP>The Apache Byte Code Engineering Library (BCEL)</a>
  * is used to manage the construction
- * of the compiled bytecode.
+ * of the compiled byte-code.
  * <p>
  * Since this reference implementation relies on the
  * BCEL to execute, Jawk employs reflection to
- * classload this compiler implementation.  If the
+ * class-load this compiler implementation. If the
  * reflection fails, it is most likely because
- * the BCEL library cannot be found in the classpath.
+ * the BCEL library cannot be found in the class-path.
  * Reflection was used to ensure that Jawk will
  * build and execute, even without the presence of
  * the BCEL.
+ * </p>
  * <p>
  * The architecture of the resultant class is nearly
  * identical to the following Java code
- * (assuming AwkScript as the classname and no package
+ * (assuming AwkScript as the class-name and no package
  * name is provided via the -d argument):
  * <blockquote>
  * <pre>
@@ -181,7 +182,7 @@ import org.jawk.util.AwkParameters;
  *		// Could have be done in the class constructor,
  *		// but placed here to ensure proper repeat initialization
  *		// if repeat execution is required
- *		// within the same JVM instance.  Because
+ *		// within the same JVM instance. Because
  *		// if these were within the class constructor, each of these
  *		// data structures / int values would have to be
  *		// reinitialized in some way anyway.
@@ -233,7 +234,7 @@ import org.jawk.util.AwkParameters;
  *		///
  *		/// Compiled function <i><strong>function_name</strong></i> code here.
  *		/// (A return() sets the _return_value_ and falls out of this
- *		///  function code block.)
+ *		/// function code block.)
  *		/// (EndException is thrown when exit() is encountered.)
  *		///
  *
@@ -249,6 +250,7 @@ import org.jawk.util.AwkParameters;
  * }
  * </pre>
  * </blockquote>
+ * </p>
  *
  * @see org.jawk.backend.AwkCompiler
  * @see org.jawk.backend.AVM
@@ -298,7 +300,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 						Object o = f.get(null);
 						Class cls = (Class) o;
 						if (!cls.getPackage().getName().equals(packagename)) {
-							throw new AssertionError("Error: " + c + " is not contained within '" + packagename + "' package.  Field = " + f);
+							throw new AssertionError("Error: " + c + " is not contained within '" + packagename + "' package. Field = " + f);
 						}
 					} catch (IllegalAccessException iae) {
 						iae.printStackTrace();
@@ -352,15 +354,17 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * <p>
 	 * Instruction marking aids in retrieving the first instruction
 	 * of a group of instructions that represents one Jawk opcode.
+	 * </p>
 	 * <p>
 	 * A mark must occur prior to appending an instruction
-	 * to the instruction list.  Then, the marked instruction
+	 * to the instruction list. Then, the marked instruction
 	 * must be retrieved before another instruction is marked.
 	 * In other words, the instruction list keeps state of
-	 * the most recent marked instruction.  The application
+	 * the most recent marked instruction. The application
 	 * code must retrieve the marked instruction as soon
 	 * as possible to do it's Jawk opcode to JVm instruction
 	 * management.
+	 * </p>
 	 */
 	private static final class MyInstructionList extends InstructionList {
 
@@ -409,58 +413,59 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	/**
-	 * Checks whether a classname is a valid classname
+	 * Checks whether a string is a valid class-name
 	 * (validity for Jawk, not necessarily for the JVM).
 	 * Validity is defined as:
 	 * <ul>
-	 * <li>classname is a non-null, non-empty string
-	 * <li>A <strong>classname unit</strong> is defined
+	 * <li>className is a non-null, non-empty string</li>
+	 * <li>A <strong>className unit</strong> is defined
 	 * as text between the start-of-string and a period,
 	 * a period and the end-of-string, or between
-	 * two periods.  classname units must be non-empty strings.
-	 * <li>classname units must adhere to Java identifier rules.
-	 * See java.lang.Character.isJavaIdentifierStart
-	 * and java.lang.Character.isJavaIdentifierPart for rules
-	 * relating to Java identifiers.
-	 * <li>classname must not contain dollar signs ($).
+	 * two periods. className units must be non-empty strings.</li>
+	 * <li>className units must adhere to Java identifier rules.
+	 * See {@see java.lang.Character.isJavaIdentifierStart}
+	 * and {@see java.lang.Character.isJavaIdentifierPart} for rules
+	 * relating to Java identifiers.</li>
+	 * <li>className must not contain dollar signs ($).
 	 * Even though dollar signs are common within class names
 	 * to indicate inner classes, the Jawk compiler cannot
-	 * process these types of names.
+	 * process these types of names.</li>
 	 * </ul>
 	 * <p>
 	 * If all of these tests pass, nothing occurs and the
-	 * method exits.  Otherwise, an IllegalArgumentException
+	 * method exits. Otherwise, an IllegalArgumentException
 	 * is thrown
+	 * </p>
 	 *
-	 * @param classname The classname to verify.
+	 * @param className The className to verify.
 	 *
-	 * @throws IllegalArgumentException if the classname does
+	 * @throws IllegalArgumentException if the className does
 	 * not conform to the rules described above.
 	 */
-	private static void validateClassname(String classname)
+	private static void validateClassname(String className)
 			throws IllegalArgumentException
 	{
 		// - check for non-null
-		assert classname != null;
+		assert className != null;
 		// - check for non-blank classname
-		if (classname.length() == 0) {
+		if (className.length() == 0) {
 			throw new IllegalArgumentException("classname cannot be black");
 		}
 		// - check for a valid java identifier
-		if (classname.charAt(0) != '.' && !Character.isJavaIdentifierStart(classname.charAt(0))) {
+		if (className.charAt(0) != '.' && !Character.isJavaIdentifierStart(className.charAt(0))) {
 			throw new IllegalArgumentException("classname is not a valid java identifier");
 		}
-		for (int i = 1; i < classname.length(); i++) {
-			if (classname.charAt(i) != '.' && !Character.isJavaIdentifierPart(classname.charAt(i))) {
+		for (int i = 1; i < className.length(); i++) {
+			if (className.charAt(i) != '.' && !Character.isJavaIdentifierPart(className.charAt(i))) {
 				throw new IllegalArgumentException("classname is not a valid java identifier");
 			}
 		}
 		// - check for $
-		if (classname.indexOf('$') >= 0) {
+		if (className.indexOf('$') >= 0) {
 			throw new IllegalArgumentException("classname cannot contain a $");
 		}
 		// - check for no ..'s in classname
-		if (classname.indexOf("..") >= 0) {
+		if (className.indexOf("..") >= 0) {
 			throw new IllegalArgumentException("null-package (..) found in classname");
 		}
 
@@ -468,29 +473,28 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	/**
-	 * Retrieves the dirname, if any, from a given classname.
+	 * Retrieves the directory-name, if there is one in the given className.
 	 * It uses the separator parameter as class "path" separators.
-	 * If no separators exist, null is returned.
 	 *
-	 * @param classname The classname to analyze.
+	 * @param className The class-name to analyze.
 	 * @param separator The separator denoting components
-	 * of the class "path".
+	 *   of the class "path".
 	 *
-	 * @return The "dir" part of the class "path".  If no
-	 * separators exist, null is returned.
+	 * @return The "dir" part of the class "path".
+	 *   If no separators exist, <code>null</code> is returned.
 	 */
-	private static String extractDirname(String classname, String separator) {
+	private static String extractDirname(String className, String separator) {
 		// converts
 		// a.b.c.d
 		// to
 		// a.b.c
 		// (if no periods exist, return null)
-		assert classname != null && classname.length() > 0;
-		int dot_idx = classname.lastIndexOf(separator);
+		assert className != null && className.length() > 0;
+		int dot_idx = className.lastIndexOf(separator);
 		if (dot_idx == -1) {
 			return null;
 		} else {
-			String dirname = classname.substring(0, dot_idx);
+			String dirname = className.substring(0, dot_idx);
 			// convert all "."'s to File.separator's
 			return dirname.replace(separator, File.separator);
 		}
@@ -498,25 +502,25 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 	/**
 	 * Retrieves the name portion of the class "path" contained
-	 * within classname.
-	 * If no separators (periods) exist, classname is returned.
+	 * within className.
+	 * If no separators (periods) exist, className is returned.
 	 *
-	 * @param classname The classname to analyze.
+	 * @param className The className to analyze.
 	 *
-	 * @return The "name" part of the class "path".  If no
-	 * separators (periods) exist, classname is returned.
+	 * @return The "name" part of the class "path".
+	 *   If no separators (periods) exist, className is returned.
 	 */
-	private static String extractClassname(String classname) {
+	private static String extractClassname(String className) {
 		// converts
 		// a.b.c.d
 		// to
 		// d
-		assert classname != null && classname.length() > 0;
-		int dot_idx = classname.lastIndexOf('.');
+		assert className != null && className.length() > 0;
+		int dot_idx = className.lastIndexOf('.');
 		if (dot_idx == -1) {
-			return classname;
+			return className;
 		} else {
-			return classname.substring(dot_idx + 1);
+			return className.substring(dot_idx + 1);
 		}
 	}
 
@@ -524,19 +528,20 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * Prepares for compilation.
 	 * Actions are as follows:
 	 * <ul>
-	 * <li>Allocate the ScriptMain and runEndBlocks method objects.
-	 * <li>Allocate local variables (dregister and sb) for both methods.
-	 * <li>Allocate static helper objects (i.e., ZERO, ONE, and MINUS_ONE).
-	 * <li>Allocate some global helper objects (i.e., random_seed_generator).
+	 * <li>Allocate the ScriptMain and runEndBlocks method objects.</li>
+	 * <li>Allocate local variables (dregister and sb) for both methods.</li>
+	 * <li>Allocate static helper objects (i.e., ZERO, ONE, and MINUS_ONE).</li>
+	 * <li>Allocate some global helper objects (i.e., random_seed_generator).</li>
 	 * </ul>
 	 * <p>
 	 * <strong>TODO:</strong> analyze tuples to check for
 	 * <ul>
-	 * <li>_CONCAT_ - if not found, no need to allocate sb
-	 * <li>_RANDOM_ - if not found, no need to allocate random_seed_generator
-	 * <li>arithmetic opcodes - if not found, no need to allocate dregister
-	 * <li><i>etc...</i>
+	 * <li>_CONCAT_ - if not found, no need to allocate sb</li>
+	 * <li>_RANDOM_ - if not found, no need to allocate random_seed_generator</li>
+	 * <li>arithmetic opcodes - if not found, no need to allocate dregister</li>
+	 * <li><i>etc...</i></li>
 	 * </ul>
+	 * </p>
 	 */
 	private void precompile() {
 		// setup JVM compilation stuff
@@ -548,15 +553,15 @@ public class AwkCompilerImpl implements AwkCompiler {
 			script_filename = "<generated>";
 		}
 		cg = new ClassGen(classname, "java.lang.Object", script_filename,
-				ACC_PUBLIC | ACC_SUPER, new String[] {VariableManagerClass.getName()});
+				ACC_PUBLIC | ACC_SUPER, new String[] { VariableManagerClass.getName() });
 		factory = new InstructionFactory(cg);
 		cp = cg.getConstantPool();
 
 		il_main = new MyInstructionList();
 		mg_main = new MethodGen(ACC_PUBLIC | ACC_FINAL,
 				Type.INT,
-				new Type[] {getObjectType(AwkParameters.class)},
-				new String[] {"parameters"},
+				new Type[] { getObjectType(AwkParameters.class) },
+				new String[] { "parameters" },
 				"ScriptMain",
 				classname,
 				il_main, cp);
@@ -665,7 +670,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * Entry point to the compiler.
 	 * The compiler traverses the AwkTuples produced by
 	 * the intermediate step, translating each tuple
-	 * into JVM code.  Some post-processing occurs
+	 * into JVM code. Some post-processing occurs
 	 * to resolve branching (jumps to Addresses).
 	 *
 	 * @param tuples The tuples which are traversed
@@ -1288,6 +1293,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * The intermediate code (tuples) is traversed one time
 	 * to discover all partial parameter calls that are
 	 * made.
+	 * </p>
 	 */
 	private void createPartialParamCalls(AwkTuples tuples) {
 
@@ -3078,7 +3084,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._ENVIRON_OFFSET_:
 			case AwkTuples._ARGC_OFFSET_:
 			case AwkTuples._ARGV_OFFSET_:
-				// DO NOTHING!  Done already.
+				// DO NOTHING! Done already.
 				break;
 			default:
 				throw new Error("Unknown opcode: " + AwkTuples.toOpcodeString(opcode));
@@ -3596,7 +3602,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 	private InstructionHandle JVMTools_getVariable(int offset, boolean is_global, boolean is_array) {
 		if (offset < 0) {
-			throw new IllegalArgumentException("offset = " + offset + " ?!  is_global=" + is_global + ", is_array=" + is_array);
+			throw new IllegalArgumentException("offset = " + offset + " ?! is_global=" + is_global + ", is_array=" + is_array);
 		}
 		InstructionHandle retval;
 		if (is_global) {
@@ -3669,6 +3675,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * <strong>Warning:</strong> If the top-of-stack is not an
 	 * object reference (i.e., an integer or a double), a VerifyError
 	 * will occur.
+	 * </p>
 	 */
 	private void JVMTools_DEBUG_TOS() {
 		// ... objref
@@ -3722,4 +3729,4 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 		return arg_list.toArray(new Type[0]);
 	}
-} // public class AwkCompilerImpl [AwkCompiler]
+}

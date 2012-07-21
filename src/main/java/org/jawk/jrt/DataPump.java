@@ -12,6 +12,7 @@ import java.io.PrintStream;
  * of a spawned process (by, for example, system() or
  * "cmd" | getline) to the stdin, stdout, and/or stderr
  * of the calling process (the interpreter itself).
+ * </p>
  */
 public class DataPump extends Thread {
 
@@ -36,7 +37,7 @@ public class DataPump extends Thread {
 	}
 
 	/**
-	 * VM entry point for the thread.  It performs the data
+	 * VM entry point for the thread. It performs the data
 	 * relay.
 	 */
 	@Override
@@ -54,4 +55,4 @@ public class DataPump extends Thread {
 			is.close();
 		} catch (IOException ioe) {}
 	}
-} // public class DataPump {Thread}
+}
