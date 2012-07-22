@@ -8,9 +8,11 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -22,6 +24,7 @@ import org.jawk.frontend.AwkSyntaxTree;
 import org.jawk.intermediate.AwkTuples;
 import org.jawk.util.AwkParameters;
 import org.jawk.util.DestDirClassLoader;
+import org.jawk.util.ScriptSource;
 
 /**
  * Entry point into the parsing, analysis, and execution/compilation
@@ -143,13 +146,20 @@ public class Awk {
 			AwkTuples tuples = new AwkTuples();
 			// to be defined below
 
-			if (parameters.isIntermediateFile()) {
-				// read the intermediate file, bypassing frontend processing
-				tuples = (AwkTuples) readObjectFromInputStream(parameters.ifInputStream());
-			} else {
+			List<ScriptSource> notIntermediateScriptSources = new ArrayList<ScriptSource>(parameters.getScriptSources().size());
+			for (ScriptSource scriptSource : parameters.getScriptSources()) {
+				if (scriptSource.isIntermediate()) {
+					// read the intermediate file, bypassing frontend processing
+					tuples = (AwkTuples) readObjectFromInputStream(scriptSource.getInputStream()); // FIXME only the last intermediate file is used!
+				} else {
+					notIntermediateScriptSources.add(scriptSource);;
+				}
+			}
+			if (!notIntermediateScriptSources.isEmpty()) {
 				AwkParser parser = new AwkParser(parameters.additional_functions, parameters.additional_type_functions, parameters.no_input, extensions);
 				// parse the script
-				AwkSyntaxTree ast = parser.parse(parameters.scriptReader());
+				AwkSyntaxTree ast = null;
+				ast = parser.parse(notIntermediateScriptSources);
 
 				if (parameters.dump_syntax_tree) {
 					// dump the syntax tree of the script to a file

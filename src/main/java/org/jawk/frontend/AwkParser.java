@@ -3,11 +3,11 @@ package org.jawk.frontend;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jawk.NotImplementedError;
@@ -17,6 +17,7 @@ import org.jawk.intermediate.Address;
 import org.jawk.intermediate.AwkTuples;
 import org.jawk.intermediate.HasFunctionAddress;
 import org.jawk.jrt.KeyList;
+import org.jawk.util.ScriptSource;
 
 /**
  * Converts the AWK script into a syntax tree,
@@ -275,6 +276,8 @@ public class AwkParser {
 		this.extensions = extensions;
 	}
 
+	private List<ScriptSource> scriptSources;
+	private int scriptSourcesCurrentIndex;
 	private LineNumberReader reader;
 	private int c;
 	private int token;
@@ -294,7 +297,13 @@ public class AwkParser {
 			c = reader.read();
 		}
 		if (c < 0) {
-			chr = 0;	// eof
+			chr = 0; // EoF
+			// check if there are additional sources
+			if ((scriptSourcesCurrentIndex + 1) < scriptSources.size()) {
+				scriptSourcesCurrentIndex++;
+				reader = new LineNumberReader(scriptSources.get(scriptSourcesCurrentIndex).getReader());
+				read();
+			}
 		} else {
 			chr = c;
 		}
@@ -310,10 +319,15 @@ public class AwkParser {
 	 *
 	 * @throws IOException upon an IO error.
 	 */
-	public AwkSyntaxTree parse(Reader script_reader)
+	public AwkSyntaxTree parse(List<ScriptSource> scriptSources)
 			throws IOException
 	{
-		reader = new LineNumberReader(script_reader);
+		if ((scriptSources == null) || scriptSources.isEmpty()) {
+			throw new IOException("No script sources supplied");
+		}
+		this.scriptSources = scriptSources;
+		scriptSourcesCurrentIndex = 0;
+		reader = new LineNumberReader(scriptSources.get(scriptSourcesCurrentIndex).getReader());
 		read();
 		lexer();
 		return SCRIPT();
@@ -322,7 +336,9 @@ public class AwkParser {
 	private class LexerException extends IOException {
 
 		LexerException(String msg) {
-			super(msg + " (line " + reader.getLineNumber() + ")");
+			super(msg + " ("
+					+ scriptSources.get(scriptSourcesCurrentIndex).getDescription()
+					+ ":" + reader.getLineNumber() + ")");
 		}
 	}
 
@@ -1966,7 +1982,8 @@ public class AwkParser {
 	// AST class defs
 	private abstract class AST implements AwkSyntaxTree {
 
-		private int lineno = reader.getLineNumber() + 1;
+		private final String sourceDescription = scriptSources.get(scriptSourcesCurrentIndex).getDescription();
+		private final int lineNo = reader.getLineNumber() + 1;
 		protected AST parent;
 		protected AST ast1, ast2, ast3, ast4;
 
@@ -2121,11 +2138,11 @@ public class AwkParser {
 		public abstract int populateTuples(AwkTuples tuples);
 
 		protected final void pushSourceLineNumber(AwkTuples tuples) {
-			tuples.pushSourceLineNumber(lineno);
+			tuples.pushSourceLineNumber(lineNo);
 		}
 
 		protected final void popSourceLineNumber(AwkTuples tuples) {
-			tuples.popSourceLineNumber(lineno);
+			tuples.popSourceLineNumber(lineNo);
 		}
 
 		protected boolean is_begin = isBegin();
@@ -2197,7 +2214,7 @@ public class AwkParser {
 		protected class SemanticException extends RuntimeException {
 
 			SemanticException(String msg) {
-				super(msg + " (line: " + lineno + ")");
+				super(msg + " (" + sourceDescription + ":" + lineNo + ")");
 			}
 		}
 
@@ -5078,7 +5095,9 @@ public class AwkParser {
 	private class ParserException extends RuntimeException {
 
 		ParserException(String msg) {
-			super(msg + " (line " + reader.getLineNumber() + ")");
+			super(msg + " ("
+					+ scriptSources.get(scriptSourcesCurrentIndex).getDescription()
+					+ ":" + reader.getLineNumber() + ")");
 		}
 	}
 }

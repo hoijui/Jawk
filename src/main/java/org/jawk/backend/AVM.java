@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -37,6 +38,7 @@ import org.jawk.util.ArrayStackImpl;
 import org.jawk.util.AwkParameters;
 import org.jawk.util.LinkedListStackImpl;
 import org.jawk.util.MyStack;
+import org.jawk.util.ScriptSource;
 
 /**
  * The Jawk interpreter.
@@ -1807,6 +1809,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// Use at your own risk.
 
 						String awk_code = JRT.toAwkString(pop(), getCONVFMT().toString());
+						List<ScriptSource> scriptSources = new ArrayList<ScriptSource>(1);
+						scriptSources.add(new ScriptSource(ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT, new StringReader(awk_code), false));
 
 						org.jawk.frontend.AwkParser ap = new org.jawk.frontend.AwkParser(
 								//true, true, true, extensions
@@ -1815,7 +1819,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 								parameters.no_input,
 								extensions);
 						try {
-							AwkSyntaxTree ast = ap.parse(new StringReader(awk_code));
+							AwkSyntaxTree ast = ap.parse(scriptSources);
 							if (ast != null) {
 								ast.semanticAnalysis();
 								ast.semanticAnalysis();

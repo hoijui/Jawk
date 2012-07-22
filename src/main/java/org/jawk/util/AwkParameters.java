@@ -1,11 +1,7 @@
 package org.jawk.util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,8 +154,7 @@ public class AwkParameters {
 		out.println("--------------");
 		out.println("initial_variables = " + initial_variables);
 		out.println("name_value_filename_list = " + name_value_filename_list);
-		out.println("script_filename = " + script_filename);
-		out.println("script_reader = " + script_reader);
+		out.println("script_sources = " + scriptSources);
 		out.println("should_compile = " + should_compile);
 		out.println("should_compile_and_run = " + should_compile_and_run);
 		out.println("initial_fs_value = " + initial_fs_value);
@@ -187,15 +182,13 @@ public class AwkParameters {
 	 */
 	public List<String> name_value_filename_list = new ArrayList<String>();
 	/**
-	 * Script filename (if provided).
-	 * If null, using the first non-"-" parameter.
+	 * Script sources meta info.
+	 * This will usually be either one String container,
+	 * made up of the script given on the command line directly,
+	 * with the first non-"-" parameter,
+	 * or one or multiple script file names (if provided with -f switches).
 	 */
-	public String script_filename = null;
-	/**
-	 * Reader providing the script.
-	 * If script comes from the command-line, a StringReader is used.
-	 */
-	private Reader script_reader;
+	private List<ScriptSource> scriptSources = new ArrayList<ScriptSource>();
 	/**
 	 * Whether to interpret or compile the script.
 	 * Initial value is set to false (interpret).
@@ -306,7 +299,7 @@ public class AwkParameters {
 				} else if (args[arg_idx].equals("-f")) {
 					checkParameterHasArgument(args, arg_idx);
 					++arg_idx;
-					script_filename = args[arg_idx];
+					scriptSources.add(new ScriptFileSource(args[arg_idx]));
 				} else if (args[arg_idx].equals("-d")) {
 					checkParameterHasArgument(args, arg_idx);
 					++arg_idx;
@@ -351,23 +344,29 @@ public class AwkParameters {
 			}
 
 			if (extension_description == null) {
-				// script mode (if -f not provided)
-				if (script_filename == null) {
+				// script mode (if -f is not provided)
+				if (scriptSources.isEmpty()) {
 					if (arg_idx >= args.length) {
 						throw new IllegalArgumentException("Awk script not provided.");
 					}
-					String script_filename = args[arg_idx++];
-					script_reader = new StringReader(script_filename);
+					String scriptContent = args[arg_idx++];
+					scriptSources.add(new ScriptSource(
+							ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT,
+							new StringReader(scriptContent),
+							false));
 				} else {
 					try {
-						is_intermediate_file = script_filename.endsWith(".ai");
-						if (is_intermediate_file) {
-							if_input_stream = new FileInputStream(script_filename);
-						} else { // read from file
-							script_reader = new FileReader(script_filename);
+						// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
+						// initialize the Readers or InputStreams
+						for (ScriptSource scriptSource : scriptSources) {
+							if (scriptSource.isIntermediate()) {
+								scriptSource.getInputStream();
+							} else {
+								scriptSource.getReader();
+							}
 						}
-					} catch (FileNotFoundException fnfe) {
-						fnfe.printStackTrace();
+					} catch (IOException ex) {
+						ex.printStackTrace();
 						usage(System.err, extension_description);
 					}
 				}
@@ -442,43 +441,6 @@ public class AwkParameters {
 		initial_variables.put(name, value);
 	}
 
-	private boolean is_intermediate_file;
-	private InputStream if_input_stream;
-
-	/**
-	 * Determine if the -f optarg is an intermediate file.
-	 * Intermediate files end with the .ai extension. No other
-	 * determination is made whether the file is an intermediate
-	 * file or not. That is, the content of the file is not checked.
-	 *
-	 * @return true if the -f optarg is an intermediate file (a file
-	 *   ending in .ai), false otherwise.
-	 */
-	public boolean isIntermediateFile() { return is_intermediate_file; }
-
-	/**
-	 * Obtain the Reader containing the script. This returns non-null
-	 * only if the -f argument is utilized.
-	 *
-	 * @return The reader which contains the script, null if no script
-	 *	file is provided.
-	 */
-	public Reader scriptReader() {
-		return script_reader;
-	}
-
-	/**
-	 * Obtain the InputStream containing the intermediate file.
-	 * This returns non-null only if the -f argument is utilized and it
-	 * refers to an intermediate file.
-	 *
-	 * @return The reader which contains the intermediate file, null if
-	 *   either the -f argument is not used, or the argument does not
-	 *   refer to an intermediate file.
-	 */
-	public InputStream ifInputStream() {
-		return if_input_stream;
-	}
 	/**
 	 * @param default_filename The filename to return if -o argument
 	 *   is not used.
@@ -500,6 +462,17 @@ public class AwkParameters {
 	 */
 	public String destDirectory() {
 		return dest_directory;
+	}
+
+	/**
+	 * Returns the script sources meta info.
+	 * This will usually be either one String container,
+	 * made up of the script given on the command line directly,
+	 * with the first non-"-" parameter,
+	 * or one or multiple script file names (if provided with -f switches).
+	 */
+	public List<ScriptSource> getScriptSources() {
+		return scriptSources;
 	}
 
 	/**

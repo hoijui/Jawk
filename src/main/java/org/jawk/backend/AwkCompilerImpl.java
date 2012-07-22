@@ -50,6 +50,8 @@ import org.jawk.jrt.KeyListImpl;
 import org.jawk.jrt.PatternPair;
 import org.jawk.jrt.VariableManager;
 import org.jawk.util.AwkParameters;
+import org.jawk.util.ScriptFileSource;
+import org.jawk.util.ScriptSource;
 
 /**
  * The reference implementation of the Jawk compiler.
@@ -548,11 +550,17 @@ public class AwkCompilerImpl implements AwkCompiler {
 		//classname = "AwkScript";
 		classname = parameters.outputFilename("AwkScript");
 		validateClassname(classname);
-		String script_filename = parameters.script_filename;
-		if (script_filename == null) {
-			script_filename = "<generated>";
+
+		// This string is only used as decorative/descriptive thing.
+		// No actual data is tried to be read from "the file"
+		// it supposedly points to.
+		String scriptFilename = "";
+		for (ScriptSource scriptSource : parameters.getScriptSources()) {
+			scriptFilename = scriptFilename + " " + scriptSource.getDescription();
 		}
-		cg = new ClassGen(classname, "java.lang.Object", script_filename,
+		scriptFilename = scriptFilename.trim();
+
+		cg = new ClassGen(classname, "java.lang.Object", scriptFilename,
 				ACC_PUBLIC | ACC_SUPER, new String[] { VariableManagerClass.getName() });
 		factory = new InstructionFactory(cg);
 		cp = cg.getConstantPool();
