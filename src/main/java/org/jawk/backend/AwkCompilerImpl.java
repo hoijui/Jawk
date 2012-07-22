@@ -784,7 +784,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			addMainMethod();
 			createMethods_VariableManager(tuples);
 			createPartialParamCalls(tuples);
-			String destdir = parameters.destDirectory();
+			String destdir = parameters.getDestDirectory();
 			String dirname = extractDirname(classname, ".");
 			String clsname = extractClassname(classname);
 			if (dirname != null) {

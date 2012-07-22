@@ -460,7 +460,7 @@ public class AwkParameters {
 	 * @return the optarg for the -d parameter, or null
 	 *   if -d is not utilized.
 	 */
-	public String destDirectory() {
+	public String getDestDirectory() {
 		return dest_directory;
 	}
 

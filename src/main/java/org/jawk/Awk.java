@@ -317,7 +317,7 @@ public class Awk {
 				System.err.println("(locating " + classname + "...)");
 			}
 			Class<?> script_class;
-			String dest_directory = parameters.destDirectory();
+			String dest_directory = parameters.getDestDirectory();
 			if (dest_directory == null) {
 				script_class = Class.forName(classname);
 				if (VERBOSE) {
