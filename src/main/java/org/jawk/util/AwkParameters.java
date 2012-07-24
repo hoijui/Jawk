@@ -3,10 +3,6 @@ package org.jawk.util;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the command-line parameters accepted by Jawk.
@@ -14,54 +10,54 @@ import java.util.Map;
  *
  * <ul>
  * <li>-v name=val [-v name=val] ... <br/>
- * Variable assignments prior to execution of the script.</li>
+ *   Variable assignments prior to the execution of the script.</li>
  * <li>-F regexp <br/>
- * Field separator (FS).</li>
+ *   Field separator (FS).</li>
  * <li>-f filename <br/>
- * Use the text contained in filename as the script rather than
- * obtaining it from the command-line.</li>
+ *   Use the text contained in filename as the script rather than
+ *   obtaining it from the command-line.</li>
  * <li><i>Extension</i> -c <br/>
- * Write intermediate file. Intermediate file can be used as
- * an argument to -f.</li>
+ *   Write intermediate file. Intermediate file can be used as
+ *   an argument to -f.</li>
  * <li><i>Extension</i> -o filename <br/>
- * Output filename for intermediate file, tuples, or syntax tree.</li>
+ *   Output filename for intermediate file, tuples, or syntax tree.</li>
  * <li><i>Extension</i> -z <br/>
- * Compile to JVM rather than interpret it.</li>
+ *   Compile to JVM rather than interpret it.</li>
  * <li><i>Extension</i> -Z <br/>
- * Compile to JVM rather and execute it.</li>
+ *   Compile to JVM rather and execute it.</li>
  * <li><i>Extension</i> -d <br/>
- * Compile results to destination directory instead of current working dir.</li>
+ *   Compile results to destination directory instead of current working dir.</li>
  * <li><i>Extension</i> -s <br/>
- * Dump the intermediate code.</li>
+ *   Dump the intermediate code.</li>
  * <li><i>Extension</i> -S <br/>
- * Dump the syntax tree.</li>
+ *   Dump the syntax tree.</li>
  * <li><i>Extension</i> -x <br/>
- * Enables _sleep, _dump, and exec keywords/functions.</li>
+ *   Enables _sleep, _dump, and exec keywords/functions.</li>
  * <li><i>Extension</i> -y <br/>
- * Enables _INTEGER, _DOUBLE, and _STRING type casting keywords.</li>
+ *   Enables _INTEGER, _DOUBLE, and _STRING type casting keywords.</li>
  * <li><i>Extension</i> -t <br/>
- * Maintain array keys in sorted order (using a TreeMap instead of a HashMap)</li>
+ *   Maintain array keys in sorted order (using a TreeMap instead of a HashMap)</li>
  * <li><i>Extension</i> -r <br/>
- * Do NOT error for <code>IllegalFormatException</code> when using
- * <code>java.util.Formatter</code> for <code>sprintf</code>
- * and <code>printf</code>.</li>
+ *   Do NOT error for <code>IllegalFormatException</code> when using
+ *   <code>java.util.Formatter</code> for <code>sprintf</code>
+ *   and <code>printf</code>.</li>
  * <li><i>Extension</i> -ext <br/>
- * Enabled user-defined extensions. Works together with the
- * -Djava.extensions property.
- * It also disables blank rule as mapping to a print $0 statement.</li>
+ *   Enabled user-defined extensions. Works together with the
+ *   -Djava.extensions property.
+ *   It also disables blank rule as mapping to a print $0 statement.</li>
  * <li><i>Extension</i> -ni <br/>
- * Do NOT consume stdin or files from ARGC/V through input rules.
- * The motivation is to leave input rules for blocking extensions
- * (i.e., Sockets, Dialogs, etc).</li>
+ *   Do NOT consume stdin or files from ARGC/V through input rules.
+ *   The motivation is to leave input rules for blocking extensions
+ *   (i.e., Sockets, Dialogs, etc).</li>
  * </ul>
  * followed by the script (if -f is not provided), then followed
  * by a list containing zero or more of the following parameters:
  * <ul>
  * <li>name=val <br/>
- * Variable assignments occurring just prior to receiving input
- * (but after the BEGIN blocks, if any).</li>
+ *   Variable assignments occurring just prior to receiving input
+ *   (but after the BEGIN blocks, if any).</li>
  * <li>filename <br/>
- * Filenames to treat as input to the script.</li>
+ *   Filenames to treat as input to the script.</li>
  * </ul>
  * <p>
  * If no filenames are provided, stdin is used as input
@@ -70,14 +66,156 @@ import java.util.Map;
  */
 public class AwkParameters {
 
-	private Class mainclass;
+	private Class mainClass;
+
+	private String extensionDescription;
+
+	/**
+	 * @param mainClass The main class to print when displaying usage.
+	 * @param extensionDescription a text description of extensions that
+	 *   are enabled (for compiled scripts)
+	 */
+	public AwkParameters(Class mainClass, String extensionDescription) {
+		this.mainClass = mainClass;
+		this.extensionDescription = extensionDescription;
+	}
+
+	/**
+	 * Parses AWK command line parameters,
+	 * for example from the VM entry point <code>main()</code>.
+	 * <p>
+	 * The command-line argument semantics are as follows:
+	 * <ul>
+	 * <li>First, "-" arguments are processed until first non-"-" argument
+	 *   is encountered, or the "-" itself is provided.</li>
+	 * <li>Next, a script is expected (unless the -f argument was provided).</li>
+	 * <li>Then, subsequent parameters are passed into the script
+	 *   via the ARGC/ARGV variables.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param args The command-line arguments provided by the user.
+	 */
+	public AwkSettings parseCommandLineArguments(String[] args) {
+
+		AwkSettings settings = new AwkSettings();
+
+		int arg_idx = 0;
+		try {
+			// optional parameter mode (i.e. args[i].charAt(0) == '-')
+			while (arg_idx < args.length) {
+				assert args[arg_idx] != null;
+				if (args[arg_idx].length() == 0) {
+					throw new IllegalArgumentException("zero-length argument at position " + (arg_idx + 1));
+				}
+				if (args[arg_idx].charAt(0) != '-') {
+					// no more -X arguments
+					break;
+				} else if (args[arg_idx].equals("-")) {
+					// no more -X arguments
+					++arg_idx;
+					break;
+				} else if (args[arg_idx].equals("-v")) {
+					checkParameterHasArgument(args, arg_idx);
+					++arg_idx;
+					checkInitialVariableFormat(args[arg_idx]);
+					addVariable(settings, args[arg_idx]);
+				} else if (args[arg_idx].equals("-f")) {
+					checkParameterHasArgument(args, arg_idx);
+					++arg_idx;
+					settings.addScriptSource(new ScriptFileSource(args[arg_idx]));
+				} else if (args[arg_idx].equals("-d")) {
+					checkParameterHasArgument(args, arg_idx);
+					++arg_idx;
+					settings.setDestinationDirectory(args[arg_idx]);
+				} else if (args[arg_idx].equals("-c")) {
+					settings.setWriteIntermediateFile(true);
+				} else if (args[arg_idx].equals("-o")) {
+					checkParameterHasArgument(args, arg_idx);
+					++arg_idx;
+					settings.setOutputFilename(args[arg_idx]);
+				} else if (args[arg_idx].equals("-z")) {
+					settings.setCompile(true);
+				} else if (args[arg_idx].equals("-Z")) {
+					settings.setCompileRun(true);
+				} else if (args[arg_idx].equals("-S")) {
+					settings.setDumpSyntaxTree(true);
+				} else if (args[arg_idx].equals("-s")) {
+					settings.setDumpIntermediateCode(true);
+				} else if (args[arg_idx].equals("-x")) {
+					settings.setAdditionalFunctions(true);
+				} else if (args[arg_idx].equals("-y")) {
+					settings.setAdditionalTypeFunctions(true);
+				} else if (args[arg_idx].equals("-t")) {
+					settings.setUseSortedArrayKeys(true);
+				} else if (args[arg_idx].equals("-r")) {
+					settings.setCatchIllegalFormatExceptions(false);
+				} else if (args[arg_idx].equals("-F")) {
+					checkParameterHasArgument(args, arg_idx);
+					++arg_idx;
+					settings.setFieldSeparator(args[arg_idx]);
+				} else if (args[arg_idx].equals("-ext")) {
+					settings.setUserExtensions(true);
+				} else if (args[arg_idx].equals("-ni")) {
+					settings.setUseStdIn(true);
+				} else if (args[arg_idx].equals("-h") || args[arg_idx].equals("-?")) {
+					usage(System.out, extensionDescription);
+				} else {
+					throw new IllegalArgumentException("unknown parameter: "+args[arg_idx]);
+				}
+
+				++arg_idx;
+			}
+
+			if (extensionDescription == null) {
+				// script mode (if -f is not provided)
+				if (settings.getScriptSources().isEmpty()) {
+					if (arg_idx >= args.length) {
+						throw new IllegalArgumentException("Awk script not provided.");
+					}
+					String scriptContent = args[arg_idx++];
+					settings.addScriptSource(new ScriptSource(
+							ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT,
+							new StringReader(scriptContent),
+							false));
+				} else {
+					try {
+						// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
+						// initialize the Readers or InputStreams
+						for (ScriptSource scriptSource : settings.getScriptSources()) {
+							if (scriptSource.isIntermediate()) {
+								scriptSource.getInputStream();
+							} else {
+								scriptSource.getReader();
+							}
+						}
+					} catch (IOException ex) {
+						ex.printStackTrace();
+						usage(System.err, extensionDescription);
+					}
+				}
+			}
+		} catch (IllegalArgumentException iae) {
+			iae.printStackTrace(System.err);
+			usage(System.err, extensionDescription);
+			throw iae;
+		}
+
+		// name=val or filename mode
+		while (arg_idx < args.length) {
+			String name_value_filename = args[arg_idx++];
+			settings.getNameValueOrFileNames().add(name_value_filename);
+		}
+
+		return settings;
+	}
 
 	/**
 	 * Dump usage to stderr; exit with a non-zero error code.
 	 */
 	private void usage(PrintStream dest, String extension_description) {
 		//String cls = Awk.class.getName();
-		String cls = mainclass.getName();
+		String cls = mainClass.getName();
 		dest.println("usage:");
 		dest.println(
 				"java ... " + cls + " [-F fs_val]"
@@ -144,253 +282,13 @@ public class AwkParameters {
 	}
 
 	/**
-	 * Provide text representation of the parameters to stdout.
-	 */
-	void dump() {
-
-		PrintStream out = System.out;
-
-		out.println("Awk Parameters");
-		out.println("--------------");
-		out.println("initial_variables = " + initial_variables);
-		out.println("name_value_filename_list = " + name_value_filename_list);
-		out.println("script_sources = " + scriptSources);
-		out.println("should_compile = " + should_compile);
-		out.println("should_compile_and_run = " + should_compile_and_run);
-		out.println("initial_fs_value = " + initial_fs_value);
-		out.println("dump_syntax_tree = " + dump_syntax_tree);
-		out.println("dump_intermediate_code = " + dump_intermediate_code);
-		out.println("additional_functions = " + additional_functions);
-		out.println("additional_type_functions = " + additional_type_functions);
-		out.println("sorted_array_keys = " + sorted_array_keys);
-		out.println("trap_illegal_format_exceptions = " + trap_illegal_format_exceptions);
-		out.println("write_to_intermediate_file = " + write_to_intermediate_file);
-		out.println("output_filename = " + output_filename);
-		out.println("dest_directory = " + dest_directory);
-		out.println();
-	}
-
-	/**
-	 * Contains variable assignments which are applied prior to
-	 * executing the script (-v assignments).
-	 */
-	public Map<String, Object> initial_variables = new HashMap<String, Object>();
-	/**
-	 * Contains name=value or filename entries.
-	 * Order is important, which is why name=value and filenames
-	 * are listed in the same List container.
-	 */
-	public List<String> name_value_filename_list = new ArrayList<String>();
-	/**
-	 * Script sources meta info.
-	 * This will usually be either one String container,
-	 * made up of the script given on the command line directly,
-	 * with the first non-"-" parameter,
-	 * or one or multiple script file names (if provided with -f switches).
-	 */
-	private List<ScriptSource> scriptSources = new ArrayList<ScriptSource>();
-	/**
-	 * Whether to interpret or compile the script.
-	 * Initial value is set to false (interpret).
-	 */
-	public boolean should_compile = false;
-	/**
-	 * Whether to compile and execute the script.
-	 * Initial value is set to false (interpret).
-	 */
-	public boolean should_compile_and_run = false;
-	/**
-	 * Initial FS value.
-	 * Initially set to null (default FS value).
-	 */
-	public String initial_fs_value = null;
-	/**
-	 * Whether to dump the syntax tree; false by default.
-	 */
-	public boolean dump_syntax_tree = false;
-	/**
-	 * Whether to dump the intermediate code; false by default.
-	 */
-	public boolean dump_intermediate_code = false;
-	/**
-	 * Whether to enable additional functions (_sleep/_dump); false by default.
-	 */
-	public boolean additional_functions = false;
-	/**
-	 * Whether to enable additional functions (_INTEGER/_DOUBLE/_STRING); false
-	 * by default.
-	 */
-	public boolean additional_type_functions = false;
-	/**
-	 * Whether to maintain array keys in sorted order; false by default.
-	 */
-	public boolean sorted_array_keys = false;
-	/**
-	 * Whether to trap IllegalFormatExceptions for [s]printf; true by default.
-	 */
-	public boolean trap_illegal_format_exceptions = true;
-
-	/**
-	 * Whether user extensions are enabled; false by default.
-	 */
-	public boolean user_extensions = false;
-	/**
-	 * Whether Jawk consumes stdin or ARGV file input; false by default.
-	 */
-	public boolean no_input = false;
-
-	/**
-	 * Write to intermediate file.
-	 * Initially set to false.
-	 */
-	public boolean write_to_intermediate_file = false;
-	/**
-	 * Output filename.
-	 * Initially set to null (use appropriate default filename).
-	 */
-	public String output_filename = null;
-	/**
-	 * Compiled destination directory (if provided).
-	 * If null, using null (i.e., present working directory).
-	 */
-	private String dest_directory = null;
-
-	/**
-	 * Allocate the parameters, using the command line parameters
-	 * from the VM entry point (main).
-	 * <p>
-	 * The command-line argument semantics are as follows:
-	 * <ul>
-	 * <li>First, "-" arguments are processed until first non-"-" argument
-	 *	is encountered, or the "-" itself is provided.</li>
-	 * <li>Next, a script is expected (unless the -f argument was provided).</li>
-	 * <li>Then, subsequent parameters are passed into the script
-	 *	via the ARGC/ARGV variables.</li>
-	 * </ul>
-	 * </p>
-	 *
-	 * @param mainclass The main class to print when displaying usage.
-	 * @param args The command-line arguments provided by the user.
-	 * @param extension_description a text description of extensions that
-	 *   are enabled (for compiled scripts)
-	 */
-	public AwkParameters(Class mainclass, String[] args, String extension_description) {
-		this.mainclass = mainclass;
-		int arg_idx = 0;
-		try {
-			// optional parameter mode (i.e. args[i].charAt(0) == '-')
-			while (arg_idx < args.length) {
-				assert args[arg_idx] != null;
-				if (args[arg_idx].length() == 0) {
-					throw new IllegalArgumentException("zero-length argument at position " + (arg_idx + 1));
-				}
-				if (args[arg_idx].charAt(0) != '-') {
-					// no more -X arguments
-					break;
-				} else if (args[arg_idx].equals("-")) {
-					// no more -X arguments
-					++arg_idx;
-					break;
-				} else if (args[arg_idx].equals("-v")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					checkInitialVariableFormat(args[arg_idx]);
-					addInitialVariable(args[arg_idx]);
-				} else if (args[arg_idx].equals("-f")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					scriptSources.add(new ScriptFileSource(args[arg_idx]));
-				} else if (args[arg_idx].equals("-d")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					dest_directory = args[arg_idx];
-				} else if (args[arg_idx].equals("-c")) {
-					write_to_intermediate_file = true;
-				} else if (args[arg_idx].equals("-o")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					output_filename = args[arg_idx];
-				} else if (args[arg_idx].equals("-z")) {
-					should_compile = true;
-				} else if (args[arg_idx].equals("-Z")) {
-					should_compile_and_run = true;
-				} else if (args[arg_idx].equals("-S")) {
-					dump_syntax_tree = true;
-				} else if (args[arg_idx].equals("-s")) {
-					dump_intermediate_code = true;
-				} else if (args[arg_idx].equals("-x")) {
-					additional_functions = true;
-				} else if (args[arg_idx].equals("-y")) {
-					additional_type_functions = true;
-				} else if (args[arg_idx].equals("-t")) {
-					sorted_array_keys = true;
-				} else if (args[arg_idx].equals("-r")) {
-					trap_illegal_format_exceptions = false;
-				} else if (args[arg_idx].equals("-F")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					initial_fs_value = args[arg_idx];
-				} else if (args[arg_idx].equals("-ext")) {
-					user_extensions = true;
-				} else if (args[arg_idx].equals("-ni")) {
-					no_input = true;
-				} else if (args[arg_idx].equals("-h") || args[arg_idx].equals("-?")) {
-					usage(System.out, extension_description);
-				} else {
-					throw new IllegalArgumentException("unknown parameter: "+args[arg_idx]);
-				}
-
-				++arg_idx;
-			}
-
-			if (extension_description == null) {
-				// script mode (if -f is not provided)
-				if (scriptSources.isEmpty()) {
-					if (arg_idx >= args.length) {
-						throw new IllegalArgumentException("Awk script not provided.");
-					}
-					String scriptContent = args[arg_idx++];
-					scriptSources.add(new ScriptSource(
-							ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT,
-							new StringReader(scriptContent),
-							false));
-				} else {
-					try {
-						// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
-						// initialize the Readers or InputStreams
-						for (ScriptSource scriptSource : scriptSources) {
-							if (scriptSource.isIntermediate()) {
-								scriptSource.getInputStream();
-							} else {
-								scriptSource.getReader();
-							}
-						}
-					} catch (IOException ex) {
-						ex.printStackTrace();
-						usage(System.err, extension_description);
-					}
-				}
-			}
-		} catch (IllegalArgumentException iae) {
-			iae.printStackTrace(System.err);
-			usage(System.err, extension_description);
-			throw iae;
-		}
-
-		// name=val or filename mode
-		while (arg_idx < args.length) {
-			String name_value_filename = args[arg_idx++];
-			name_value_filename_list.add(name_value_filename);
-		}
-	}
-
-	/**
 	 * Validates that a required argument is provided with the parameter.
-	 * This could have been done with a simple if (arg_idx+1 &gt;= args.length) ...
+	 * This could have been done with a simple
+	 * <code>if (arg_idx+1 &gt;= args.length) ...</code>.
 	 * However,
 	 * <ul>
-	 * <li>this normalizes the implementation throughout the class.
-	 * <li>additional assertions are performed.
+	 * <li>this normalizes the implementation throughout the class.</li>
+	 * <li>additional assertions are performed.</li>
 	 * </ul>
 	 */
 	private static void checkParameterHasArgument(String[] args, int arg_idx)
@@ -421,7 +319,7 @@ public class AwkParameters {
 		}
 	}
 
-	private void addInitialVariable(String v_arg) {
+	private static void addVariable(AwkSettings settings, String v_arg) {
 		int eq_idx = v_arg.indexOf('=');
 		assert eq_idx >= 0;
 		String name = v_arg.substring(0, eq_idx);
@@ -437,66 +335,7 @@ public class AwkParameters {
 				value = value_string;
 			}
 		}
-		// note: can overwrite previously defined variables
-		initial_variables.put(name, value);
-	}
-
-	/**
-	 * @param default_filename The filename to return if -o argument
-	 *   is not used.
-	 *
-	 * @return the optarg for the -o parameter, or the default_filename
-	 *   parameter if -o is not utilized.
-	 */
-	public String outputFilename(String default_filename) {
-		if (output_filename == null) {
-			return default_filename;
-		} else {
-			return output_filename;
-		}
-	}
-
-	/**
-	 * @return the optarg for the -d parameter, or null
-	 *   if -d is not utilized.
-	 */
-	public String getDestDirectory() {
-		return dest_directory;
-	}
-
-	/**
-	 * Returns the script sources meta info.
-	 * This will usually be either one String container,
-	 * made up of the script given on the command line directly,
-	 * with the first non-"-" parameter,
-	 * or one or multiple script file names (if provided with -f switches).
-	 */
-	public List<ScriptSource> getScriptSources() {
-		return scriptSources;
-	}
-
-	/**
-	 * Provides a description of extensions that are enabled/disabled.
-	 * The default compiler implementation uses this method
-	 * to describe extensions which are compiled into the script.
-	 * The description is then provided to the user within the usage.
-	 *
-	 * @return A description of the extensions which are enabled/disabled.
-	 */
-	public String extensionDescription() {
-		// additional_functions (_sleep, _dump)
-		// additional_type_functions (_INTEGER, _DOUBLE, _STRING)
-		// sorted_array_keys
-		// trap_illegal_format_exceptions (for FALSE)
-		String retval = ""
-				+ (additional_functions ? ", _sleep & _dump enabled" : "")
-				+ (additional_type_functions ? ", _INTEGER, _DOUBLE, _STRING enabled" : "")
-				+ (sorted_array_keys ? ", associative array keys are sorted" : "")
-				+ (!trap_illegal_format_exceptions ? ", IllegalFormatExceptions NOT trapped" : "");
-		if (retval.length() > 0) {
-			return "{extensions: " + retval.substring(2) + "}";
-		} else {
-			return "{no compiled extensions utilized}";
-		}
+		// note: this can overwrite previously defined variables
+		settings.getVariables().put(name, value);
 	}
 }

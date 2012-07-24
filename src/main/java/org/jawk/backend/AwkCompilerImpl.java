@@ -50,7 +50,7 @@ import org.jawk.jrt.KeyListImpl;
 import org.jawk.jrt.PatternPair;
 import org.jawk.jrt.VariableManager;
 import org.jawk.util.AwkParameters;
-import org.jawk.util.ScriptFileSource;
+import org.jawk.util.AwkSettings;
 import org.jawk.util.ScriptSource;
 
 /**
@@ -100,9 +100,10 @@ import org.jawk.util.ScriptSource;
  *	public static void main(String args[]) {
  *		AwkScript as = new AwkScript();
  *		// this is why org.jawk.util.AwkParameters is in jrt.jar ...
- *		AwkParameters ap = new AwkParameters(AwkScript.class, args, EXTENSION_DESCRIPTION);
+ *		AwkParameters ap = new AwkParameters(AwkScript.class, EXTENSION_DESCRIPTION);
+ *		AwkSettings settings = ap.parseCommandLineArguments(args);
  *		// to send the error code back to the calling process
- *		System.exit(as.ScriptMain(ap));
+ *		System.exit(as.ScriptMain(settings));
  *	}
  *
  *	<strong>// to satisfy the VariableManager interface
@@ -172,7 +173,7 @@ import org.jawk.util.ScriptSource;
  *	// to the AwkParameters constructor to ensure proper
  *	// extension description in the usage statement.</strong>
  *
- *	public final int ScriptMain(AwkParameters awk_parameters) {
+ *	public final int ScriptMain(AwkSettings settings) {
  *
  *		// local variables
  *
@@ -336,7 +337,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private Map<Integer, InstructionHandle> ihs_temp = null;
 	private Map<String, Integer> lvs_temp = null;
 
-	private AwkParameters parameters;
+	private AwkSettings settings;
 
 	/**
 	 * Creates the compiler implementation.
@@ -346,8 +347,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 *
 	 * @see org.jawk.Awk
 	 */
-	public AwkCompilerImpl(AwkParameters parameters) {
-		this.parameters = parameters;
+	public AwkCompilerImpl(AwkSettings settings) {
+		this.settings = settings;
 	}
 
 	/**
@@ -548,14 +549,14 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private void precompile() {
 		// setup JVM compilation stuff
 		//classname = "AwkScript";
-		classname = parameters.outputFilename("AwkScript");
+		classname = settings.getOutputFilename("AwkScript");
 		validateClassname(classname);
 
 		// This string is only used as decorative/descriptive thing.
 		// No actual data is tried to be read from "the file"
 		// it supposedly points to.
 		String scriptFilename = "";
-		for (ScriptSource scriptSource : parameters.getScriptSources()) {
+		for (ScriptSource scriptSource : settings.getScriptSources()) {
 			scriptFilename = scriptFilename + " " + scriptSource.getDescription();
 		}
 		scriptFilename = scriptFilename.trim();
@@ -568,8 +569,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il_main = new MyInstructionList();
 		mg_main = new MethodGen(ACC_PUBLIC | ACC_FINAL,
 				Type.INT,
-				new Type[] { getObjectType(AwkParameters.class) },
-				new String[] { "parameters" },
+				new Type[] { getObjectType(AwkSettings.class) },
+				new String[] { "settings" },
 				"ScriptMain",
 				classname,
 				il_main, cp);
@@ -620,7 +621,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		MethodGen static_mg = new MethodGen(ACC_STATIC, Type.VOID, Type.NO_ARGS, new String[] {}, "<clinit>", classname, static_il, cp);
 
 		JVMTools_allocateStaticField(String.class, "EXTENSION_DESCRIPTION", ACC_PUBLIC);
-		static_il.append(new PUSH(cp, parameters.extensionDescription()));
+		static_il.append(new PUSH(cp, settings.toExtensionDescription()));
 		static_il.append(factory.createFieldAccess(classname, "EXTENSION_DESCRIPTION", getObjectType(String.class), Constants.PUTSTATIC));
 
 		JVMTools_allocateStaticField(Integer.class, "ZERO");
@@ -784,7 +785,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			addMainMethod();
 			createMethods_VariableManager(tuples);
 			createPartialParamCalls(tuples);
-			String destdir = parameters.getDestDirectory();
+			String destdir = settings.getDestinationDirectory();
 			String dirname = extractDirname(classname, ".");
 			String clsname = extractClassname(classname);
 			if (dirname != null) {
@@ -861,20 +862,24 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(Object.class.getName(), "getClass", getObjectType(Class.class), new Type[] {}, INVOKEVIRTUAL));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class
 
-		il.append(InstructionFactory.createLoad(Type.OBJECT, 0));
 		il.append(factory.createFieldAccess(classname, "EXTENSION_DESCRIPTION", getObjectType(String.class), Constants.GETSTATIC));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class, args, desc
 		il.append(factory.createInvoke(AwkParameters.class.getName(), "<init>",
 				Type.VOID,
 				new Type[] {
 					getObjectType(Class.class),
-					new ArrayType(getObjectType(String.class), 1),
-					getObjectType(String.class)},
+					getObjectType(String.class) },
 				INVOKESPECIAL));
-
 		// ..., mainclass, AwkParameters
+		il.append(InstructionFactory.createLoad(Type.OBJECT, 0));
+		// ..., mainclass, AwkParameters, args
+		il.append(factory.createInvoke(AwkParameters.class.getName(), "parseCommandLineArguments",
+				getObjectType(AwkSettings.class),
+				new Type[] { new ArrayType(getObjectType(String.class), 1) },
+				INVOKEVIRTUAL));
+		// ..., mainclass, AwkSettings
 
-		il.append(factory.createInvoke(classname, "ScriptMain", Type.INT, new Type[] {getObjectType(AwkParameters.class)}, INVOKEVIRTUAL));
+		il.append(factory.createInvoke(classname, "ScriptMain", Type.INT, new Type[] { getObjectType(AwkSettings.class) }, INVOKEVIRTUAL));
 		il.append(factory.createInvoke(System.class.getName(), "exit", Type.VOID, new Type[] {Type.INT}, INVOKESTATIC));
 		// ??? the return (below) is required, even though we're exit()ing (above) ???
 		// ??? (missing return results in a VerifyError) ???
@@ -1197,20 +1202,20 @@ public class AwkCompilerImpl implements AwkCompiler {
 				}
 				case AwkTuples._ARGV_OFFSET_: {
 					argv_field = "global_" + (argv_offset = position.intArg(0));
-					// access parameters.name_value_filename_list
+					// access settings.getNameValueOrFileNames()
 					// and cycle from 1 to ARGC, populating ARGV
 					// with the contents of this list as:
 					// for (...)
-					//	ARGV[i] = parameters.name_value_filename_list.get(i)
+					//	ARGV[i] = settings.getNameValueOrFileNames().get(i)
 					//
-					// (NVFL = name_value_file_list)
+					// (NVFL = nameValueOrFileNames)
 
 					// ...
 					JVMTools_getVariable(argv_offset, true, true);	// true = is global, true = it is an array
 					JVMTools_cast(AssocArrayClass);
 					// ..., Argv
-					il.append(InstructionConstants.ALOAD_1);	// 1st parameter is (AwkParameters) "parameters"
-					il.append(factory.createFieldAccess(AwkParameters.class.getName(), "name_value_filename_list", getObjectType(List.class), Constants.GETFIELD));
+					il.append(InstructionConstants.ALOAD_1);	// 1st parameter is (AwkSettings) "settings"
+					JVMTools_invokeVirtual(List.class, AwkSettings.class, "getNameValueOrFileNames");
 					// ..., Argv, NVFL	 (name_value_filename_list)
 					JVMTools_DUP_X1();
 					// ..., NVFL, Argv, NVFL
@@ -1456,11 +1461,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 					JVMTools_allocateField(Object.class, "global_" + i);
 				}
 
-				// process initial_variables list from "parameters" parameter
+				// call "settings.getVariables()"
 
 				JVMTools_getField(JRT_Class, "input_runtime");
-				il.append(InstructionConstants.ALOAD_1);	// 1st parameter is (AwkParameters) "parameters"
-				il.append(factory.createFieldAccess(AwkParameters.class.getName(), "initial_variables", getObjectType(Map.class), Constants.GETFIELD));
+				il.append(InstructionConstants.ALOAD_1);	// 1st parameter is (AwkSettings) "settings"
+				JVMTools_invokeVirtual(Map.class, AwkSettings.class, "getVariables");
 				// ..., JRT, Map
 
 				// cycle through the map, assigning variables that exist
@@ -1684,12 +1689,12 @@ public class AwkCompilerImpl implements AwkCompiler {
 				switch (opcode) {
 					case AwkTuples._PRINTF_:
 						JVMTools_invokeStatic(Void.TYPE, JRT_Class,
-								parameters.trap_illegal_format_exceptions ? "printfFunction" : "printfFunctionNoCatch",
+								settings.isCatchIllegalFormatExceptions() ? "printfFunction" : "printfFunctionNoCatch",
 								Object[].class, String.class);
 						break;
 					case AwkTuples._SPRINTF_:
 						JVMTools_invokeStatic(String.class, JRT_Class,
-								parameters.trap_illegal_format_exceptions ? "sprintfFunction" : "sprintfFunctionNoCatch",
+								settings.isCatchIllegalFormatExceptions() ? "sprintfFunction" : "sprintfFunctionNoCatch",
 								Object[].class, String.class);
 						break;
 					default:
@@ -1768,7 +1773,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				il.append(InstructionFactory.createLoad(getObjectType(String.class), fmt_arg.getIndex()));
 				// ..., ps, array, fmt_arg
 				JVMTools_invokeStatic(Void.TYPE, JRT_Class,
-						parameters.trap_illegal_format_exceptions ? "printfFunction" : "printfFunctionNoCatch",
+						settings.isCatchIllegalFormatExceptions() ? "printfFunction" : "printfFunctionNoCatch",
 						PrintStream.class, Object[].class, String.class);
 				// ...
 				break;
@@ -3601,7 +3606,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private void JVMTools_newAssocArray() {
 		il.append(factory.createNew(AssocArrayClass.getName()));
 		il.append(InstructionConstants.DUP);
-		il.append(new PUSH(cp, parameters.sorted_array_keys));	// false = not in sorted order
+		il.append(new PUSH(cp, settings.isUseSortedArrayKeys()));	// false = not in sorted order
 		il.append(factory.createInvoke(AssocArrayClass.getName(), "<init>",
 				Type.VOID,
 				buildArgs(new Class[] {Boolean.TYPE}),

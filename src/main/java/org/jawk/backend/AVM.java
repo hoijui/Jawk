@@ -35,7 +35,7 @@ import org.jawk.jrt.RegexTokenizer;
 import org.jawk.jrt.SingleCharacterTokenizer;
 import org.jawk.jrt.VariableManager;
 import org.jawk.util.ArrayStackImpl;
-import org.jawk.util.AwkParameters;
+import org.jawk.util.AwkSettings;
 import org.jawk.util.LinkedListStackImpl;
 import org.jawk.util.MyStack;
 import org.jawk.util.ScriptSource;
@@ -54,12 +54,12 @@ import org.jawk.util.ScriptSource;
  * The interpreter runs completely independent of the frontend/intermediate step.
  * In fact, an intermediate file produced by Jawk is sufficient to
  * execute on this interpreter. The binding data-structure is
- * the AwkParameters, which can contain options pertinent to
+ * the AwkSettings, which can contain options pertinent to
  * the interpreter. For example, the interpreter must know about
- * the -v command line arguments, as well as the file/variable list
- * parameters (ARGC/ARGV) after the script on the command line.
+ * the -v command line argument values, as well as the file/variable list
+ * parameter values (ARGC/ARGV) after the script on the command line.
  * However, if programmatic access to the AVM is required, meaningful
- * AwkParameters are not required.
+ * AwkSettings are not required.
  * </p>
  * <p>
  * Semantic analysis has occurred prior to execution of the interpreter.
@@ -93,7 +93,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private Object pop() { return operand_stack.pop(); }
 	private void push(Object o) { operand_stack.push(o); }
 
-	private final AwkParameters parameters;
+	private final AwkSettings settings;
 
 	/**
 	 * Construct the interpreter.
@@ -103,7 +103,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * </p>
 	 */
 	public AVM() {
-		parameters = null;
+		settings = null;
 		arguments = new ArrayList<String>();
 		sorted_array_keys = false;
 		initial_variables = new HashMap<String, Object>();
@@ -120,18 +120,18 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * @param parameters The parameters affecting the behavior of the
 	 *	interpreter.
 	 */
-	public AVM(AwkParameters parameters, Map<String, JawkExtension> extensions)
+	public AVM(AwkSettings parameters, Map<String, JawkExtension> extensions)
 			throws IllegalArgumentException
 	{
 		if (parameters == null) {
-			throw new IllegalArgumentException("AwkParameters argument cannot be null");
+			throw new IllegalArgumentException("AwkSettings can not be null");
 		}
-		this.parameters = parameters;
-		arguments = parameters.name_value_filename_list;
-		sorted_array_keys = parameters.sorted_array_keys;
-		initial_variables = parameters.initial_variables;
-		initial_fs_value = parameters.initial_fs_value;
-		trap_illegal_format_exceptions = parameters.trap_illegal_format_exceptions;
+		this.settings = parameters;
+		arguments = parameters.getNameValueOrFileNames();
+		sorted_array_keys = parameters.isUseSortedArrayKeys();
+		initial_variables = parameters.getVariables();
+		initial_fs_value = parameters.getFieldSeparator();
+		trap_illegal_format_exceptions = parameters.isCatchIllegalFormatExceptions();
 		jrt = new JRT(this);	// this = VariableManager
 		this.extensions = extensions;
 		for (JawkExtension ext : extensions.values()) {
@@ -1814,9 +1814,9 @@ public class AVM implements AwkInterpreter, VariableManager {
 
 						org.jawk.frontend.AwkParser ap = new org.jawk.frontend.AwkParser(
 								//true, true, true, extensions
-								parameters.additional_functions,
-								parameters.additional_type_functions,
-								parameters.no_input,
+								settings.isAdditionalFunctions(),
+								settings.isAdditionalTypeFunctions(),
+								settings.isUseStdIn(),
 								extensions);
 						try {
 							AwkSyntaxTree ast = ap.parse(scriptSources);
@@ -1828,7 +1828,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 								assert result == 0;
 								new_tuples.postProcess();
 								ap.populateGlobalVariableNameToOffsetMappings(new_tuples);
-								AVM new_avm = new AVM(parameters, extensions);
+								AVM new_avm = new AVM(settings, extensions);
 								int retcode = new_avm.interpret(new_tuples);
 								push(retcode);
 							} else {

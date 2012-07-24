@@ -23,6 +23,7 @@ import org.jawk.frontend.AwkParser;
 import org.jawk.frontend.AwkSyntaxTree;
 import org.jawk.intermediate.AwkTuples;
 import org.jawk.util.AwkParameters;
+import org.jawk.util.AwkSettings;
 import org.jawk.util.DestDirClassLoader;
 import org.jawk.util.ScriptSource;
 
@@ -129,11 +130,12 @@ public class Awk {
 	{
 		AVM avm = null;
 		try {
-			AwkParameters parameters = new AwkParameters(Awk.class, args, null);	// null = NO extension description ==> require awk script
+			AwkParameters parameters = new AwkParameters(Awk.class, null); // null = NO extension description ==> require awk script
+			AwkSettings settings = parameters.parseCommandLineArguments(args);
 
 			// key = Keyword, value = JawkExtension
 			Map<String, JawkExtension> extensions;
-			if (parameters.user_extensions) {
+			if (settings.isUserExtensions()) {
 				extensions = getJawkExtensions();
 				if (VERBOSE) {
 					System.err.println("(user extensions = " + extensions.keySet() + ")");
@@ -146,8 +148,8 @@ public class Awk {
 			AwkTuples tuples = new AwkTuples();
 			// to be defined below
 
-			List<ScriptSource> notIntermediateScriptSources = new ArrayList<ScriptSource>(parameters.getScriptSources().size());
-			for (ScriptSource scriptSource : parameters.getScriptSources()) {
+			List<ScriptSource> notIntermediateScriptSources = new ArrayList<ScriptSource>(settings.getScriptSources().size());
+			for (ScriptSource scriptSource : settings.getScriptSources()) {
 				if (scriptSource.isIntermediate()) {
 					// read the intermediate file, bypassing frontend processing
 					tuples = (AwkTuples) readObjectFromInputStream(scriptSource.getInputStream()); // FIXME only the last intermediate file is used!
@@ -156,14 +158,18 @@ public class Awk {
 				}
 			}
 			if (!notIntermediateScriptSources.isEmpty()) {
-				AwkParser parser = new AwkParser(parameters.additional_functions, parameters.additional_type_functions, parameters.no_input, extensions);
+				AwkParser parser = new AwkParser(
+						settings.isAdditionalFunctions(),
+						settings.isAdditionalTypeFunctions(),
+						settings.isUseStdIn(),
+						extensions);
 				// parse the script
 				AwkSyntaxTree ast = null;
 				ast = parser.parse(notIntermediateScriptSources);
 
-				if (parameters.dump_syntax_tree) {
+				if (settings.isDumpSyntaxTree()) {
 					// dump the syntax tree of the script to a file
-					String filename = parameters.outputFilename("syntax_tree.lst");
+					String filename = settings.getOutputFilename("syntax_tree.lst");
 					System.err.println("(writing to '" + filename + "')");
 					PrintStream ps = new PrintStream(new FileOutputStream(filename));
 					if (ast != null) {
@@ -191,17 +197,17 @@ public class Awk {
 					// on the "file list input" command line
 					parser.populateGlobalVariableNameToOffsetMappings(tuples);
 				}
-				if (parameters.write_to_intermediate_file) {
+				if (settings.isWriteIntermediateFile()) {
 					// dump the intermediate code to an intermediate code file
-					String filename = parameters.outputFilename("a.ai");
+					String filename = settings.getOutputFilename("a.ai");
 					System.err.println("(writing to '" + filename + "')");
 					writeObjectToFile(tuples, filename);
 					return 0;
 				}
 			}
-			if (parameters.dump_intermediate_code) {
+			if (settings.isDumpIntermediateCode()) {
 				// dump the intermediate code to a human-readable text file
-				String filename = parameters.outputFilename("avm.lst");
+				String filename = settings.getOutputFilename("avm.lst");
 				System.err.println("(writing to '" + filename + "')");
 				PrintStream ps = new PrintStream(new FileOutputStream(filename));
 				tuples.dump(ps);
@@ -209,20 +215,20 @@ public class Awk {
 				return 0;
 			}
 
-			if (parameters.should_compile || parameters.should_compile_and_run) {
+			if (settings.isCompileRun() || settings.isCompileRun()) {
 				// compile!
-				int retcode = attemptToCompile(parameters, tuples);
+				int retcode = attemptToCompile(settings, tuples);
 				if (retcode != 0) {
 					return retcode;
 				}
-				if (parameters.should_compile_and_run) {
-					return attemptToExecuteCompiledResult(parameters);
+				if (settings.isCompileRun()) {
+					return attemptToExecuteCompiledResult(settings);
 				} else {
 					return retcode;
 				}
 			} else {
 				// interpret!
-				avm = new AVM(parameters, extensions);
+				avm = new AVM(settings, extensions);
 				return avm.interpret(tuples);
 			}
 		} catch (Error err) {
@@ -268,7 +274,7 @@ public class Awk {
 	/**
 	 * Use reflection in attempt to access the compiler.
 	 */
-	private static int attemptToCompile(AwkParameters parameters, AwkTuples tuples) {
+	private static int attemptToCompile(AwkSettings settings, AwkTuples tuples) {
 		try {
 			if (VERBOSE) {
 				System.err.println("(locating AwkCompilerImpl...)");
@@ -278,12 +284,12 @@ public class Awk {
 				System.err.println("(found: " + compiler_class + ")");
 			}
 			try {
-				Constructor constructor = compiler_class.getConstructor(AwkParameters.class);
+				Constructor constructor = compiler_class.getConstructor(AwkSettings.class);
 				try {
 					if (VERBOSE) {
 						System.err.println("(allocating new instance of the AwkCompiler class...)");
 					}
-					AwkCompiler compiler = (AwkCompiler) constructor.newInstance(parameters);
+					AwkCompiler compiler = (AwkCompiler) constructor.newInstance(settings);
 					if (VERBOSE) {
 						System.err.println("(allocated: " + compiler + ")");
 					}
@@ -310,14 +316,15 @@ public class Awk {
 		}
 	}
 
-	private static int attemptToExecuteCompiledResult(AwkParameters parameters) {
-		String classname = parameters.outputFilename("AwkScript");
+	private static int attemptToExecuteCompiledResult(AwkSettings settings) {
+		String classname = settings.getOutputFilename("AwkScript");
+
 		try {
 			if (VERBOSE) {
 				System.err.println("(locating " + classname + "...)");
 			}
 			Class<?> script_class;
-			String dest_directory = parameters.getDestDirectory();
+			String dest_directory = settings.getDestinationDirectory();
 			if (dest_directory == null) {
 				script_class = Class.forName(classname);
 				if (VERBOSE) {
@@ -337,8 +344,8 @@ public class Awk {
 						System.err.println("(allocating and executing new instance of " + classname + " class...)");
 					}
 					Object obj = constructor.newInstance();
-					Method method = script_class.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkParameters.class});
-					Object result = method.invoke(obj, new Object[] {parameters});
+					Method method = script_class.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
+					Object result = method.invoke(obj, new Object[] {settings});
 					return 0;
 				} catch (InstantiationException ie) {
 					throw new Error("Cannot instantiate the script: " + ie);
