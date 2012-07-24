@@ -809,7 +809,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			fos = new FileOutputStream(clsname + ".class");
 			cg.getJavaClass().dump(fos);
 			if (VERBOSE) {
-				System.err.println("(wrote: " + cg + ")");
+				System.err.println("(wrote: " + clsname + ".class)");
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();

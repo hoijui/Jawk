@@ -348,23 +348,23 @@ public class Awk {
 					Object result = method.invoke(obj, new Object[] {settings});
 					return 0;
 				} catch (InstantiationException ie) {
-					throw new Error("Cannot instantiate the script: " + ie);
+					throw new Error("Cannot instantiate the script",ie);
 				} catch (IllegalAccessException iae) {
-					throw new Error("Cannot instantiate the script: " + iae);
+					throw new Error("Cannot instantiate the script", iae);
 				} catch (java.lang.reflect.InvocationTargetException ite) {
 					Throwable exception = ite.getCause();
 					if (exception == null) {
-						throw new Error("Cannot instantiate the script: " + ite);
+						throw new Error("Cannot instantiate the script", ite);
 					} else {
 						exception.printStackTrace();
-						throw new Error("Cannot instantiate the script: " + exception);
+						throw new Error("Cannot instantiate the script", exception);
 					}
 				}
 			} catch (NoSuchMethodException nsme) {
-				throw new Error("Cannot find the constructor: " + nsme);
+				throw new Error("Cannot find the constructor", nsme);
 			}
 		} catch (ClassNotFoundException cnfe) {
-			throw new IllegalArgumentException("Cannot find the " + classname + " class.");
+			throw new IllegalArgumentException("Cannot find the " + classname + " class.", cnfe);
 		}
 	}
 
