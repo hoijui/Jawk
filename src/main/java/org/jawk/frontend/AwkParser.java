@@ -1759,11 +1759,34 @@ public class AwkParser {
 		return new DeleteStatement_AST(symbol_ast);
 	}
 
-	AST PRINT_STATEMENT()
+	private static final class ParsedPrintStatement {
+
+		private AST funcParams;
+		private int outputToken;
+		private AST outputExpr;
+
+		ParsedPrintStatement(AST funcParams, int outputToken, AST outputExpr) {
+			this.funcParams = funcParams;
+			this.outputToken = outputToken;
+			this.outputExpr = outputExpr;
+		}
+
+		public AST getFuncParams() {
+			return funcParams;
+		}
+
+		public int getOutputToken() {
+			return outputToken;
+		}
+
+		public AST getOutputExpr() {
+			return outputExpr;
+		}
+	}
+
+	private ParsedPrintStatement parsePrintStatement(boolean parens)
 			throws IOException
 	{
-		boolean parens = (c == '(');
-		expectKeyword("print");
 		AST func_params;
 		int output_token;
 		AST output_expr;
@@ -1793,7 +1816,20 @@ public class AwkParser {
 			output_expr = null;
 		}
 
-		return new Print_AST(func_params, output_token, output_expr);
+		return new ParsedPrintStatement(func_params, output_token, output_expr);
+	}
+
+	AST PRINT_STATEMENT()
+			throws IOException
+	{
+		boolean parens = (c == '(');
+		expectKeyword("print");
+		ParsedPrintStatement parsedPrintStatement = parsePrintStatement(parens);
+
+		return new Print_AST(
+				parsedPrintStatement.getFuncParams(),
+				parsedPrintStatement.getOutputToken(),
+				parsedPrintStatement.getOutputExpr());
 	}
 
 	AST PRINTF_STATEMENT()
@@ -1801,36 +1837,12 @@ public class AwkParser {
 	{
 		boolean parens = (c == '(');
 		expectKeyword("printf");
-		AST func_params;
-		int output_token;
-		AST output_expr;
-		if (parens) {
-			lexer();
-			if (token == _CLOSE_PAREN_) {
-				func_params = null;
-			} else {
-				func_params = EXPRESSION_LIST(false, true);	// NO comparators allowed, allow in expression
-			}
-			lexer(_CLOSE_PAREN_);
-		} else {
-			if (token == _NEWLINE_ || token == _SEMICOLON_ || token == _CLOSE_BRACE_ || token == _CLOSE_PAREN_
-					|| (token == _GT_ || token == _APPEND_ || token == _PIPE_))
-			{
-				func_params = null;
-			} else {
-				func_params = EXPRESSION_LIST(false, true);	// NO comparators allowed, allow in expression
-			}
-		}
-		if (token == _GT_ || token == _APPEND_ || token == _PIPE_) {
-			output_token = token;
-			lexer();
-			output_expr = ASSIGNMENT_EXPRESSION(true, true, false);	// true = allow comparators, allow IN keyword, do NOT allow multidim indices expressions
-		} else {
-			output_token = -1;
-			output_expr = null;
-		}
+		ParsedPrintStatement parsedPrintStatement = parsePrintStatement(parens);
 
-		return new Printf_AST(func_params, output_token, output_expr);
+		return new Printf_AST(
+				parsedPrintStatement.getFuncParams(),
+				parsedPrintStatement.getOutputToken(),
+				parsedPrintStatement.getOutputExpr());
 	}
 
 	AST GETLINE_EXPRESSION(AST pipe_expr, boolean allow_comparators, boolean allow_in_keyword)
