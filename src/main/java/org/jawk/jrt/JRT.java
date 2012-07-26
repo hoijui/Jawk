@@ -825,7 +825,7 @@ public class JRT {
 				Process p = spawnProcess(cmd);
 				// no input to this process!
 				p.getOutputStream().close();
-				new DataPump(cmd, p.getErrorStream(), System.err);
+				DataPump.dump(cmd, p.getErrorStream(), System.err);
 				command_processes.put(cmd, p);
 				command_readers.put(cmd, pr = new PartitioningReader(new InputStreamReader(p.getInputStream()), vm.getRS().toString()));
 				vm.setFILENAME("");
@@ -867,8 +867,8 @@ public class JRT {
 			Process p;
 			try {
 				p = spawnProcess(cmd);
-				new DataPump(cmd, p.getErrorStream(), System.err);
-				new DataPump(cmd, p.getInputStream(), System.out);
+				DataPump.dump(cmd, p.getErrorStream(), System.err);
+				DataPump.dump(cmd, p.getInputStream(), System.out);
 			} catch (IOException ioe) {
 				throw new AwkRuntimeException("Can't spawn " + cmd + ": " + ioe);
 			}
@@ -1019,8 +1019,8 @@ public class JRT {
 			Process p = spawnProcess(cmd);
 			// no input to this process!
 			p.getOutputStream().close();
-			new DataPump(cmd, p.getErrorStream(), System.err);
-			new DataPump(cmd, p.getInputStream(), System.out);
+			DataPump.dump(cmd, p.getErrorStream(), System.err);
+			DataPump.dump(cmd, p.getInputStream(), System.out);
 			try {
 				int retcode = p.waitFor();
 				return Integer.valueOf(retcode);

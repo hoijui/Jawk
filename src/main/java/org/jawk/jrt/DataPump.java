@@ -14,26 +14,34 @@ import java.io.PrintStream;
  * of the calling process (the interpreter itself).
  * </p>
  */
-public class DataPump extends Thread {
+public class DataPump implements Runnable {
 
 	private InputStream is;
 	private PrintStream os;
 
 	/**
+	 * Represents a data pump.
+	 *
+	 * @param in The input stream.
+	 * @param out The output stream.
+	 */
+	public DataPump(InputStream in, PrintStream out) {
+		this.is = in;
+		this.os = out;
+		//setDaemon(true);
+	}
+
+	/**
 	 * Allocate the data pump and start the thread.
 	 *
-	 * @param s A human-readable description of this data pump.
+	 * @param desc A human-readable description of this data pump.
 	 *   It is part of the thread name, and, therefore, visible
 	 *   upon a VM thread dump.
-	 * @param is The input stream.
-	 * @param os The output stream.
+	 * @param in The input stream.
+	 * @param out The output stream.
 	 */
-	public DataPump(String s, InputStream is, PrintStream os) {
-		super("DataPump for " + s);
-		this.is = is;
-		this.os = os;
-		//setDaemon(true);
-		start();
+	public static void dump(String desc, InputStream in, PrintStream out) {
+		new Thread(new DataPump(in, out), desc).start();
 	}
 
 	/**
