@@ -84,7 +84,35 @@ public class Awk {
 
 	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
 	private static final boolean VERBOSE = (System.getProperty("jawk.verbose", null) != null);
-	private static final String EXTENSIONS_PREFIX = "org.jawk.ext.CoreExtension#org.jawk.ext.SocketExtension#org.jawk.ext.StdinExtension";
+	private static final String DEFAULT_EXTENSIONS
+			= org.jawk.ext.CoreExtension.class.getName()
+			+ "#" + org.jawk.ext.SocketExtension.class.getName()
+			+ "#" + org.jawk.ext.StdinExtension.class.getName();
+
+	/**
+	 * Prohibit the instantiation of this class, other than the
+	 * way required by JSR 223.
+	 */
+	private Awk() {}
+
+	/**
+	 * Class constructor to support the JSR 223 scripting interface
+	 * already provided by Java SE 6.
+	 *
+	 * @param args String arguments from the command-line.
+	 * @param is The input stream to use as stdin.
+	 * @param os The output stream to use as stdout.
+	 * @param es The output stream to use as stderr.
+	 * @throws Exception enables exceptions to propagate to the callee.
+	 */
+	public Awk(String[] args, InputStream is, PrintStream os, PrintStream es)
+			throws Exception
+	{
+		System.setIn(is);
+		System.setOut(os);
+		System.setErr(es);
+		main(args);
+	}
 
 	/**
 	 * The entry point to Jawk for the VM.
@@ -253,25 +281,6 @@ public class Awk {
 	}
 
 	/**
-	 * Class constructor to support the JSR 223 scripting interface
-	 * already provided by Java SE 6.
-	 *
-	 * @param args String arguments from the command-line.
-	 * @param is The input stream to use as stdin.
-	 * @param os The output stream to use as stdout.
-	 * @param es The output stream to use as stderr.
-	 * @throws Exception enables exceptions to propagate to the callee.
-	 */
-	public Awk(String[] args, InputStream is, PrintStream os, PrintStream es)
-			throws Exception
-	{
-		System.setIn(is);
-		System.setOut(os);
-		System.setErr(es);
-		main(args);
-	}
-
-	/**
 	 * Use reflection in attempt to access the compiler.
 	 */
 	private static int attemptToCompile(AwkSettings settings, AwkTuples tuples) {
@@ -377,19 +386,13 @@ public class Awk {
 		oos.close();
 	}
 
-	/**
-	 * Prohibit the instantiation of this class, other than the
-	 * way required by JSR 223.
-	 */
-	private Awk() {}
-
 	private static Map<String, JawkExtension> getJawkExtensions() {
 		String extensionsStr = System.getProperty("jawk.extensions", null);
 		if (extensionsStr == null) {
 			//return Collections.emptyMap();
-			extensionsStr = EXTENSIONS_PREFIX;
+			extensionsStr = DEFAULT_EXTENSIONS;
 		} else {
-			extensionsStr = EXTENSIONS_PREFIX + "#" + extensionsStr;
+			extensionsStr = DEFAULT_EXTENSIONS + "#" + extensionsStr;
 		}
 
 		// use reflection to obtain extensions
