@@ -9,20 +9,20 @@ import java.util.Enumeration;
 public class SingleCharacterTokenizer implements Enumeration<Object> {
 
 	private String input;
-	private int split_char;
+	private int splitChar;
 	private int idx = 0;
 
 	/**
 	 * Construct a RegexTokenizer.
 	 *
 	 * @param input The input string to tokenize.
-	 * @param split_char The character which delineates tokens
+	 * @param splitChar The character which delineates tokens
 	 *   within the input string.
 	 */
-	public SingleCharacterTokenizer(String input, int split_char) {
+	public SingleCharacterTokenizer(String input, int splitChar) {
 		// input + sentinel
-		this.input = input + ((char) split_char);
-		this.split_char = split_char;
+		this.input = input + ((char) splitChar);
+		this.splitChar = splitChar;
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class SingleCharacterTokenizer implements Enumeration<Object> {
 	public Object nextElement() {
 		sb.setLength(0);
 		while (idx < input.length()) {
-			if (input.charAt(idx) == split_char) {
+			if (input.charAt(idx) == splitChar) {
 				++idx;
 				break;
 			} else {

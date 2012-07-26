@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * an underlying input reader.
  * <p>
  * <h3>Greedy Regex Matching</h3>
- * The current implementation matches RS against
+ * The current implementation matches setRecordSeparator against
  * contents of an input buffer (the underlying input
  * stream filling the input buffer). Records are
  * split against the matched regular expression
@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
  * </p>
  * <p>
  * By default, greedy regular expression matching
- * for RS is turned off. It is assumed
- * the user will employ a non-ambiguous regex for RS.
+ * for setRecordSeparator is turned off. It is assumed
+ * the user will employ a non-ambiguous regex for setRecordSeparator.
  * For example, ab*c is a non-ambiguous regex,
  * but ab?c?b is an ambiguous regex because
  * it can match ab or abc, and the reader may
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * or no input is available. However, this behavior
  * is not desirable in all cases (i.e., interactive
  * input against some sort of ambiguous newline
- * regex). To enable greedy RS regex consumption,
+ * regex). To enable greedy setRecordSeparator regex consumption,
  * use <code>-Djawk.forceGreedyRS=true</code>.
  * </p>
  */
@@ -46,51 +46,51 @@ public class PartitioningReader extends FilterReader {
 	}
 	private Pattern rs;
 	private Matcher matcher;
-	private boolean from_filename_list;
+	private boolean fromFileNameList;
 
 	/**
 	 * Construct the partitioning reader.
 	 *
-	 * @param r The reader containing the input data stream.
-	 * @param rs_string The record separator, as a regular expression.
+	 * @param reader The reader containing the input data stream.
+	 * @param recordSeparator The record separator, as a regular expression.
 	 */
-	public PartitioningReader(Reader r, String rs_string) {
-		this(r, rs_string, false);
+	public PartitioningReader(Reader reader, String recordSeparator) {
+		this(reader, recordSeparator, false);
 	}
 
 	/**
 	 * Construct the partitioning reader.
 	 *
 	 * @param r The reader containing the input data stream.
-	 * @param rs_string The record separator, as a regular expression.
-	 * @param from_filename_list Whether the underlying input reader
+	 * @param recordSeparator The record separator, as a regular expression.
+	 * @param fromFileNameList Whether the underlying input reader
 	 *   is a file from the filename list (the parameters passed
 	 *   into AWK after the script argument).
 	 */
-	public PartitioningReader(Reader r, String rs_string, boolean from_filename_list) {
+	public PartitioningReader(Reader r, String recordSeparator, boolean fromFileNameList) {
 		super(r);
-		this.from_filename_list = from_filename_list;
-		RS(rs_string);
+		this.fromFileNameList = fromFileNameList;
+		setRecordSeparator(recordSeparator);
 	}
-	private String prior_rs_string = null;
-	private boolean consume_all = false;
+	private String priorRecordSeparator = null;
+	private boolean consumeAll = false;
 
 	/**
 	 * Assign a new record separator for this partitioning reader.
 	 *
-	 * @param rs_string The new record separator, as a regular expression.
+	 * @param recordSeparator The new record separator, as a regular expression.
 	 */
-	public void RS(String rs_string) {
-		//assert !rs_string.equals("") : "rs_string cannot be BLANK";
-		if (!rs_string.equals(prior_rs_string)) {
-			if (rs_string.equals("")) {
-				consume_all = true;
+	public void setRecordSeparator(String recordSeparator) {
+		//assert !recordSeparator.equals("") : "recordSeparator cannot be BLANK";
+		if (!recordSeparator.equals(priorRecordSeparator)) {
+			if (recordSeparator.equals("")) {
+				consumeAll = true;
 				rs = Pattern.compile("\\z", Pattern.DOTALL | Pattern.MULTILINE);
 			} else {
-				consume_all = false;
-				rs = Pattern.compile(rs_string, Pattern.DOTALL | Pattern.MULTILINE);
+				consumeAll = false;
+				rs = Pattern.compile(recordSeparator, Pattern.DOTALL | Pattern.MULTILINE);
 			}
-			prior_rs_string = rs_string;
+			priorRecordSeparator = recordSeparator;
 		}
 	}
 
@@ -99,19 +99,19 @@ public class PartitioningReader extends FilterReader {
 	 *	filename list argument; false otherwise
 	 */
 	public boolean fromFilenameList() {
-		return from_filename_list;
+		return fromFileNameList;
 	}
 
 	private StringBuffer remaining = new StringBuffer();
-	private char[] read_buf = new char[4096];
+	private char[] readBuffer = new char[4096];
 
 	@Override
 	public int read(char[] b, int start, int len) throws IOException {
-		int ret_val = super.read(b, start, len);
-		if (ret_val >= 0) {
-			remaining.append(b, start, ret_val);
+		int retVal = super.read(b, start, len);
+		if (retVal >= 0) {
+			remaining.append(b, start, retVal);
 		}
-		return ret_val;
+		return retVal;
 	}
 
 	public boolean willBlock() {
@@ -121,7 +121,7 @@ public class PartitioningReader extends FilterReader {
 			matcher.reset(remaining);
 		}
 
-		return (consume_all || eof || remaining.length() == 0 || !matcher.find());
+		return (consumeAll || eof || remaining.length() == 0 || !matcher.find());
 	}
 	private boolean eof = false;
 
@@ -142,16 +142,16 @@ public class PartitioningReader extends FilterReader {
 			matcher.reset(remaining);
 		}
 
-		while (consume_all || eof || remaining.length() == 0 || !matcher.find()) {
-			int len;
-			if (eof || (len = read(read_buf, 0, read_buf.length)) < 0) {
+		while (consumeAll || eof || remaining.length() == 0 || !matcher.find()) {
+			int len = read(readBuffer, 0, readBuffer.length);
+			if (eof || (len < 0)) {
 				eof = true;
-				String ret_val = remaining.toString();
+				String retVal = remaining.toString();
 				remaining.setLength(0);
-				if (ret_val.length() == 0) {
+				if (retVal.length() == 0) {
 					return null;
 				} else {
-					return ret_val;
+					return retVal;
 				}
 			} else if (len == 0) {
 				throw new RuntimeException("len == 0 ?!");
@@ -169,7 +169,7 @@ public class PartitioningReader extends FilterReader {
 			// were read
 			// (one char at a time!)
 			while (matcher.find() && matcher.end() == remaining.length() && matcher.requireEnd()) {
-				if (read(read_buf, 0, 1) >= 0) {
+				if (read(readBuffer, 0, 1) >= 0) {
 					matcher = rs.matcher(remaining);
 				} else {
 					break;
@@ -179,15 +179,15 @@ public class PartitioningReader extends FilterReader {
 
 		// we have a record separator!
 
-		String[] split_string = rs.split(remaining, 2);
+		String[] splitString = rs.split(remaining, 2);
 
-		String ret_val = split_string[0];
+		String retVal = splitString[0];
 		remaining.setLength(0);
 		// append to remaining only if the split
 		// resulted in multiple parts
-		if (split_string.length > 1) {
-			remaining.append(split_string[1]);
+		if (splitString.length > 1) {
+			remaining.append(splitString[1]);
 		}
-		return ret_val;
+		return retVal;
 	}
 }

@@ -25,10 +25,14 @@ public final class BulkBlockObject extends BlockObject {
 	 */
 	private static final boolean BYPASS_ALL_BLANK_HANDLES = true;
 
+	private static final String ALL_HANDLES_ARE_BLANK = "ALL_HANDLES_ARE_BLANK";
+	private static final String ALL_HANDLES_ARE_BLOCKED = "ALL_HANDLES_ARE_BLOCKED";
+
 	private final String prefix;
 	private final Set<String> handles;
 	private final Map<String, ? extends Blockable> blockables;
 	private final VariableManager vm;
+	private String blockResult = null;
 
 	/**
 	 * Construct a block object which waits for any Blockable
@@ -37,7 +41,7 @@ public final class BulkBlockObject extends BlockObject {
 	 * @param prefix First part of the return string for the block operation.
 	 * @param blockables All universe of handles and their associated blockables.
 	 * @param vm Required to obtain OFS (used in the construction of the
-	 * 	return string / notifier tag).
+	 *   return string / notifier tag).
 	 */
 	public BulkBlockObject(String prefix, Map<String, ? extends Blockable> blockables, VariableManager vm) {
 		if (prefix == null) {
@@ -59,7 +63,6 @@ public final class BulkBlockObject extends BlockObject {
 		return handles.contains(handle);
 	}
 
-	private String block_result = null;
 	/**
 	 * What to return to the client code when a handle is non-blocking.
 	 * <p>
@@ -79,11 +82,8 @@ public final class BulkBlockObject extends BlockObject {
 		assert vm != null;
 		return prefix
 				+ JRT.toAwkString(vm.getOFS(), vm.getCONVFMT().toString())
-				+ block_result;
+				+ blockResult;
 	}
-
-	private static final String ALL_HANDLES_ARE_BLANK = "ALL_HANDLES_ARE_BLANK";
-	private static final String ALL_HANDLES_ARE_BLOCKED = "ALL_HANDLES_ARE_BLOCKED";
 
 	@Override
 	public void block()
@@ -103,19 +103,19 @@ public final class BulkBlockObject extends BlockObject {
 			}
 			assert (handle != null);
 			assert !handle.equals(ALL_HANDLES_ARE_BLOCKED) : "handle == ALL_HANDLES_ARE_BLOCKED is an invalid return value ... willBlock() could be of issue";
-			block_result = handle;
+			blockResult = handle;
 		}
 	}
 
 	private String checkForNonblockHandle() {
-		boolean all_handles_are_blank = true;
+		boolean allHandlesAreBlank = true;
 		// cycle through all block_handles
 		// check if any of them has accepted sockets
 		for (String handle : handles) {
 			if (BYPASS_ALL_BLANK_HANDLES && handle.equals("")) {
 				continue;
 			}
-			all_handles_are_blank = false;
+			allHandlesAreBlank = false;
 			Blockable blockable = blockables.get(handle);
 			if (blockable == null) {
 				/*
@@ -131,53 +131,52 @@ public final class BulkBlockObject extends BlockObject {
 			}
 		}
 		//return null;
-		if (all_handles_are_blank) {
+		if (allHandlesAreBlank) {
 			return ALL_HANDLES_ARE_BLANK;
 		} else {
 			return ALL_HANDLES_ARE_BLOCKED;
 		}
 	}
-	private static final BlockHandleValidator no_block_handle_validation = new BlockHandleValidator() {
+
+	private static final BlockHandleValidator NO_BLOCK_HANDLE_VALIDATION = new BlockHandleValidator() {
 
 		@Override
-		public final String isBlockHandleValid(String handle) {
+		public String isBlockHandleValid(String handle) {
 			// always valid
 			return null;
 		}
 	};
 
-	public BlockObject populateHandleSet(Object[] args, VariableManager vm) {
-		return populateHandleSet(args, vm, no_block_handle_validation);
+	public BlockObject setHandles(Object[] args, VariableManager vm) {
+		return setHandles(args, vm, NO_BLOCK_HANDLE_VALIDATION);
 	}
 
-	public BlockObject populateHandleSet(Object[] args, VariableManager vm, BlockHandleValidator validator) {
+	public BlockObject setHandles(Object[] args, VariableManager vm, BlockHandleValidator validator) {
 		BlockObject blocker = this;
 
 		if (args.length == 0) {
 			throw new IllegalArgumentException(prefix + " blocker requires at least one argument.");
 		}
-		int num_args = args.length;
-		Object last_arg = args[num_args - 1];
-		if (last_arg instanceof BlockObject) {
-			BlockObject bo = (BlockObject) last_arg;
+		int numArgs = args.length;
+		Object lastArg = args[numArgs - 1];
+		if (lastArg instanceof BlockObject) {
+			BlockObject bo = (BlockObject) lastArg;
 			blocker.setNextBlockObject(bo);
 			if (args.length == 1) {
 				throw new IllegalArgumentException(prefix + " blocker requires at least one item to close-block on.");
 			}
-			--num_args;
+			--numArgs;
 		} else {
 			blocker.clearNextBlockObject();
 		}
 
 		// what we know
-		// 0 .. num_args-1 = items to close-block
-		// num_args >= 1
+		// 0 .. numArgs-1 = items to close-block
+		// numArgs >= 1
 
-		Set<String> handle_set = handles;
+		handles.clear();
 
-		handle_set.clear();
-
-		for (int i = 0; i < num_args; ++i) {
+		for (int i = 0; i < numArgs; ++i) {
 			Object o = args[i];
 			if (o instanceof AssocArray) {
 				AssocArray aa = (AssocArray) o;
@@ -188,7 +187,7 @@ public final class BulkBlockObject extends BlockObject {
 						throw new AwkRuntimeException(handle + ": invalid handle: " + reason);
 					}
 					// otherwise...
-					handle_set.add(handle);
+					handles.add(handle);
 				}
 			} else {
 				String handle = JRT.toAwkString(o, vm.getCONVFMT().toString());
@@ -197,7 +196,7 @@ public final class BulkBlockObject extends BlockObject {
 					throw new AwkRuntimeException(handle + ": invalid handle: " + reason);
 				}
 				// otherwise...
-				handle_set.add(handle);
+				handles.add(handle);
 			}
 		}
 

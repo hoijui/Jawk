@@ -2101,9 +2101,7 @@ public class AwkParser {
 		 * @throws SemanticException upon a semantic error.
 		 */
 		@Override
-		public void semanticAnalysis()
-				throws SemanticException
-		{
+		public void semanticAnalysis() {
 			if (ast1 != null) {
 				ast1.semanticAnalysis();
 			}

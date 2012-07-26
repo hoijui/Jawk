@@ -21,10 +21,10 @@ import java.util.TreeMap;
  */
 public class AssocArray implements Comparator<Object> {
 
-	protected Map<Object, Object> map;
+	private Map<Object, Object> map;
 
-	public AssocArray(boolean sorted_array_keys) {
-		if (sorted_array_keys) {
+	public AssocArray(boolean sortedArrayKeys) {
+		if (sortedArrayKeys) {
 			map = new TreeMap<Object, Object>(this);
 		} else {
 			map = new HashMap<Object, Object>();
@@ -51,12 +51,12 @@ public class AssocArray implements Comparator<Object> {
 	 * Convert the map which backs this associative array
 	 * into one of HashMap, LinkedHashMap, or TreeMap.
 	 *
-	 * @param map_type Can be one of MT_HASH, MT_LINKED,
+	 * @param mapType Can be one of MT_HASH, MT_LINKED,
 	 *   or MT_TREE.
 	 */
-	public void useMapType(int map_type) {
+	public void useMapType(int mapType) {
 		assert map.isEmpty();
-		switch (map_type) {
+		switch (mapType) {
 			case MT_HASH:
 				map = new HashMap<Object, Object>();
 				break;
@@ -67,7 +67,7 @@ public class AssocArray implements Comparator<Object> {
 				map = new TreeMap<Object, Object>(this);
 				break;
 			default:
-				throw new Error("Invalid map type : " + map_type);
+				throw new Error("Invalid map type : " + mapType);
 		}
 	}
 
@@ -132,7 +132,8 @@ public class AssocArray implements Comparator<Object> {
 			// based on the AWK specification:
 			// Any reference (except for IN expressions) to a non-existent
 			// array element will automatically create it.
-			map.put(key, result = BLANK);
+			result = BLANK;
+			map.put(key, result);
 		}
 		return result;
 	}

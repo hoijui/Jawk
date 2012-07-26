@@ -120,9 +120,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * @param parameters The parameters affecting the behavior of the
 	 *	interpreter.
 	 */
-	public AVM(AwkSettings parameters, Map<String, JawkExtension> extensions)
-			throws IllegalArgumentException
-	{
+	public AVM(AwkSettings parameters, Map<String, JawkExtension> extensions) {
 		if (parameters == null) {
 			throw new IllegalArgumentException("AwkSettings can not be null");
 		}
@@ -1583,7 +1581,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						assert rs_offset != NULL_OFFSET;
 						Object rs_obj = runtime_stack.getVariable(rs_offset, true);	// true = global
 						if (jrt.pr != null) {
-							jrt.pr.RS(rs_obj.toString());
+							jrt.pr.setRecordSeparator(rs_obj.toString());
 						}
 						position.next();
 						break;
@@ -2132,9 +2130,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 *
 	 * @param name_value The variable assignment in <i>name=value</i> form.
 	 */
-	private void setFilelistVariable(String name_value)
-			throws IllegalArgumentException
-	{
+	private void setFilelistVariable(String name_value) {
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
 		assert eq_idx >= 0;

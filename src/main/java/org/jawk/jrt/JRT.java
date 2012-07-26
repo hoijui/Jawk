@@ -65,7 +65,7 @@ import java.util.regex.Pattern;
 public class JRT {
 
 	/**
-	 * The default regular expression for RS.
+	 * The default regular expression for setRecordSeparator.
 	 * The AVM refers to this field, so that the field exists
 	 * in one place.
 	 */
@@ -572,9 +572,7 @@ public class JRT {
 		}
 	}
 
-	private void setFilelistVariable(String name_value)
-			throws IllegalArgumentException
-	{
+	private void setFilelistVariable(String name_value) {
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
 		assert eq_idx >= 0;
@@ -1197,7 +1195,7 @@ public class JRT {
 //	if (rs_obj.toString().equals(BLANK))
 //		rs_obj = DEFAULT_RS_REGEX;
 		if (pr != null) {
-			pr.RS(rs_obj.toString());
+			pr.setRecordSeparator(rs_obj.toString());
 		}
 	}
 }

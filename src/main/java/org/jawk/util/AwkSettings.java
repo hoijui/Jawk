@@ -131,38 +131,38 @@ public class AwkSettings {
 
 		StringBuilder desc = new StringBuilder();
 
-		final char DELIM = '\n';
+		final char newLine = '\n';
 
 		desc.append("variables = ")
-				.append(getVariables()).append(DELIM);
+				.append(getVariables()).append(newLine);
 		desc.append("nameValueOrFileNames = ")
-				.append(getNameValueOrFileNames()).append(DELIM);
+				.append(getNameValueOrFileNames()).append(newLine);
 		desc.append("scriptSources = ")
-				.append(scriptSources).append(DELIM);
+				.append(scriptSources).append(newLine);
 		desc.append("(should) compile = ")
-				.append(isCompile()).append(DELIM);
+				.append(isCompile()).append(newLine);
 		desc.append("(should) compile & run = ")
-				.append(isCompileRun()).append(DELIM);
+				.append(isCompileRun()).append(newLine);
 		desc.append("fieldSeparator = ")
-				.append(getFieldSeparator()).append(DELIM);
+				.append(getFieldSeparator()).append(newLine);
 		desc.append("dumpSyntaxTree = ")
-				.append(isDumpSyntaxTree()).append(DELIM);
+				.append(isDumpSyntaxTree()).append(newLine);
 		desc.append("dumpIntermediateCode = ")
-				.append(isDumpIntermediateCode()).append(DELIM);
+				.append(isDumpIntermediateCode()).append(newLine);
 		desc.append("additionalFunctions = ")
-				.append(isAdditionalFunctions()).append(DELIM);
+				.append(isAdditionalFunctions()).append(newLine);
 		desc.append("additionalTypeFunctions = ")
-				.append(isAdditionalTypeFunctions()).append(DELIM);
+				.append(isAdditionalTypeFunctions()).append(newLine);
 		desc.append("useSortedArrayKeys = ")
-				.append(isUseSortedArrayKeys()).append(DELIM);
-		desc.append("trap_illegal_format_exceptions = ")
-				.append(isCatchIllegalFormatExceptions()).append(DELIM);
+				.append(isUseSortedArrayKeys()).append(newLine);
+		desc.append("catchIllegalFormatExceptions = ")
+				.append(isCatchIllegalFormatExceptions()).append(newLine);
 		desc.append("writeIntermediateFile = ")
-				.append(isWriteIntermediateFile()).append(DELIM);
+				.append(isWriteIntermediateFile()).append(newLine);
 		desc.append("outputFilename = ")
-				.append(getOutputFilename()).append(DELIM);
+				.append(getOutputFilename()).append(newLine);
 		desc.append("destinationDirectory = ")
-				.append(getDestinationDirectory()).append(DELIM);
+				.append(getDestinationDirectory()).append(newLine);
 
 		return desc.toString();
 	}
@@ -200,20 +200,20 @@ public class AwkSettings {
 	}
 
 
-	private void addInitialVariable(String v_arg) {
-		int eq_idx = v_arg.indexOf('=');
-		assert eq_idx >= 0;
-		String name = v_arg.substring(0, eq_idx);
-		String value_string = v_arg.substring(eq_idx + 1);
+	private void addInitialVariable(String keyValue) {
+		int equalsIdx = keyValue.indexOf('=');
+		assert equalsIdx >= 0;
+		String name = keyValue.substring(0, equalsIdx);
+		String valueString = keyValue.substring(equalsIdx + 1);
 		Object value;
 		// deduce type
 		try {
-			value = Integer.parseInt(value_string);
+			value = Integer.parseInt(valueString);
 		} catch (NumberFormatException nfe) {
 			try {
-				value = Double.parseDouble(value_string);
+				value = Double.parseDouble(valueString);
 			} catch (NumberFormatException nfe2) {
-				value = value_string;
+				value = valueString;
 			}
 		}
 		// note: can overwrite previously defined variables
@@ -221,15 +221,15 @@ public class AwkSettings {
 	}
 
 	/**
-	 * @param default_filename The filename to return if -o argument
+	 * @param defaultFileName The filename to return if -o argument
 	 *   is not used.
 	 *
-	 * @return the optarg for the -o parameter, or the default_filename
+	 * @return the optarg for the -o parameter, or the defaultFileName
 	 *   parameter if -o is not utilized.
 	 */
-	public String getOutputFilename(String default_filename) {
+	public String getOutputFilename(String defaultFileName) {
 		if (getOutputFilename() == null) {
-			return default_filename;
+			return defaultFileName;
 		} else {
 			return getOutputFilename();
 		}

@@ -27,7 +27,7 @@ public class ScriptSource {
 		this.intermediate = intermediate;
 	}
 
-	public String getDescription() {
+	public final String getDescription() {
 		return description;
 	}
 
@@ -67,7 +67,7 @@ public class ScriptSource {
 	 * @return <code>true</code> if the "-f optarg" is an intermediate file
 	 *   (a file ending in ".ai"), <code>false</code> otherwise.
 	 */
-	public boolean isIntermediate() {
+	public final boolean isIntermediate() {
 		return intermediate;
 	}
 

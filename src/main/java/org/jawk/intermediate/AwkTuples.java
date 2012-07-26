@@ -2267,8 +2267,7 @@ public class AwkTuples implements Serializable {
 		 *	the class version
 		 */
 		private void readObject(ObjectInputStream ois)
-				throws IOException, ClassNotFoundException,
-				InvalidClassException
+				throws IOException, ClassNotFoundException
 		{
 			INSTANCE_VERSION = ois.readInt();
 			if (INSTANCE_VERSION != CLASS_VERSION) {

@@ -15,11 +15,11 @@ public class RegexTokenizer implements Enumeration<Object> {
 	 * Construct a RegexTokenizer.
 	 *
 	 * @param input The input string to tokenize.
-	 * @param regex_string The regular expression delineating tokens
+	 * @param delimitterRegexPattern The regular expression delineating tokens
 	 *   within the input string.
 	 */
-	public RegexTokenizer(String input, String regex_string) {
-		array = input.split(regex_string, -2);
+	public RegexTokenizer(String input, String delimitterRegexPattern) {
+		array = input.split(delimitterRegexPattern, -2);
 	}
 
 	@Override

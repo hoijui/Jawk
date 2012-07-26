@@ -12,6 +12,10 @@ import java.util.List;
  * @see BulkBlockObject
  */
 public class BlockManager {
+
+	private final Object notifierLock = "NOTIFIER_LOCK";
+	private String notifier = null;
+
 	/**
 	 * Executes all block segments simultaneously, waiting for
 	 * one block release.
@@ -59,13 +63,13 @@ public class BlockManager {
 		//	signal a break in the block
 		// interrupt all other threads, resulting in InterruptedExceptions
 
-		List<Thread> thread_list = new LinkedList<Thread>();
+		List<Thread> threadList = new LinkedList<Thread>();
 		synchronized (BlockManager.this) {
 			for (BlockObject blockobj : bos) {
 				// spawn a thread
 				Thread t = new BlockThread(blockobj);
 				t.start();
-				thread_list.add(t);
+				threadList.add(t);
 			}
 
 			// now, wait for notification from one of the BlockThreads
@@ -76,7 +80,7 @@ public class BlockManager {
 
 		// block successful, interrupt other blockers
 		// and wait for thread deaths
-		for (Thread t : thread_list) {
+		for (Thread t : threadList) {
 			t.interrupt();
 			try {
 				t.join();
@@ -88,9 +92,6 @@ public class BlockManager {
 		return notifier;
 	}
 
-	private Object NOTIFIER_LOCK = "NOTIFIER_LOCK";
-	private String notifier = null;
-
 	private final class BlockThread extends Thread {
 
 		private BlockObject bo;
@@ -101,10 +102,10 @@ public class BlockManager {
 		}
 
 		@Override
-		public final void run() {
+		public void run() {
 			try {
 				bo.block();
-				synchronized (NOTIFIER_LOCK) {
+				synchronized (notifierLock) {
 					if (notifier == null) {
 						notifier = bo.getNotifierTag();
 					}

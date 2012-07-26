@@ -100,80 +100,80 @@ public class AwkParameters {
 
 		AwkSettings settings = new AwkSettings();
 
-		int arg_idx = 0;
+		int argIdx = 0;
 		try {
 			// optional parameter mode (i.e. args[i].charAt(0) == '-')
-			while (arg_idx < args.length) {
-				assert args[arg_idx] != null;
-				if (args[arg_idx].length() == 0) {
-					throw new IllegalArgumentException("zero-length argument at position " + (arg_idx + 1));
+			while (argIdx < args.length) {
+				assert args[argIdx] != null;
+				if (args[argIdx].length() == 0) {
+					throw new IllegalArgumentException("zero-length argument at position " + (argIdx + 1));
 				}
-				if (args[arg_idx].charAt(0) != '-') {
+				if (args[argIdx].charAt(0) != '-') {
 					// no more -X arguments
 					break;
-				} else if (args[arg_idx].equals("-")) {
+				} else if (args[argIdx].equals("-")) {
 					// no more -X arguments
-					++arg_idx;
+					++argIdx;
 					break;
-				} else if (args[arg_idx].equals("-v")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					checkInitialVariableFormat(args[arg_idx]);
-					addVariable(settings, args[arg_idx]);
-				} else if (args[arg_idx].equals("-f")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					settings.addScriptSource(new ScriptFileSource(args[arg_idx]));
-				} else if (args[arg_idx].equals("-d")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					settings.setDestinationDirectory(args[arg_idx]);
-				} else if (args[arg_idx].equals("-c")) {
+				} else if (args[argIdx].equals("-v")) {
+					checkParameterHasArgument(args, argIdx);
+					++argIdx;
+					checkInitialVariableFormat(args[argIdx]);
+					addVariable(settings, args[argIdx]);
+				} else if (args[argIdx].equals("-f")) {
+					checkParameterHasArgument(args, argIdx);
+					++argIdx;
+					settings.addScriptSource(new ScriptFileSource(args[argIdx]));
+				} else if (args[argIdx].equals("-d")) {
+					checkParameterHasArgument(args, argIdx);
+					++argIdx;
+					settings.setDestinationDirectory(args[argIdx]);
+				} else if (args[argIdx].equals("-c")) {
 					settings.setWriteIntermediateFile(true);
-				} else if (args[arg_idx].equals("-o")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					settings.setOutputFilename(args[arg_idx]);
-				} else if (args[arg_idx].equals("-z")) {
+				} else if (args[argIdx].equals("-o")) {
+					checkParameterHasArgument(args, argIdx);
+					++argIdx;
+					settings.setOutputFilename(args[argIdx]);
+				} else if (args[argIdx].equals("-z")) {
 					settings.setCompile(true);
-				} else if (args[arg_idx].equals("-Z")) {
+				} else if (args[argIdx].equals("-Z")) {
 					settings.setCompileRun(true);
-				} else if (args[arg_idx].equals("-S")) {
+				} else if (args[argIdx].equals("-S")) {
 					settings.setDumpSyntaxTree(true);
-				} else if (args[arg_idx].equals("-s")) {
+				} else if (args[argIdx].equals("-s")) {
 					settings.setDumpIntermediateCode(true);
-				} else if (args[arg_idx].equals("-x")) {
+				} else if (args[argIdx].equals("-x")) {
 					settings.setAdditionalFunctions(true);
-				} else if (args[arg_idx].equals("-y")) {
+				} else if (args[argIdx].equals("-y")) {
 					settings.setAdditionalTypeFunctions(true);
-				} else if (args[arg_idx].equals("-t")) {
+				} else if (args[argIdx].equals("-t")) {
 					settings.setUseSortedArrayKeys(true);
-				} else if (args[arg_idx].equals("-r")) {
+				} else if (args[argIdx].equals("-r")) {
 					settings.setCatchIllegalFormatExceptions(false);
-				} else if (args[arg_idx].equals("-F")) {
-					checkParameterHasArgument(args, arg_idx);
-					++arg_idx;
-					settings.setFieldSeparator(args[arg_idx]);
-				} else if (args[arg_idx].equals("-ext")) {
+				} else if (args[argIdx].equals("-F")) {
+					checkParameterHasArgument(args, argIdx);
+					++argIdx;
+					settings.setFieldSeparator(args[argIdx]);
+				} else if (args[argIdx].equals("-ext")) {
 					settings.setUserExtensions(true);
-				} else if (args[arg_idx].equals("-ni")) {
+				} else if (args[argIdx].equals("-ni")) {
 					settings.setUseStdIn(true);
-				} else if (args[arg_idx].equals("-h") || args[arg_idx].equals("-?")) {
-					usage(System.out, extensionDescription);
+				} else if (args[argIdx].equals("-h") || args[argIdx].equals("-?")) {
+					usage(System.out);
 				} else {
-					throw new IllegalArgumentException("unknown parameter: "+args[arg_idx]);
+					throw new IllegalArgumentException("unknown parameter: "+args[argIdx]);
 				}
 
-				++arg_idx;
+				++argIdx;
 			}
 
 			if (extensionDescription == null) {
 				// script mode (if -f is not provided)
 				if (settings.getScriptSources().isEmpty()) {
-					if (arg_idx >= args.length) {
+					if (argIdx >= args.length) {
 						throw new IllegalArgumentException("Awk script not provided.");
 					}
-					String scriptContent = args[arg_idx++];
+					String scriptContent = args[argIdx++];
 					settings.addScriptSource(new ScriptSource(
 							ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT,
 							new StringReader(scriptContent),
@@ -191,20 +191,20 @@ public class AwkParameters {
 						}
 					} catch (IOException ex) {
 						ex.printStackTrace();
-						usage(System.err, extensionDescription);
+						usage(System.err);
 					}
 				}
 			}
 		} catch (IllegalArgumentException iae) {
 			iae.printStackTrace(System.err);
-			usage(System.err, extensionDescription);
+			usage(System.err);
 			throw iae;
 		}
 
 		// name=val or filename mode
-		while (arg_idx < args.length) {
-			String name_value_filename = args[arg_idx++];
-			settings.getNameValueOrFileNames().add(name_value_filename);
+		while (argIdx < args.length) {
+			String nameValueOrFileName = args[argIdx++];
+			settings.getNameValueOrFileNames().add(nameValueOrFileName);
 		}
 
 		return settings;
@@ -213,13 +213,13 @@ public class AwkParameters {
 	/**
 	 * Dump usage to stderr; exit with a non-zero error code.
 	 */
-	private void usage(PrintStream dest, String extension_description) {
+	private void usage(PrintStream dest) {
 		//String cls = Awk.class.getName();
 		String cls = mainClass.getName();
 		dest.println("usage:");
 		dest.println(
 				"java ... " + cls + " [-F fs_val]"
-				+ (extension_description == null ? ""
+				+ (extensionDescription == null ? ""
 				+ " [-f script-filename]"
 				+ " [-o output-filename]"
 				+ " [-c]"
@@ -236,17 +236,17 @@ public class AwkParameters {
 				: "")
 				+ " [-t]"
 				+ " [-v name=val]..."
-				+ (extension_description == null ? " [script]" : "")
+				+ (extensionDescription == null ? " [script]" : "")
 				+ " [name=val | input_filename]...");
 		dest.println();
 		dest.println(" -F fs_val = Use fs_val for FS.");
-		if (extension_description == null) {
+		if (extensionDescription == null) {
 			dest.println(" -f filename = Use contents of filename for script.");
 		}
 		dest.println(" -v name=val = Initial awk variable assignments.");
 		dest.println();
 		dest.println(" -t = (extension) Maintain array keys in sorted order.");
-		if (extension_description == null) {
+		if (extensionDescription == null) {
 			dest.println(" -c = (extension) Compile to intermediate file. (default: a.ai)");
 			dest.println(" -o = (extension) Specify output file.");
 			dest.println(" -z = (extension) | Compile for JVM. (default: AwkScript.class)");
@@ -269,7 +269,7 @@ public class AwkParameters {
 			// from the -t argument description (above)
 			// with a newline
 			dest.println();
-			dest.println(extension_description);
+			dest.println(extensionDescription);
 		}
 		dest.println();
 		dest.println(" -h or -? = (extension) This help screen.");
@@ -284,55 +284,51 @@ public class AwkParameters {
 	/**
 	 * Validates that a required argument is provided with the parameter.
 	 * This could have been done with a simple
-	 * <code>if (arg_idx+1 &gt;= args.length) ...</code>.
+	 * <code>if (argIdx+1 &gt;= args.length) ...</code>.
 	 * However,
 	 * <ul>
 	 * <li>this normalizes the implementation throughout the class.</li>
 	 * <li>additional assertions are performed.</li>
 	 * </ul>
 	 */
-	private static void checkParameterHasArgument(String[] args, int arg_idx)
-			throws IllegalArgumentException
-	{
-		assert arg_idx < args.length;
-		assert args[arg_idx].charAt(0) == '-';
-		if (arg_idx + 1 >= args.length) {
-			throw new IllegalArgumentException("Need additional argument for " + args[arg_idx]);
+	private static void checkParameterHasArgument(String[] args, int argIdx) {
+		assert argIdx < args.length;
+		assert args[argIdx].charAt(0) == '-';
+		if (argIdx + 1 >= args.length) {
+			throw new IllegalArgumentException("Need additional argument for " + args[argIdx]);
 		}
 	}
 
 	/**
 	 * Makes sure the argument is of the form name=value.
 	 */
-	private static void checkInitialVariableFormat(String v_arg)
-			throws IllegalArgumentException
-	{
-		int equals_count = 0;
-		int length = v_arg.length();
-		for (int i = 0; equals_count <= 1 && i < length; i++) {
-			if (v_arg.charAt(i) == '=') {
-				++equals_count;
+	private static void checkInitialVariableFormat(String keyValue) {
+		int equalsCount = 0;
+		int length = keyValue.length();
+		for (int i = 0; equalsCount <= 1 && i < length; i++) {
+			if (keyValue.charAt(i) == '=') {
+				++equalsCount;
 			}
 		}
-		if (equals_count != 1) {
-			throw new IllegalArgumentException("v_arg \"" + v_arg + "\" must be of the form name=value");
+		if (equalsCount != 1) {
+			throw new IllegalArgumentException("keyValue \"" + keyValue + "\" must be of the form \"name=value\"");
 		}
 	}
 
-	private static void addVariable(AwkSettings settings, String v_arg) {
-		int eq_idx = v_arg.indexOf('=');
-		assert eq_idx >= 0;
-		String name = v_arg.substring(0, eq_idx);
-		String value_string = v_arg.substring(eq_idx + 1);
+	private static void addVariable(AwkSettings settings, String keyValue) {
+		int equalsIdx = keyValue.indexOf('=');
+		assert equalsIdx >= 0;
+		String name = keyValue.substring(0, equalsIdx);
+		String valueString = keyValue.substring(equalsIdx + 1);
 		Object value;
 		// deduce type
 		try {
-			value = Integer.parseInt(value_string);
+			value = Integer.parseInt(valueString);
 		} catch (NumberFormatException nfe) {
 			try {
-				value = Double.parseDouble(value_string);
+				value = Double.parseDouble(valueString);
 			} catch (NumberFormatException nfe2) {
-				value = value_string;
+				value = valueString;
 			}
 		}
 		// note: this can overwrite previously defined variables

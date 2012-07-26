@@ -14,9 +14,10 @@ import org.jawk.jrt.VariableManager;
  */
 public abstract class AbstractExtension implements JawkExtension {
 
-	protected JRT jrt;
-	protected VariableManager vm;
+	private JRT jrt;
+	private VariableManager vm;
 
+	@Override
 	public void init(VariableManager vm, JRT jrt) {
 		this.vm = vm;
 		this.jrt = jrt;
@@ -32,19 +33,19 @@ public abstract class AbstractExtension implements JawkExtension {
 	 *   has been applied.
 	 */
 	protected final String toAwkString(Object obj) {
-		return JRT.toAwkString(obj, vm.getCONVFMT().toString());
+		return JRT.toAwkString(obj, getVm().getCONVFMT().toString());
 	}
 
 	/**
 	 * Assume no guarantee of any extension parameter being an
 	 * associative array.
 	 *
-	 * @param extension_keyword The extension keyword to check.
-	 * @param arg_count The number of actual parameters used in this
+	 * @param extensionKeyword The extension keyword to check.
+	 * @param argCount The number of actual parameters used in this
 	 *   extension invocation.
 	 */
 	@Override
-	public int[] getAssocArrayParameterPositions(String extension_keyword, int arg_count) {
+	public int[] getAssocArrayParameterPositions(String extensionKeyword, int argCount) {
 		return new int[0];
 	}
 
@@ -54,21 +55,29 @@ public abstract class AbstractExtension implements JawkExtension {
 	 * of the argument array.
 	 *
 	 * @param arr The arguments to check.
-	 * @param expected_num The expected number of arguments.
+	 * @param expectedNum The expected number of arguments.
 	 *
 	 * @throws IllegalAwkArgumentException if the number of arguments
 	 *   do not match the expected number of arguments.
 	 */
-	protected static void checkNumArgs(Object[] arr, int expected_num) {
+	protected static void checkNumArgs(Object[] arr, int expectedNum) {
 		// some sanity checks on the arguments
 		// (made into assertions so that
 		// production code does not perform
 		// these checks)
 		assert arr != null;
-		assert expected_num >= 0;
+		assert expectedNum >= 0;
 
-		if (arr.length != expected_num) {
-			throw new IllegalAwkArgumentException("Expecting " + expected_num + " arg(s), got " + arr.length);
+		if (arr.length != expectedNum) {
+			throw new IllegalAwkArgumentException("Expecting " + expectedNum + " arg(s), got " + arr.length);
 		}
+	}
+
+	protected JRT getJrt() {
+		return jrt;
+	}
+
+	protected VariableManager getVm() {
+		return vm;
 	}
 }

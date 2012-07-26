@@ -43,10 +43,10 @@ public interface VariableManager {
 	Object getSUBSEP();
 
 	/** Set the contents of the FILENAME variable. */
-	void setFILENAME(String new_filename);
+	void setFILENAME(String fileName);
 
 	/** Set the contents of the NF variable. */
-	void setNF(Integer new_nf);
+	void setNF(Integer newNf);
 
 	/** Increases the NR variable by 1. */
 	void incNR();

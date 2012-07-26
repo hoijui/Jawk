@@ -34,6 +34,8 @@ import java.util.Set;
  */
 public abstract class BlockObject {
 
+	private BlockObject nextBlockObject = null;
+
 	protected BlockObject() {}
 
 	/**
@@ -49,13 +51,12 @@ public abstract class BlockObject {
 	 */
 	public abstract void block() throws InterruptedException;
 
-	private BlockObject next_block_object = null;
 
 	/**
 	 * Eliminate the rest of the BlockObject chain.
 	 */
-	public void clearNextBlockObject() {
-		this.next_block_object = null;
+	public final void clearNextBlockObject() {
+		this.nextBlockObject = null;
 	}
 
 	/**
@@ -64,7 +65,11 @@ public abstract class BlockObject {
 	 * the number of BlockObjects that can be supported.
 	 */
 	public void setNextBlockObject(BlockObject bo) {
-		this.next_block_object = bo;
+		this.nextBlockObject = bo;
+	}
+
+	protected final BlockObject getNextBlockObject() {
+		return nextBlockObject;
 	}
 
 	/**
@@ -79,20 +84,18 @@ public abstract class BlockObject {
 	 * @throws AwkRuntimeException if the BlockObject
 	 *   chain contains a cycle.
 	 */
-	public List<BlockObject> getBlockObjects()
-			throws AwkRuntimeException
-	{
+	public List<BlockObject> getBlockObjects() {
 		List<BlockObject> retval = new LinkedList<BlockObject>();
-		Set<BlockObject> bo_set = new HashSet<BlockObject>();
+		Set<BlockObject> blockObjects = new HashSet<BlockObject>();
 		BlockObject ref = this;
 		while (ref != null) {
-			if (bo_set.contains(ref)) {
+			if (blockObjects.contains(ref)) {
 				throw new AwkRuntimeException("Block chain contains a cycle (duplicate) : " + ref.getClass().getName() + " / " + ref.getNotifierTag());
 			} else {
-				bo_set.add(ref);
+				blockObjects.add(ref);
 			}
 			retval.add(ref);
-			ref = ref.next_block_object;
+			ref = ref.getNextBlockObject();
 		}
 		return retval;
 	}

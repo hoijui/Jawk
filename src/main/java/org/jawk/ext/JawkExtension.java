@@ -78,8 +78,8 @@ public interface JawkExtension {
 	 * to enforce type checking and correct Jawk variable allocation
 	 * (which is done at the beginning of script execution).
 	 *
-	 * @param extension_keyword The extension keyword to check.
-	 * @param num_args How many actual parameters are used in the call.
+	 * @param extensionKeyword The extension keyword to check.
+	 * @param numArgs How many actual parameters are used in the call.
 	 *
 	 * @return An array of parameter indexes containing associative arrays.
 	 *   <strong>Note:</strong> non-inclusion of a parameter index
@@ -87,7 +87,7 @@ public interface JawkExtension {
 	 *   parameter is a scalar or an associative array. It means
 	 *   that its type is not guaranteed to be an associative array.
 	 */
-	int[] getAssocArrayParameterPositions(String extension_keyword, int num_args);
+	int[] getAssocArrayParameterPositions(String extensionKeyword, int numArgs);
 
 	/**
 	 * Invoke extension as a method.

@@ -1,7 +1,7 @@
 package org.jawk.util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File; // for File.separator
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -10,6 +10,10 @@ import java.io.IOException;
  * environmental class-path setting.
  * This is useful when a directory is specified for class files,
  * and it would not make sense to deviate from that directory.
+ * So this ClassLoader does practically the same
+ * like a <code>URLClassLoader</code> with a "file://.../" URL,
+ * except that it does not forward calls to its parent,
+ * if it can not find the class its self.
  * <p>
  * For Jawk, this is used when the -d argument is present.
  * </p>
@@ -33,9 +37,9 @@ public final class DestDirClassLoader extends ClassLoader {
 	private byte[] loadClassData(String name)
 			throws ClassNotFoundException
 	{
-		String filename = dirname + File.separator + name + ".class";
+		String fileName = dirname + File.separator + name + ".class";
 		try {
-			FileInputStream f = new FileInputStream(filename);
+			FileInputStream f = new FileInputStream(fileName);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] b = new byte[4096];
 			int len;
@@ -46,8 +50,9 @@ public final class DestDirClassLoader extends ClassLoader {
 			baos.close();
 			return baos.toByteArray();
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			throw new ClassNotFoundException("Could not load " + filename + ": " + ioe);
+			throw new ClassNotFoundException(
+					"Could not load class " + name
+					+ " from file \"" + fileName + "\"", ioe);
 		}
 	}
 }

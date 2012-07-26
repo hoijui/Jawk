@@ -30,9 +30,9 @@ import org.jawk.jrt.VariableManager;
  * <p>
  * To use:
  * <blockquote><pre>
- * ## example echo server using CServerSocket (character-based)
+ * ## example echo server using createCServerSocket (character-based)
  * BEGIN {
- * 	css = CServerSocket(7777);
+ * 	css = createCServerSocket(7777);
  * }
  * $0 = SocketAcceptBlock(css,
  * 	SocketInputBlock(handles,
@@ -55,10 +55,10 @@ import org.jawk.jrt.VariableManager;
  * The extension functions are as follows:
  * <ul>
  * <hr>
- * <li><strong><em><font size=+1>ServerSocket</font></em></strong> -<br>
- * Sets up a server socket to listen for incoming
+ * <li><strong><em><font size=+1>createServerSocket</font></em></strong> -<br>
+ * Sets up a server createSocket to listen for incoming
  * connections. SocketRead on Sockets accepted
- * by ServerSocket return arbitrary-length Strings
+ * by createServerSocket return arbitrary-length Strings
  * (bytes buffered by the input stream, converted
  * to a string).<br>
  * <strong>Parameters:</strong>
@@ -67,25 +67,25 @@ import org.jawk.jrt.VariableManager;
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
- * <li>A string handle to a ServerSocket.
+ * <li>A string handle to a createServerSocket.
  * </ul><p>
- * <li><strong><em><font size=+1>CServerSocket</font></em></strong> -<br>
- * Sets up a server socket to listen for incoming
+ * <li><strong><em><font size=+1>createCServerSocket</font></em></strong> -<br>
+ * Sets up a server createSocket to listen for incoming
  * connections. SocketRead on Sockets accepted
- * by CServerSocket return strings which terminate
+ * by createCServerSocket return strings which terminate
  * by a newline, or text in the input buffer just
- * prior to the closing of the socket.<br>
+ * prior to the closing of the createSocket.<br>
  * <strong>Parameters:</strong>
  * <ul>
  * <li>port number - required
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
- * <li>A string handle to a CServerSocket.
+ * <li>A string handle to a createCServerSocket.
  * </ul><p>
  * <hr>
  * <li><strong><em><font size=+1>Socket</font></em></strong> -<br>
- * Create a Socket and connect it to a TCP socket
+ * Create a Socket and connect it to a TCP createSocket
  * endpoint. SocketRead on Sockets returned
  * by Socket return arbitrary-length Strings
  * (bytes buffered by the input stream, converted
@@ -99,12 +99,12 @@ import org.jawk.jrt.VariableManager;
  * <ul>
  * <li>A string handle to a Socket.
  * </ul><p>
- * <li><strong><em><font size=+1>CSocket</font></em></strong> -<br>
- * Create a Socket and connect it to a TCP socket
+ * <li><strong><em><font size=+1>createCSocket</font></em></strong> -<br>
+ * Create a Socket and connect it to a TCP createSocket
  * endpoint. SocketRead on Sockets returned
  * by Socket return strings which terminate
  * by a newline, or text in the input buffer just
- * prior to the closing of the socket.<br>
+ * prior to the closing of the createSocket.<br>
  * <strong>Parameters:</strong>
  * <ul>
  * <li>hostName/IP/"localhost" - required
@@ -112,18 +112,18 @@ import org.jawk.jrt.VariableManager;
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
- * <li>A string handle to a CSocket.
+ * <li>A string handle to a createCSocket.
  * </ul><p>
  * <hr>
  * <li><strong><em><font size=+1>SocketAcceptBlock</font></em></strong> -<br>
- * Blocks until a ServerSocket or CServerSocket
+ * Blocks until a createServerSocket or createCServerSocket
  * is ready to accept a connecting Socket.<br>
  * <strong>Parameters:</strong>
  * <ul>
  * <li>Any mix of
- * ServerSocket or CServerSocket handles
+ * createServerSocket or createCServerSocket handles
  * and/or associative arrays whose keys
- * are ServerSocket or CServerSocket handles.
+ * are createServerSocket or createCServerSocket handles.
  * The last argument can optionally be
  * another block call for block chaining.
  * </ul>
@@ -131,89 +131,89 @@ import org.jawk.jrt.VariableManager;
  * <ul>
  * <li>A string of the form:
  * <code><font size=+1>SocketAccept<em>OFS</em>handle</font></code>
- * where handle is a ServerSocket or CServerSocket
+ * where handle is a createServerSocket or createCServerSocket
  * handle.
  * </ul><p>
  * <li><strong><em><font size=+1>SocketInputBlock</font></em></strong> -<br>
- * Blocks until a Socket or CSocket is ready
+ * Blocks until a Socket or createCSocket is ready
  * to accept input (via SocketRead).<br>
  * <strong>Parameters:</strong>
  * <ul>
  * <li>Any mix of
- * Socket or CSocket handles and/or associative
- * arrays whose keys are Socket or CSocket handles.
+ * Socket or createCSocket handles and/or associative
+ * arrays whose keys are Socket or createCSocket handles.
  * The last argument can optionally be
  * another block call for block chaining.
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
  * <li>A string of the form: <code><font size=+1>SocketInput<em>OFS</em>handle</font></code>
- * where handle is a Socket or CSocket
+ * where handle is a Socket or createCSocket
  * handle.
  * </ul><p>
  * <li><strong><em><font size=+1>SocketCloseBlock</font></em></strong> -<br>
- * Blocks until a ServerSocket, CServerSocket,
- * Socket, or CSocket has been closed on the
+ * Blocks until a createServerSocket, createCServerSocket,
+ * Socket, or createCSocket has been closed on the
  * remote end.<br>
  * <strong>Parameters:</strong>
  * <ul>
  * <li>Any mix of
- * ServerSocket, CServerSocket, Socket, or CSocket
+ * createServerSocket, createCServerSocket, Socket, or createCSocket
  * handles and/or associative
- * arrays whose keys are ServerSocket, CServerSocket,
- * Socket, or CSocket handles.
+ * arrays whose keys are createServerSocket, createCServerSocket,
+ * Socket, or createCSocket handles.
  * The last argument can optionally be
  * another block call for block chaining.
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
  * <li>A string of the form: <code><font size=+1>SocketClose<em>OFS</em>handle</font></code>
- * where handle is a ServerSocket, CServerSocket, Socket,
- * or CSocket handle.
+ * where handle is a createServerSocket, createCServerSocket, Socket,
+ * or createCSocket handle.
  * </ul><p>
  * <hr>
  * <li><strong><em><font size=+1>SocketAccept</font></em></strong> -<br>
- * Accepts a Socket from a ServerSocket or
- * a CServerSocket. The operation will
+ * Accepts a Socket from a createServerSocket or
+ * a createCServerSocket. The operation will
  * block if there is no Socket to accept.<br>
  * <strong>Parameters:</strong>
  * <ul>
- * <li>ServerSocket-or-CServerSocket handle - required
+ * <li>createServerSocket-or-createCServerSocket handle - required
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
- * <li>A string handle to a Socket or CSocket.
+ * <li>A string handle to a Socket or createCSocket.
  * </ul><p>
  * <hr>
  * <li><strong><em><font size=+1>SocketRead</font></em></strong> -<br>
  * Reads input from the input stream of a Socket
- * or a CSocket. For a Socket, the input length
- * is arbitrary. For a CSocket, the input
+ * or a createCSocket. For a Socket, the input length
+ * is arbitrary. For a createCSocket, the input
  * length is bounded by a newline or upon
- * termination of the socket.
+ * termination of the createSocket.
  * The operation will block if there is no input
- * on the socket.<br>
+ * on the createSocket.<br>
  * <strong>Parameters:</strong>
  * <ul>
- * <li>Socket-or-CSocket handle - required
+ * <li>Socket-or-createCSocket handle - required
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
- * <li>A string containing the input on the socket.
+ * <li>A string containing the input on the createSocket.
  * </ul><p>
  * <li><strong><em><font size=+1>SocketWrite</font></em></strong> -<br>
- * Writes data to the Socket or CSocket.
+ * Writes data to the Socket or createCSocket.
  * For a Socket, the string is converted
  * to bytes (via java.lang.String.getBytes()),
- * and the bytes are sent to the socket's
+ * and the bytes are sent to the createSocket's
  * output stream.
- * For a CSocket, println() is called on the
- * underlying socket's PrintStream.<br>
+ * For a createCSocket, println() is called on the
+ * underlying createSocket's PrintStream.<br>
  * <strong>Parameters:</strong>
  * <ul>
- * <li>Socket-or-CSocket handle - required
+ * <li>Socket-or-createCSocket handle - required
  * <li>msg - required - The string to write to
- * 	the Socket. For a CSocket, a newline
+ * 	the Socket. For a createCSocket, a newline
  * 	is added to it (via the
  * 	java.io.PrintStream.println() method).
  * </ul>
@@ -222,10 +222,10 @@ import org.jawk.jrt.VariableManager;
  * <li>1 upon a successful write, 0 otherwise
  * </ul><p>
  * <li><strong><em><font size=+1>SocketFlush</font></em></strong> -<br>
- * Flushes the output stream of a Socket or CSocket.<br>
+ * Flushes the output stream of a Socket or createCSocket.<br>
  * <strong>Parameters:</strong>
  * <ul>
- * <li>Socket-or-CSocket handle - required
+ * <li>Socket-or-createCSocket handle - required
  * </ul>
  * <strong>Returns:</strong>
  * <ul>
@@ -234,7 +234,7 @@ import org.jawk.jrt.VariableManager;
  * <hr>
  * <li><strong><em><font size=+1>SocketClose</font></em></strong> -<br>
  * Closes the Socket/CSocket on the local end,
- * or a ServerSocket/CServerSocket.
+ * or a createServerSocket/CServerSocket.
  * Can be called in response to a SocketCloseBlock
  * event, or to force a Socket/CSocket connection to
  * terminate.<br>
@@ -252,18 +252,18 @@ import org.jawk.jrt.VariableManager;
 public class SocketExtension extends AbstractExtension {
 
 	/**
-	 * Either threaded or non-threaded (nio-style) socket
+	 * Either threaded or non-threaded (nio-style) createSocket
 	 * handling. The threaded implementation is provided
 	 * upon initial release. Non-threaded
 	 * functionality will be available in a subsequent
 	 * release.
 	 */
-	private IO_Style impl_delegate;
+	private IOStyle implDelegate;
 
 	@Override
 	public final void init(VariableManager vm, JRT jrt) {
 		super.init(vm, jrt);
-		impl_delegate = new Threaded_IO_Style(vm);
+		implDelegate = new ThreadedIOStyle(vm);
 	}
 
 	@Override
@@ -274,10 +274,10 @@ public class SocketExtension extends AbstractExtension {
 	@Override
 	public final String[] extensionKeywords() {
 		return new String[] {
-					"ServerSocket", // i.e., ss = ServerSocket(8080) or ss = ServerSocket("ip", 8080)
-					"CServerSocket", // i.e., css = CServerSocket(8080) or css = CServerSocket("ip", 8080)
+					"ServerSocket", // i.e., ss = createServerSocket(8080) or ss = createServerSocket("ip", 8080)
+					"CServerSocket", // i.e., css = createCServerSocket(8080) or css = createCServerSocket("ip", 8080)
 					"Socket", // i.e., s = Socket("localhost", 8080)
-					"CSocket", // i.e., cs = CSocket("localhost", 8080)
+					"CSocket", // i.e., cs = createCSocket("localhost", 8080)
 					"SocketAcceptBlock", // i.e., $0 = SocketAcceptBlock(ss, css,
 					"SocketInputBlock", // i.e., SocketInputBlock(s, cs,
 					"SocketCloseBlock", // i.e., SocketCloseBlock(ss,css, s,cs)));
@@ -290,76 +290,76 @@ public class SocketExtension extends AbstractExtension {
 	}
 
 	@Override
-	public final Object invoke(String method_name, Object[] args) {
+	public final Object invoke(String methodName, Object[] args) {
 		// large if-then-else block to decide which extension to invoke
 		if (false) {
 			throw new Error("Should never reach.");
-		} else if (method_name.equals("ServerSocket")) {
+		} else if (methodName.equals("ServerSocket")) {
 			if (args.length == 1) {
-				return impl_delegate.ServerSocket(
+				return implDelegate.createServerSocket(
 					null,
 					(int) JRT.toDouble(args[0])
 				);
 			} else if (args.length == 2) {
-				return impl_delegate.ServerSocket(
+				return implDelegate.createServerSocket(
 					toAwkString(args[0]),
 					(int) JRT.toDouble(args[1])
 				);
 			} else {
 				throw new IllegalAwkArgumentException("Expecting 1 or 2 arguments, not " + args.length);
 			}
-		} else if (method_name.equals("CServerSocket")) {
+		} else if (methodName.equals("CServerSocket")) {
 			if (args.length == 1) {
-				return impl_delegate.CServerSocket(
+				return implDelegate.createCServerSocket(
 					null,
 					(int) JRT.toDouble(args[0])
 				);
 			} else if (args.length == 2) {
-				return impl_delegate.CServerSocket(
+				return implDelegate.createCServerSocket(
 					toAwkString(args[0]),
 					(int) JRT.toDouble(args[1])
 				);
 			} else {
 				throw new IllegalAwkArgumentException("Expecting 1 or 2 arguments, not " + args.length);
 			}
-		} else if (method_name.equals("Socket")) {
+		} else if (methodName.equals("Socket")) {
 			checkNumArgs(args, 2);
-			return impl_delegate.socket(
+			return implDelegate.createSocket(
 				toAwkString(args[0]),
 				(int) JRT.toDouble(args[1])
 			);
-		} else if (method_name.equals("CSocket")) {
+		} else if (methodName.equals("CSocket")) {
 			checkNumArgs(args, 2);
-			return impl_delegate.CSocket(
+			return implDelegate.createCSocket(
 				toAwkString(args[0]),
 				(int) JRT.toDouble(args[1])
 			);
-		} else if (method_name.equals("SocketAcceptBlock")) {
-			return impl_delegate.socketacceptblock(args);
-		} else if (method_name.equals("SocketInputBlock")) {
-			return impl_delegate.socketinputblock(args);
-		} else if (method_name.equals("SocketCloseBlock")) {
-			return impl_delegate.socketcloseblock(args);
-		} else if (method_name.equals("SocketAccept")) {
+		} else if (methodName.equals("SocketAcceptBlock")) {
+			return implDelegate.socketAcceptBlock(args);
+		} else if (methodName.equals("SocketInputBlock")) {
+			return implDelegate.socketInputBlock(args);
+		} else if (methodName.equals("SocketCloseBlock")) {
+			return implDelegate.socketCloseBlock(args);
+		} else if (methodName.equals("SocketAccept")) {
 			checkNumArgs(args, 1);
-			return impl_delegate.socketaccept(toAwkString(args[0]));
-		} else if (method_name.equals("SocketRead")) {
+			return implDelegate.socketAccept(toAwkString(args[0]));
+		} else if (methodName.equals("SocketRead")) {
 			checkNumArgs(args, 1);
-			return impl_delegate.socketread(toAwkString(args[0]));
-		} else if (method_name.equals("SocketWrite")) {
+			return implDelegate.socketRead(toAwkString(args[0]));
+		} else if (methodName.equals("SocketWrite")) {
 			checkNumArgs(args, 2);
-			return impl_delegate.socketwrite(
+			return implDelegate.socketWrite(
 				toAwkString(args[0]),
 				toAwkString(args[1])
 			);
-		} else if (method_name.equals("SocketFlush")) {
+		} else if (methodName.equals("SocketFlush")) {
 			checkNumArgs(args, 1);
-			return impl_delegate.socketflush(toAwkString(args[0]));
-		} else if (method_name.equals("SocketClose")) {
+			return implDelegate.socketFlush(toAwkString(args[0]));
+		} else if (methodName.equals("SocketClose")) {
 			checkNumArgs(args, 1);
-			return impl_delegate.socketclose(toAwkString(args[0]));
+			return implDelegate.socketClose(toAwkString(args[0]));
 		} else {
-			throw new NotImplementedError(method_name);
+			throw new NotImplementedError(methodName);
 		}
 	}
 }
@@ -368,18 +368,19 @@ public class SocketExtension extends AbstractExtension {
 // INTERFACE TO DELEGATE
 //
 
+
 /**
- * Interface to the socket handling delegate which
+ * Interface to the createSocket handling delegate which
  * does all the work. The SocketExtension manager
- * class delegates all concrete socket IO
+ * class delegates all concrete createSocket IO
  * processing to an instance of this interface.
  */
-interface IO_Style {
+interface IOStyle {
 
 	/**
-	 * Sets up a server socket to listen for incoming
+	 * Sets up a server createSocket to listen for incoming
 	 * connections. SocketRead on sockets accepted
-	 * by ServerSocket return arbitrary-length Strings
+	 * by createServerSocket return arbitrary-length Strings
 	 * (bytes buffered by the input stream, converted
 	 * to a string).
 	 *
@@ -387,27 +388,27 @@ interface IO_Style {
 	 *   host-name can be null.
 	 * @param port The port number.
 	 *
-	 * @return A handle to a newly created ServerSocket.
+	 * @return A handle to a newly created createServerSocket.
 	 */
-	String ServerSocket(String hostname, int port);
+	String createServerSocket(String hostname, int port);
 
 	/**
-	 * Sets up a server socket to listen for incoming
+	 * Sets up a server createSocket to listen for incoming
 	 * connections. SocketRead on sockets accepted
-	 * by CServerSocket return strings which terminate
+	 * by createCServerSocket return strings which terminate
 	 * by a newline, or text in the input buffer just
-	 * prior to the closing of the socket.
+	 * prior to the closing of the createSocket.
 	 *
 	 * @param hostname The host-name or IP address as a string.
 	 *   host-name can be null.
 	 * @param port The port number.
 	 *
-	 * @return A handle to a newly created CServerSocket.
+	 * @return A handle to a newly created createCServerSocket.
 	 */
-	String CServerSocket(String hostname, int port);
+	String createCServerSocket(String hostname, int port);
 
 	/**
-	 * Create a Socket and connect it to a TCP socket
+	 * Create a Socket and connect it to a TCP createSocket
 	 * endpoint. SocketRead on sockets returned
 	 * by Socket return arbitrary-length Strings
 	 * (bytes buffered by the input stream, converted
@@ -419,170 +420,170 @@ interface IO_Style {
 	 *
 	 * @return A handle to a newly created Socket.
 	 */
-	String socket(String hostname, int port);
+	String createSocket(String hostname, int port);
 
 	/**
-	 * Create a Socket and connect it to a TCP socket
+	 * Create a Socket and connect it to a TCP createSocket
 	 * endpoint. SocketRead on sockets returned
 	 * by Socket return strings which terminate
 	 * by a newline, or text in the input buffer just
-	 * prior to the closing of the socket.
+	 * prior to the closing of the createSocket.
 	 *
 	 * @param hostname The host-name or IP address as a string.
 	 *   host-name can be null.
 	 * @param port The port number.
 	 *
-	 * @return A handle to a newly created CSocket.
+	 * @return A handle to a newly created createCSocket.
 	 */
-	String CSocket(String hostname, int port);
+	String createCSocket(String hostname, int port);
 
 	/**
-	 * Blocks until a ServerSocket or CServerSocket
-	 * is ready to accept a connecting socket.
+	 * Blocks until a createServerSocket or createCServerSocket
+	 * is ready to accept a connecting createSocket.
 	 *
 	 * @param args An array of
-	 *   ServerSocket or CServerSocket handles
+	 *   createServerSocket or createCServerSocket handles
 	 *   and/or associative arrays whose keys
-	 *   are ServerSocket or CServerSocket handles.
+	 *   are createServerSocket or createCServerSocket handles.
 	 *   The last argument can optionally be
 	 *   another block call for block chaining.
 	 *
 	 * @return A block object conditioned
 	 *   to block on the acceptance of
-	 *   socket connections from any of
+	 *   createSocket connections from any of
 	 *   the ServerSockets / CServerSockets
 	 *   referred to by the handles passed
 	 *   in to the object array.
 	 */
-	BlockObject socketacceptblock(Object[] args);
+	BlockObject socketAcceptBlock(Object[] args);
 
 	/**
-	 * Blocks until a socket or CSocket is ready
+	 * Blocks until a createSocket or createCSocket is ready
 	 * to accept input (via SocketRead).
 	 *
 	 * @param args An array of
-	 * socket or CSocket handles and/or associative
-	 * arrays whose keys are socket or CSocket handles.
+	 * createSocket or createCSocket handles and/or associative
+	 * arrays whose keys are createSocket or createCSocket handles.
 	 * The last argument can optionally be
 	 * another block call for block chaining.
 	 *
 	 * @return A block object conditioned
-	 * to block on the availability of
-	 * input from any of the sockets / CSockets
-	 * referred to by the handles passed
-	 * in to the object array.
+	 *   to block on the availability of
+	 *   input from any of the sockets / CSockets
+	 *   referred to by the handles passed
+	 *   in to the object array.
 	 */
-	BlockObject socketinputblock(Object[] args);
+	BlockObject socketInputBlock(Object[] args);
 
 	/**
-	 * Blocks until a ServerSocket, CServerSocket,
-	 * socket, or CSocket has been closed on the
+	 * Blocks until a createServerSocket, createCServerSocket,
+	 * createSocket, or createCSocket has been closed on the
 	 * remote end.
 	 *
 	 * @param args An array of
-	 * ServerSocket, CServerSocket, socket, or CSocket
-	 * handles and/or associative
-	 * arrays whose keys are ServerSocket, CServerSocket,
-	 * socket, or CSocket handles.
-	 * The last argument can optionally be
-	 * another block call for block chaining.
+	 *   createServerSocket, createCServerSocket, createSocket, or createCSocket
+	 *   handles and/or associative
+	 *   arrays whose keys are createServerSocket, createCServerSocket,
+	 *   createSocket, or createCSocket handles.
+	 *   The last argument can optionally be
+	 *   another block call for block chaining.
 	 *
 	 * @return A block object conditioned
-	 * to block until any of the sockets /
-	 * CSockets / ServerSockets / CServerSockets
-	 * in to the object array have closed.
+	 *   to block until any of the sockets /
+	 *   CSockets / ServerSockets / CServerSockets
+	 *   in to the object array have closed.
 	 */
-	BlockObject socketcloseblock(Object[] args);
+	BlockObject socketCloseBlock(Object[] args);
 
 	/**
-	 * Accepts a socket from a ServerSocket or
-	 * a CServerSocket. The operation will
-	 * block if there is no socket to accept.
+	 * Accepts a createSocket from a createServerSocket or
+	 * a createCServerSocket. The operation will
+	 * block if there is no createSocket to accept.
 	 *
-	 * @param handle A string handle to a ServerSocket
-	 *   or CServerSocket.
+	 * @param handle A string handle to a createServerSocket
+	 *   or createCServerSocket.
 	 *
-	 * @return A handle to a socket or CSocket that
-	 *   has connected to the ServerSocket / CServerSocket
+	 * @return A handle to a createSocket or createCSocket that
+	 *   has connected to the createServerSocket / createCServerSocket
 	 *   referred to by the handle argument.
 	 */
-	String socketaccept(String handle);
+	String socketAccept(String handle);
 
 	/**
-	 * Reads input from the input stream of a socket
-	 * or a CSocket. For a socket, the input length
-	 * is arbitrary. For a CSocket, the input
+	 * Reads input from the input stream of a createSocket
+	 * or a createCSocket. For a createSocket, the input length
+	 * is arbitrary. For a createCSocket, the input
 	 * length is bounded by a newline or upon
-	 * termination of the socket.
+	 * termination of the createSocket.
 	 * The operation will block if there is no input
-	 * on the socket.
+	 * on the createSocket.
 	 *
-	 * @param handle A string handle to a socket
-	 * or CSocket.
+	 * @param handle A string handle to a createSocket
+	 *   or createCSocket.
 	 *
-	 * @return A block of byte input from a socket
-	 * (converted to a string), or a line of
-	 * string input from a CSocket bounded by
-	 * a newline in the stream or upon the closing
-	 * of the CSocket.
+	 * @return A block of byte input from a createSocket
+	 *   (converted to a string), or a line of
+	 *   string input from a createCSocket bounded by
+	 *   a newline in the stream or upon the closing
+	 *   of the createCSocket.
 	 */
-	String socketread(String handle);
+	String socketRead(String handle);
 
 	/**
-	 * Writes data to the socket or CSocket.
-	 * For a socket, the string is converted
+	 * Writes data to the createSocket or createCSocket.
+	 * For a createSocket, the string is converted
 	 * to bytes (via java.lang.String.getBytes()),
 	 * and the bytes are sent to the underlying
-	 * socket's output stream.
-	 * For a CSocket, println() is called on the
-	 * underlying socket's PrintStream.
+	 * createSocket's output stream.
+	 * For a createCSocket, println() is called on the
+	 * underlying createSocket's PrintStream.
 	 *
-	 * @param handle A string handle to a socket
-	 *   or CSocket.
+	 * @param handle A string handle to a createSocket
+	 *   or createCSocket.
 	 * @param buf The string containing the
 	 *   bytes to write. SocketWrite writes
 	 *   the contents of the resulting buf.getBytes()
-	 *   call to the socket.
+	 *   call to the createSocket.
 	 *
-	 * @param handle A String handle to a socket
-	 *   or CSocket.
+	 * @param handle A String handle to a createSocket
+	 *   or createCSocket.
 	 * @param buf A string containing a block of
-	 *   bytes to write to a socket (via
+	 *   bytes to write to a createSocket (via
 	 *   {@see java.lang.String#getBytes()}) if handle
-	 *   refers to a socket. If handle refers
-	 *   to a CSocket, the line of text to write
+	 *   refers to a createSocket. If handle refers
+	 *   to a createCSocket, the line of text to write
 	 *   via {@see PrintStream#println(String)}.
 	 *
 	 * @return 1 upon a successful write,
 	 *   0 upon an IO exception/error.
 	 */
-	int socketwrite(String handle, String buf);
+	int socketWrite(String handle, String buf);
 
 	/**
-	 * Flushes the output stream of a socket or CSocket.
+	 * Flushes the output stream of a createSocket or createCSocket.
 	 *
-	 * @param handle A string handle to a socket
-	 * or CSocket.
+	 * @param handle A string handle to a createSocket
+	 * or createCSocket.
 	 *
 	 * @return 1 upon a successful flush operation,
 	 * 0 upon an IO exception/error.
 	 */
-	int socketflush(String handle);
+	int socketFlush(String handle);
 
 	/**
-	 * Closes the socket/CSocket on the local end,
-	 * or a ServerSocket/CServerSocket.
+	 * Closes the createSocket/CSocket on the local end,
+	 * or a createServerSocket/CServerSocket.
 	 * Can be called in response to a SocketCloseBlock
-	 * event, or to force a socket/CSocket connection to
+	 * event, or to force a createSocket/CSocket connection to
 	 * terminate.
 	 *
-	 * @param handle A string handle to a socket,
-	 * 	CSocket, ServerSocket, or CServerSocket.
+	 * @param handle A string handle to a createSocket,
+	 * 	createCSocket, createServerSocket, or createCServerSocket.
 	 *
 	 * @return 1 upon a successful close operation,
 	 * 0 upon an IO exception/error.
 	 */
-	int socketclose(String handle);
+	int socketClose(String handle);
 }
 
 /**
@@ -601,27 +602,27 @@ class MapUnion<K, V> extends AbstractMap<K, V> {
 	@Override
 	public final Set<Map.Entry<K, V>> entrySet() {
 		// build the entry set
-		Set<Map.Entry<K, V>> entry_set = new HashSet<Map.Entry<K, V>>();
+		Set<Map.Entry<K, V>> entries = new HashSet<Map.Entry<K, V>>();
 
 		Set<Map.Entry<K, V>> s1 = m1.entrySet();
 		Set<Map.Entry<K, V>> s2 = m2.entrySet();
 		for (Map.Entry<K, V> me : s1) {
-			entry_set.add(me);
+			entries.add(me);
 		}
 		for (Map.Entry<K, V> me : s2) {
-			entry_set.add(me);
+			entries.add(me);
 		}
 
-		return entry_set;
+		return entries;
 	}
 }
 
-class Threaded_IO_Style implements IO_Style {
+class ThreadedIOStyle implements IOStyle {
 
-	private String last_err = null;
+	private String lastError = null;
 
 	/**
-	 * Map of "Socket"/"CSocket" handles to
+	 * Map of "Socket"/"createCSocket" handles to
 	 * the objects which perform the actual
 	 * read and block operations.
 	 * <p>
@@ -634,7 +635,7 @@ class Threaded_IO_Style implements IO_Style {
 	 * nor "Accepter" were extensions of "Blockable".
 	 * MapUnion originally accepted 3 generic parameters:
 	 * K, V1 extends Blockable, and V2 extends Blockable.
-	 * And, close_blocker's BulkBlockObject Map parameter was:
+	 * And, closeBlocker's BulkBlockObject Map parameter was:
 	 * <code>new MapUnion<String, Accepter, Consumer>(accepters, consumers)</code>.
 	 * But, it wouldn't compile.
 	 * The resulting warning/error messages stated that
@@ -654,9 +655,9 @@ class Threaded_IO_Style implements IO_Style {
 	private final Map<String, Closeable> consumers = new HashMap<String, Closeable>();
 
 	/**
-	 * Map of "ServerSocket"/"CServerSocket" handles
+	 * Map of "createServerSocket"/"createCServerSocket" handles
 	 * to the objects which perform the actual
-	 * socket accept operation.
+	 * createSocket accept operation.
 	 * <p>
 	 * <strong>Note:</strong>
 	 * See lengthy diatribe above for "consumers".
@@ -667,20 +668,23 @@ class Threaded_IO_Style implements IO_Style {
 
 	private final VariableManager vm;
 
-	private final BulkBlockObject accept_blocker;
-	private final BulkBlockObject input_blocker;
-	private final BulkBlockObject close_blocker;
+	private final BulkBlockObject acceptBlocker;
+	private final BulkBlockObject inputBlocker;
+	private final BulkBlockObject closeBlocker;
 
-	Threaded_IO_Style(VariableManager vm) {
+	private int socketIdx = 0;
+	private int ssocketIdx = 0;
+
+	ThreadedIOStyle(VariableManager vm) {
 		assert vm != null;
 		this.vm = vm;
-		accept_blocker = new BulkBlockObject("SocketAccept", accepters, vm);
-		input_blocker = new BulkBlockObject("SocketInput", consumers, vm);
-		close_blocker = new BulkBlockObject("SocketClose", new MapUnion<String, Closeable>(accepters, consumers), vm);
+		acceptBlocker = new BulkBlockObject("SocketAccept", accepters, vm);
+		inputBlocker = new BulkBlockObject("SocketInput", consumers, vm);
+		closeBlocker = new BulkBlockObject("SocketClose", new MapUnion<String, Closeable>(accepters, consumers), vm);
 	}
 
 	@Override
-	public final String ServerSocket(String hostname, int port) {
+	public final String createServerSocket(String hostname, int port) {
 		try {
 			ServerSocket ss;
 			if (hostname == null) {
@@ -690,86 +694,83 @@ class Threaded_IO_Style implements IO_Style {
 			}
 			String handle = createHandle(ss);
 			//ssockets.put(handle, ss);
-			Accepter accepter_thread = new Accepter(handle, ss);
-			accepters.put(handle, accepter_thread);
-			accepter_thread.start();
+			Accepter accepterThread = new Accepter(handle, ss);
+			accepters.put(handle, accepterThread);
+			accepterThread.start();
 			return handle;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			last_err = ioe.toString();
+			lastError = ioe.toString();
 			return "";
 		}
 	}
 
 	@Override
-	public final String CServerSocket(String hostname, int port) {
+	public final String createCServerSocket(String hostName, int port) {
 		try {
 			ServerSocket ss;
-			if (hostname == null) {
+			if (hostName == null) {
 				ss = new ServerSocket(port);
 			} else { // 0 = default backlog
-				ss = new ServerSocket(port, 0, InetAddress.getByName(hostname));
+				ss = new ServerSocket(port, 0, InetAddress.getByName(hostName));
 			}
 			String handle = createHandle(ss);
 			//ssockets.put(handle, ss);
-			Accepter accepter_thread = new CAccepter(handle, ss);
-			accepters.put(handle, accepter_thread);
-			accepter_thread.start();
+			Accepter accepterThread = new CAccepter(handle, ss);
+			accepters.put(handle, accepterThread);
+			accepterThread.start();
 			return handle;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			last_err = ioe.toString();
+			lastError = ioe.toString();
 			return "";
 		}
 	}
 
 	@Override
-	public final String socket(String hostname, int port) {
-		// create the socket
+	public final String createSocket(String hostname, int port) {
+		// create the createSocket
 		try {
 			Socket socket = new Socket(hostname, port);
 			String handle = createHandle(socket);
-			//sockets.put(handle, socket);
+			//sockets.put(handle, createSocket);
 			// start the reader
-			Consumer reader_thread = new ByteConsumer(handle, socket);
-			consumers.put(handle, reader_thread);
-			reader_thread.start();
+			Consumer readerThread = new ByteConsumer(handle, socket);
+			consumers.put(handle, readerThread);
+			readerThread.start();
 			return handle;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			last_err = ioe.toString();
+			lastError = ioe.toString();
 			return "";
 		}
 	}
 
 	@Override
-	public final String CSocket(String hostname, int port) {
+	public final String createCSocket(String hostname, int port) {
 		try {
-			// create the socket
+			// create the createSocket
 			Socket socket = new Socket(hostname, port);
 			String handle = createHandle(socket);
-			//sockets.put(handle, socket);
+			//sockets.put(handle, createSocket);
 			// start the reader
-			Consumer reader_thread = new CharacterConsumer(handle, socket);
-			consumers.put(handle, reader_thread);
-			reader_thread.start();
+			Consumer readerThread = new CharacterConsumer(handle, socket);
+			consumers.put(handle, readerThread);
+			readerThread.start();
 			return handle;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			last_err = ioe.toString();
+			lastError = ioe.toString();
 			return "";
 		}
 	}
-
-	private int socket_idx = 0;
-	private int ssocket_idx = 0;
 
 	private String createHandle(Socket socket) {
-		return "Socket:" + socket.getInetAddress().toString() + ":" + socket.getPort() + "/" + (++socket_idx);
+		return "Socket:" + socket.getInetAddress().toString() + ":" + socket.getPort() + "/" + (++socketIdx);
 	}
 
 	private String createHandle(ServerSocket ssocket) {
-		return "ServerSocket:" + ssocket.getInetAddress().toString() + ":" + ssocket.getLocalPort() + "/" + (++ssocket_idx);
+		return "ServerSocket:" + ssocket.getInetAddress().toString() + ":" + ssocket.getLocalPort() + "/" + (++ssocketIdx);
 	}
 
 	/*private final String getFS() {
@@ -780,7 +781,7 @@ class Threaded_IO_Style implements IO_Style {
 	//////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////
 
-	private final BlockHandleValidator accept_handle_validator = new BlockHandleValidator() {
+	private final BlockHandleValidator acceptHandleValidator = new BlockHandleValidator() {
 
 		@Override
 		public String isBlockHandleValid(String handle) {
@@ -796,7 +797,7 @@ class Threaded_IO_Style implements IO_Style {
 		}
 	};
 
-	private final BlockHandleValidator input_handle_validator = new BlockHandleValidator() {
+	private final BlockHandleValidator inputHandleValidator = new BlockHandleValidator() {
 
 		@Override
 		public String isBlockHandleValid(String handle) {
@@ -812,7 +813,7 @@ class Threaded_IO_Style implements IO_Style {
 		}
 	};
 
-	private final BlockHandleValidator close_handle_validator = new BlockHandleValidator() {
+	private final BlockHandleValidator closeHandleValidator = new BlockHandleValidator() {
 
 		@Override
 		public String isBlockHandleValid(String handle) {
@@ -832,63 +833,60 @@ class Threaded_IO_Style implements IO_Style {
 	};
 
 	@Override
-	public final BlockObject socketacceptblock(Object[] args) {
-		return accept_blocker.populateHandleSet(args, vm, accept_handle_validator);
+	public final BlockObject socketAcceptBlock(Object[] args) {
+		return acceptBlocker.setHandles(args, vm, acceptHandleValidator);
 	}
 
 	@Override
-	public final BlockObject socketinputblock(Object[] args) {
-		return input_blocker.populateHandleSet(args, vm, input_handle_validator);
+	public final BlockObject socketInputBlock(Object[] args) {
+		return inputBlocker.setHandles(args, vm, inputHandleValidator);
 	}
 
 	@Override
-	public final BlockObject socketcloseblock(Object[] args) {
-		return close_blocker.populateHandleSet(args, vm, close_handle_validator);
+	public final BlockObject socketCloseBlock(Object[] args) {
+		return closeBlocker.setHandles(args, vm, closeHandleValidator);
 	}
 
 	@Override
-	public final String socketaccept(String handle) {
+	public final String socketAccept(String handle) {
 		try {
 			Accepter accepter = (Accepter) accepters.get(handle);
 			if (accepter == null) {
 				throw new IllegalAwkArgumentException("Invalid server socket handle : " + handle);
 			}
-			// it's "as if" accept_blocker is querying whether to block or not
-			if (accepter.willBlock(accept_blocker) && accepter.isClosed()) {
-				last_err = "Server closed.";
+			// it's "as if" acceptBlocker is querying whether to block or not
+			if (accepter.willBlock(acceptBlocker) && accepter.isClosed()) {
+				lastError = "Server closed.";
 				return "";
 			}
 			return accepter.getSocket();
 		} catch (InterruptedException ie) {
-			ie.printStackTrace();
-			throw new Error("A queue operation cannot be interrupted.");
+			throw new Error("A queue operation cannot be interrupted.", ie);
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			throw new Error("Error occurred during creation of accepted socket.");
+			throw new Error("Error occurred during creation of accepted socket.", ioe);
 		}
 	}
 
 	@Override
-	public final String socketread(String handle) {
+	public final String socketRead(String handle) {
 		try {
 			Consumer consumer = (Consumer) consumers.get(handle);
 			if (consumer == null) {
 				throw new IllegalAwkArgumentException("Invalid socket handle : " + handle);
 			}
-			// it's "as if" input_blocker is querying whether to block or not
-			if (consumer.willBlock(input_blocker) && consumer.isClosed()) {
-				last_err = "No more input.";
+			// it's "as if" inputBlocker is querying whether to block or not
+			if (consumer.willBlock(inputBlocker) && consumer.isClosed()) {
+				lastError = "No more input.";
 				return "";
 			}
 			return consumer.getInput();
 		} catch (InterruptedException ie) {
-			ie.printStackTrace();
-			throw new Error("A queue operation cannot be interrupted.");
+			throw new Error("A queue operation cannot be interrupted.", ie);
 		}
 	}
 
 	@Override
-	public final int socketwrite(String handle, String buf) {
+	public final int socketWrite(String handle, String buf) {
 		Consumer consumer = (Consumer) consumers.get(handle);
 		if (consumer == null) {
 			throw new IllegalAwkArgumentException("Invalid socket handle : " + handle);
@@ -897,7 +895,7 @@ class Threaded_IO_Style implements IO_Style {
 	}
 
 	@Override
-	public final int socketflush(String handle) {
+	public final int socketFlush(String handle) {
 		Consumer consumer = (Consumer) consumers.get(handle);
 		if (consumer == null) {
 			throw new IllegalAwkArgumentException("Invalid socket handle : " + handle);
@@ -906,7 +904,7 @@ class Threaded_IO_Style implements IO_Style {
 	}
 
 	@Override
-	public final int socketclose(String handle) {
+	public final int socketClose(String handle) {
 		Closeable t = consumers.remove(handle);
 		if (t == null) {
 			t = accepters.remove(handle);
@@ -940,25 +938,24 @@ class Threaded_IO_Style implements IO_Style {
 
 	private class Accepter extends Thread implements Closeable, Blockable {
 
-		private String handle;
-		private ServerSocket ssocket;
+//		private String handle;
+		private ServerSocket serverSocket;
 
 		// only 1 slot
-		protected BlockingQueue<Socket> queue = new ArrayBlockingQueue<Socket>(1);
-		//private BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+		private BlockingQueue<Socket> queue = new ArrayBlockingQueue<Socket>(1);
+
+		private Accepter(String handle, ServerSocket serverSocket)
+				throws IOException
+		{
+//			this.handle = handle;
+			//this.handle = serverSocket.get(handle);
+			this.serverSocket = serverSocket;
+			assert serverSocket != null;
+		}
 
 		@Override
 		public boolean willBlock(BlockObject bo) {
 			return queue.size() == 0;
-		}
-
-		private Accepter(String handle, ServerSocket ssocket)
-				throws IOException
-		{
-			this.handle = handle;
-			//ssocket = ssockets.get(handle);
-			this.ssocket = ssocket;
-			assert ssocket != null;
 		}
 
 		@Override
@@ -968,15 +965,14 @@ class Threaded_IO_Style implements IO_Style {
 			}
 			try {
 				Socket socket;
-				while ((socket = ssocket.accept()) != null) {
+				while ((socket = serverSocket.accept()) != null) {
 					queue.put(socket);
-					synchronized (accept_blocker) {
-						accept_blocker.notify();
+					synchronized (acceptBlocker) {
+						acceptBlocker.notify();
 					}
 				}
 			} catch (InterruptedException ie) {
-				ie.printStackTrace();
-				throw new Error("A queue operation cannot be interrupted.");
+				throw new Error("A queue operation cannot be interrupted.", ie);
 			} catch (SocketException se) {
 				// no big deal
 				// assume we should just shutdown now
@@ -984,22 +980,25 @@ class Threaded_IO_Style implements IO_Style {
 				ioe.printStackTrace();
 				// no big deal
 			}
-			synchronized (close_blocker) {
-				close_blocker.notify();
+			synchronized (closeBlocker) {
+				closeBlocker.notify();
 			}
 		}
-		// can be overridden
+
+		protected BlockingQueue<Socket> getQueue() {
+			return queue;
+		}
 
 		public String getSocket()
 				throws IOException, InterruptedException
 		{
 			Socket socket = queue.take();
-			// ... same as socket() method ...
+			// ... same as createSocket() method ...
 			String handle = createHandle(socket);
 			// start the reader
-			Consumer reader_thread = new ByteConsumer(handle, socket);
-			reader_thread.start();
-			consumers.put(handle, reader_thread);
+			Consumer readerThread = new ByteConsumer(handle, socket);
+			readerThread.start();
+			consumers.put(handle, readerThread);
 			return handle;
 		}
 
@@ -1012,7 +1011,7 @@ class Threaded_IO_Style implements IO_Style {
 		public final void close()
 				throws IOException
 		{
-			ssocket.close();
+			serverSocket.close();
 		}
 	}
 
@@ -1028,13 +1027,13 @@ class Threaded_IO_Style implements IO_Style {
 		public String getSocket()
 				throws IOException, InterruptedException
 		{
-			Socket socket = queue.take();
-			// ... same as socket() method ...
+			Socket socket = getQueue().take();
+			// ... same as createSocket() method ...
 			String handle = createHandle(socket);
 			// start the reader
-			Consumer reader_thread = new CharacterConsumer(handle, socket);
-			reader_thread.start();
-			consumers.put(handle, reader_thread);
+			Consumer readerThread = new CharacterConsumer(handle, socket);
+			readerThread.start();
+			consumers.put(handle, readerThread);
 			return handle;
 		}
 	}
@@ -1070,33 +1069,33 @@ class Threaded_IO_Style implements IO_Style {
 
 	private abstract class AbstractConsumer<T> extends Thread implements Consumer {
 
-		private final String handle;
-		protected final Socket socket;
-		protected final PrintStream ps;
+//		private final String handle;
+		private final Socket socket;
+		private final PrintStream printStream;
 		private int state = ACTIVE_STATE;
 
 		// only 1 slot
-		protected BlockingQueue<T> queue = new ArrayBlockingQueue<T>(1);
-
-		@Override
-		public final boolean willBlock(BlockObject bo) {
-			if (bo == input_blocker) {
-				return queue.size() == 0;
-			} else if (bo == close_blocker) {
-				return state == ACTIVE_STATE;
-			} else {
-				throw new Error("Unknown block object : " + bo.getNotifierTag());
-			}
-		}
+		private BlockingQueue<T> queue = new ArrayBlockingQueue<T>(1);
 
 		protected AbstractConsumer(String handle, Socket socket)
 				throws IOException
 		{
-			this.handle = handle;
+//			this.handle = handle;
 			//socket = sockets.get(handle);
 			this.socket = socket;
 			assert socket != null;
-			ps = new PrintStream(socket.getOutputStream(), true);
+			printStream = new PrintStream(socket.getOutputStream(), true);
+		}
+
+		@Override
+		public final boolean willBlock(BlockObject bo) {
+			if (bo == inputBlocker) {
+				return queue.size() == 0;
+			} else if (bo == closeBlocker) {
+				return state == ACTIVE_STATE;
+			} else {
+				throw new Error("Unknown block object : " + bo.getNotifierTag());
+			}
 		}
 
 		protected abstract T readFromSocket() throws IOException;
@@ -1110,13 +1109,12 @@ class Threaded_IO_Style implements IO_Style {
 				T input;
 				while ((input = readFromSocket()) != null) {
 					queue.put(input);
-					synchronized (input_blocker) {
-						input_blocker.notify();
+					synchronized (inputBlocker) {
+						inputBlocker.notify();
 					}
 				}
 			} catch (InterruptedException ie) {
-				ie.printStackTrace();
-				throw new Error("A queue operation cannot be interrupted.");
+				throw new Error("A queue operation cannot be interrupted.", ie);
 			} catch (SocketException se) {
 				// no big deal
 				// assume we should just shutdown now
@@ -1124,42 +1122,43 @@ class Threaded_IO_Style implements IO_Style {
 				ioe.printStackTrace();
 				// no big deal
 			}
-			synchronized (close_blocker) {
+			synchronized (closeBlocker) {
 				if (state == ACTIVE_STATE) {
 					state = CLOSE_PENDING_STATE;
-					close_blocker.notify();
+					closeBlocker.notify();
 				}
 			}
 		}
 
 		protected abstract String readFromQueue() throws InterruptedException;
 
+		protected PrintStream getPrintStream() {
+			return printStream;
+		}
+
+		protected BlockingQueue<T> getQueue() {
+			return queue;
+		}
+
 		@Override
 		public final String getInput()
 				throws InterruptedException
 		{
-			assert state != CLOSED_STATE;	// active or close_pending
+			assert state != CLOSED_STATE;	// active or closePending
 			String str = readFromQueue();
 			if (queue.size() == 0 && state == CLOSE_PENDING_STATE) {
-				synchronized (close_blocker) {
+				synchronized (closeBlocker) {
 					// could be either ACTIVE or CLOSE_PENDING states
 					assert state != CLOSED_STATE;
-					close_blocker.notify();
+					closeBlocker.notify();
 				}
 			}
 			return str;
 		}
 
-		// write is defined in subclasses
-		/*
-		public final int write(String buf) {
-			ps.println(buf);
-			return 1;
-		}
-		*/
 		@Override
 		public final int flush() {
-			ps.flush();
+			printStream.flush();
 			return 1;
 		}
 
@@ -1187,7 +1186,7 @@ class Threaded_IO_Style implements IO_Style {
 		private CharacterConsumer(String handle, Socket socket)
 				throws IOException
 		{
-			super(handle, socket);	// constructs socket (protected field in AbstractConsumer)
+			super(handle, socket);	// constructs createSocket (protected field in AbstractConsumer)
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}
 
@@ -1202,12 +1201,12 @@ class Threaded_IO_Style implements IO_Style {
 		protected String readFromQueue()
 				throws InterruptedException
 		{
-			return queue.take();
+			return getQueue().take();
 		}
 
 		@Override
 		public int write(String buf) {
-			ps.println(buf);
+			getPrintStream().println(buf);
 			return 1;
 		}
 	}
@@ -1215,12 +1214,12 @@ class Threaded_IO_Style implements IO_Style {
 	private final class ByteConsumer extends AbstractConsumer<Integer> {
 
 		private final BufferedInputStream bis;
-		private final byte[] buf = new byte[4096];
+		private final byte[] readBuffer = new byte[4096];
 
 		private ByteConsumer(String handle, Socket socket)
 				throws IOException
 		{
-			super(handle, socket);	// constructs socket (protected field in AbstractConsumer)
+			super(handle, socket);	// constructs createSocket (protected field in AbstractConsumer)
 			bis = new BufferedInputStream(socket.getInputStream());
 		}
 
@@ -1228,7 +1227,7 @@ class Threaded_IO_Style implements IO_Style {
 		protected Integer readFromSocket()
 				throws IOException
 		{
-			int len = bis.read(buf, 0, buf.length);
+			int len = bis.read(readBuffer, 0, readBuffer.length);
 			if (len < 0) {
 				return null;
 			} else {
@@ -1240,20 +1239,20 @@ class Threaded_IO_Style implements IO_Style {
 		protected String readFromQueue()
 				throws InterruptedException
 		{
-			int len = queue.take();
-			String str = new String(buf, 0, len);
+			int len = getQueue().take();
+			String str = new String(readBuffer, 0, len);
 			return str;
 		}
 
 		@Override
-		public int write(String buf) {
+		public int write(String buffer) {
 			try {
-				byte[] b = buf.getBytes();
-				ps.write(b);
+				byte[] b = buffer.getBytes();
+				getPrintStream().write(b);
 				return 1;
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
-				last_err = ioe.toString();
+				lastError = ioe.toString();
 				return 0;
 			}
 		}

@@ -154,7 +154,7 @@ public class Awk {
 					// read the intermediate file, bypassing frontend processing
 					tuples = (AwkTuples) readObjectFromInputStream(scriptSource.getInputStream()); // FIXME only the last intermediate file is used!
 				} else {
-					notIntermediateScriptSources.add(scriptSource);;
+					notIntermediateScriptSources.add(scriptSource);
 				}
 			}
 			if (!notIntermediateScriptSources.isEmpty()) {
@@ -279,12 +279,12 @@ public class Awk {
 			if (VERBOSE) {
 				System.err.println("(locating AwkCompilerImpl...)");
 			}
-			Class<?> compiler_class = Class.forName("org.jawk.backend.AwkCompilerImpl");
+			Class<?> compilerClass = Class.forName("org.jawk.backend.AwkCompilerImpl");
 			if (VERBOSE) {
-				System.err.println("(found: " + compiler_class + ")");
+				System.err.println("(found: " + compilerClass + ")");
 			}
 			try {
-				Constructor constructor = compiler_class.getConstructor(AwkSettings.class);
+				Constructor constructor = compilerClass.getConstructor(AwkSettings.class);
 				try {
 					if (VERBOSE) {
 						System.err.println("(allocating new instance of the AwkCompiler class...)");
@@ -322,25 +322,25 @@ public class Awk {
 			if (VERBOSE) {
 				System.err.println("(locating " + classname + "...)");
 			}
-			Class<?> script_class;
+			Class<?> scriptClass;
 			String destinationDirectory = settings.getDestinationDirectory();
 			ClassLoader cl = new DestDirClassLoader(destinationDirectory);
-			script_class = cl.loadClass(classname);
+			scriptClass = cl.loadClass(classname);
 			if (VERBOSE) {
-				System.err.println("(found: " + script_class + " in " + destinationDirectory + ")");
+				System.err.println("(found: " + scriptClass + " in " + destinationDirectory + ")");
 			}
 			try {
-				Constructor constructor = script_class.getConstructor();
+				Constructor constructor = scriptClass.getConstructor();
 				try {
 					if (VERBOSE) {
 						System.err.println("(allocating and executing new instance of " + classname + " class...)");
 					}
 					Object obj = constructor.newInstance();
-					Method method = script_class.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
+					Method method = scriptClass.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
 					Object result = method.invoke(obj, new Object[] {settings});
 					return 0;
 				} catch (InstantiationException ie) {
-					throw new Error("Cannot instantiate the script",ie);
+					throw new Error("Cannot instantiate the script", ie);
 				} catch (IllegalAccessException iae) {
 					throw new Error("Cannot instantiate the script", iae);
 				} catch (java.lang.reflect.InvocationTargetException ite) {
@@ -384,20 +384,20 @@ public class Awk {
 	private Awk() {}
 
 	private static Map<String, JawkExtension> getJawkExtensions() {
-		String extensions_string = System.getProperty("jawk.extensions", null);
-		if (extensions_string == null) {
+		String extensionsStr = System.getProperty("jawk.extensions", null);
+		if (extensionsStr == null) {
 			//return Collections.emptyMap();
-			extensions_string = EXTENSIONS_PREFIX;
+			extensionsStr = EXTENSIONS_PREFIX;
 		} else {
-			extensions_string = EXTENSIONS_PREFIX + "#" + extensions_string;
+			extensionsStr = EXTENSIONS_PREFIX + "#" + extensionsStr;
 		}
 
 		// use reflection to obtain extensions
 
-		Set<Class> extension_classes = new HashSet<Class>();
+		Set<Class> extensionClasses = new HashSet<Class>();
 		Map<String, JawkExtension> retval = new HashMap<String, JawkExtension>();
 
-		StringTokenizer st = new StringTokenizer(extensions_string, "#");
+		StringTokenizer st = new StringTokenizer(extensionsStr, "#");
 		while (st.hasMoreTokens()) {
 			String cls = st.nextToken();
 			if (VERBOSE) {
@@ -409,11 +409,11 @@ public class Awk {
 				if (!JawkExtension.class.isAssignableFrom(c)) {
 					throw new ClassNotFoundException(cls + " does not implement JawkExtension");
 				}
-				if (extension_classes.contains(c)) {
+				if (extensionClasses.contains(c)) {
 					System.err.println("Warning: " + cls + " multiply referred in extension class list. Skipping.");
 					continue;
 				} else {
-					extension_classes.add(c);
+					extensionClasses.add(c);
 				}
 
 				// it is...
