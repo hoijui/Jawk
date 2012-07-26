@@ -16,7 +16,7 @@
 	</parent>
 
 	<groupId>org.jawk</groupId>
-	<artifactId>org.jawk</artifactId>
+	<artifactId>jawk</artifactId>
 	<version>1.03-SNAPSHOT</version>
 
 	<packaging>bundle</packaging>
