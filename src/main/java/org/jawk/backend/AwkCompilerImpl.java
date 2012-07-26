@@ -785,18 +785,16 @@ public class AwkCompilerImpl implements AwkCompiler {
 			addMainMethod();
 			createMethods_VariableManager(tuples);
 			createPartialParamCalls(tuples);
-			String destdir = settings.getDestinationDirectory();
+			String destDir = settings.getDestinationDirectory();
 			String dirname = extractDirname(classname, ".");
 			String clsname = extractClassname(classname);
 			if (dirname != null) {
 				clsname = dirname + File.separator + clsname;
 			}
-			if (destdir != null) {
-				if (new File(destdir).exists()) {
-					clsname = destdir + File.separator + clsname;
-				} else {
-					throw new IOException("Directory \"" + destdir + "\" does not exist.");
-				}
+			if (new File(destDir).exists()) {
+				clsname = destDir + File.separator + clsname;
+			} else {
+				throw new IOException("Directory \"" + destDir + "\" does not exist.");
 			}
 			String path = extractDirname(clsname, File.separator);
 			if (path != null) {

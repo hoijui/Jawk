@@ -318,24 +318,16 @@ public class Awk {
 
 	private static int attemptToExecuteCompiledResult(AwkSettings settings) {
 		String classname = settings.getOutputFilename("AwkScript");
-
 		try {
 			if (VERBOSE) {
 				System.err.println("(locating " + classname + "...)");
 			}
 			Class<?> script_class;
-			String dest_directory = settings.getDestinationDirectory();
-			if (dest_directory == null) {
-				script_class = Class.forName(classname);
-				if (VERBOSE) {
-					System.err.println("(found: " + script_class + ")");
-				}
-			} else {
-				ClassLoader cl = new DestDirClassLoader(dest_directory);
-				script_class = cl.loadClass(classname);
-				if (VERBOSE) {
-					System.err.println("(found: " + script_class + " in " + dest_directory + ")");
-				}
+			String destinationDirectory = settings.getDestinationDirectory();
+			ClassLoader cl = new DestDirClassLoader(destinationDirectory);
+			script_class = cl.loadClass(classname);
+			if (VERBOSE) {
+				System.err.println("(found: " + script_class + " in " + destinationDirectory + ")");
 			}
 			try {
 				Constructor constructor = script_class.getConstructor();

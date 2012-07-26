@@ -119,10 +119,10 @@ public class AwkSettings {
 	private String outputFilename = null;
 
 	/**
-	 * Compiled destination directory (if provided).
-	 * If <code>null</code>, using CWD (i.e., present working directory).
+	 * Compiled destination directory (if provided);
+	 * <code>"."</code> by default.
 	 */
-	private String destinationDirectory = null;
+	private String destinationDirectory = ".";
 
 	/**
 	 * Provide a human readable representation of the parameters values.
@@ -505,15 +505,25 @@ public class AwkSettings {
 	}
 
 	/**
-	 * Compiled destination directory (if provided).
-	 * If <code>null</code>, using CWD (i.e., present working directory).
+	 * Compiled destination directory (if provided);
+	 * <code>"."</code> by default.
 	 * @return the destinationDirectory
 	 */
 	public String getDestinationDirectory() {
 		return destinationDirectory;
 	}
 
+	/**
+	 * Compiled destination directory (if provided).
+	 * @param destinationDirectory the destinationDirectory to set,
+	 *   <code>"."</code> by default.
+	 */
 	public void setDestinationDirectory(String destinationDirectory) {
+
+		if (destinationDirectory == null) {
+			throw new IllegalArgumentException("The destination directory might never be null (you might want to use \".\")");
+		}
+
 		this.destinationDirectory = destinationDirectory;
 	}
 
