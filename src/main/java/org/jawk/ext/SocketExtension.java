@@ -294,9 +294,7 @@ public class SocketExtension extends AbstractExtension {
 	@Override
 	public final Object invoke(String methodName, Object[] args) {
 		// large if-then-else block to decide which extension to invoke
-		if (false) {
-			throw new Error("Should never reach.");
-		} else if (methodName.equals("ServerSocket")) {
+		if        (methodName.equals("ServerSocket")) {
 			if (args.length == 1) {
 				return implDelegate.createServerSocket(
 					null,
@@ -632,13 +630,13 @@ class ThreadedIOStyle implements IOStyle {
 	 * <p>
 	 * <strong>Note:</strong>
 	 * "consumers" originally was of type
-	 * <code>Map<String, Consumer></code>, but changed to ...,Closeable.
+	 * <code>Map<String, Consumer></code>, but changed to <code>...,Closeable</code>.
 	 * (Likewise, "accepters" was originally ...,Accepter,
 	 * but then changed to ...,Closeable.)
 	 * Why? Because MapUnion could not infer that "Consumer"
 	 * nor "Accepter" were extensions of "Blockable".
 	 * MapUnion originally accepted 3 generic parameters:
-	 * K, V1 extends Blockable, and V2 extends Blockable.
+	 * K, V1 extends Blockable, and V2 extends <code>Blockable</code>.
 	 * And, closeBlocker's BulkBlockObject Map parameter was:
 	 * <code>new MapUnion<String, Accepter, Consumer>(accepters, consumers)</code>.
 	 * But, it wouldn't compile.
@@ -979,7 +977,7 @@ class ThreadedIOStyle implements IOStyle {
 				throw new Error("A queue operation cannot be interrupted.", ie);
 			} catch (SocketException se) {
 				// no big deal
-				// assume we should just shutdown now
+				// TODO? assume we should just shutdown now
 			} catch (IOException ioe) {
 				LOG.warn("Failed to accept on the server-socket", ioe);
 				// no big deal
@@ -1121,7 +1119,7 @@ class ThreadedIOStyle implements IOStyle {
 				throw new Error("A queue operation cannot be interrupted.", ie);
 			} catch (SocketException se) {
 				// no big deal
-				// assume we should just shutdown now
+				// TODO? assume we should just shutdown now
 			} catch (IOException ioe) {
 				LOG.warn("Failed to read from socket", ioe);
 				// no big deal

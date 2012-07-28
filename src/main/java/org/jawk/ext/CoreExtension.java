@@ -549,9 +549,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	}
 
 	static String typeOf(Object arg, VariableManager vm) {
-		if (false) {
-			throw new Error("Should never reach here.");
-		} else if (arg instanceof AssocArray) {
+		if        (arg instanceof AssocArray) {
 			return "AssocArray";
 		} else if (arg instanceof Integer) {
 			return "Integer";

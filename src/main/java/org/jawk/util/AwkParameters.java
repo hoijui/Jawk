@@ -165,7 +165,7 @@ public class AwkParameters {
 					usage(System.out);
 					System.exit(0);
 				} else {
-					throw new IllegalArgumentException("unknown parameter: "+args[argIdx]);
+					throw new IllegalArgumentException("unknown parameter: " + args[argIdx]);
 				}
 
 				++argIdx;

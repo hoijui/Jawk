@@ -192,8 +192,7 @@ public class Awk {
 						settings.isUseStdIn(),
 						extensions);
 				// parse the script
-				AwkSyntaxTree ast = null;
-				ast = parser.parse(notIntermediateScriptSources);
+				AwkSyntaxTree ast = parser.parse(notIntermediateScriptSources);
 
 				if (settings.isDumpSyntaxTree()) {
 					// dump the syntax tree of the script to a file

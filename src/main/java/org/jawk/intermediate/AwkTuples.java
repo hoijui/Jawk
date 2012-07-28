@@ -2143,8 +2143,8 @@ public class AwkTuples implements Serializable {
 	 * Executed after all tuples are entered in the queue.
 	 * Its main functions are:
 	 * <ul>
-	 * <li>Assign queue.next to the next element in the queue.
-	 * <li>Calls touch(...) per Tuple so that addresses can be normalized/assigned/allocated
+	 * <li>Assign queue.next to the next element in the queue.</li>
+	 * <li>Calls touch(...) per Tuple so that addresses can be normalized/assigned/allocated</li>
 	 * properly.
 	 * </ul>
 	 */
