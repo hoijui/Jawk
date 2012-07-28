@@ -39,6 +39,8 @@ import org.jawk.util.AwkSettings;
 import org.jawk.util.LinkedListStackImpl;
 import org.jawk.util.MyStack;
 import org.jawk.util.ScriptSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Jawk interpreter.
@@ -70,6 +72,7 @@ import org.jawk.util.ScriptSource;
  */
 public class AVM implements AwkInterpreter, VariableManager {
 
+	private static final Logger LOG = LoggerFactory.getLogger(AVM.class);
 	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
 
 	private RuntimeStack runtime_stack = new RuntimeStack();
@@ -1897,10 +1900,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 			assert operand_stack.size() == 0 : "operand stack is NOT empty upon script termination. operand_stack (size=" + operand_stack.size() + ") = " + operand_stack;
 			return exit_code;
 		} catch (RuntimeException re) {
-			System.out.println("Runtime Exception: " + re);
-			System.out.println("operand_stack = " + operand_stack);
-			System.out.println("position = " + position);
-			System.out.println("line number = " + position.lineNumber());
+			LOG.error("", re);
+			LOG.error("operand_stack = {}", operand_stack);
+			LOG.error("position = {}", position);
+			LOG.error("line number = {}", position.lineNumber());
 
 			// clear runtime stack
 			runtime_stack.popAllFrames();
@@ -1909,17 +1912,17 @@ public class AVM implements AwkInterpreter, VariableManager {
 
 			throw re;
 		} catch (AssertionError ae) {
-			System.out.println("Assertion Error: " + ae);
-			System.out.println("operand_stack = " + operand_stack);
+			LOG.error("", ae);
+			LOG.error("operand_stack = {}", operand_stack);
 			try {
-				System.out.println("position = " + position);
+				LOG.error("position = {}", position);
 			} catch (Throwable t) {
-				System.out.println("{ could not report on position : " + t + " }");
+				LOG.error("{ could not report on position", t);
 			}
 			try {
-				System.out.println("line number = " + position.lineNumber());
+				LOG.error("line number = {}", position.lineNumber());
 			} catch (Throwable t) {
-				System.out.println("{ could not report on line number : " + t + " }");
+				LOG.error("{ could not report on line number", t);
 			}
 			throw ae;
 		} finally {
@@ -1945,12 +1948,12 @@ public class AVM implements AwkInterpreter, VariableManager {
 					AssocArray aa = (AssocArray) value;
 					value = aa.mapString();
 				}
-				System.out.println(name + " = " + value);
+				LOG.info("{} = {}", name, value);
 			}
 		} else {
 			// dump associative arrays
 			for (AssocArray aa : aa_array) {
-				System.out.println(aa.mapString());
+				LOG.info(aa.mapString());
 			}
 		}
 	}
@@ -2342,10 +2345,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 		private MyStack<Integer> return_indexes = new LinkedListStackImpl<Integer>();
 
 		public void dump() {
-			System.out.println("globals = " + Arrays.toString(globals));
-			System.out.println("locals = " + Arrays.toString(locals));
-			System.out.println("locals_stack = " + locals_stack);
-			System.out.println("return_indexes = " + return_indexes);
+			LOG.info("globals = " + Arrays.toString(globals));
+			LOG.info("locals = " + Arrays.toString(locals));
+			LOG.info("locals_stack = " + locals_stack);
+			LOG.info("return_indexes = " + return_indexes);
 
 		}
 
