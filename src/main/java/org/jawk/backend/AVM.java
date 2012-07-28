@@ -250,6 +250,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * @return The return code (the value passed into the exit call).
 	 */
 	@Override
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public int interpret(AwkTuples tuples) {
 
 		Map<String, Pattern> regexps = new HashMap<String, Pattern>();

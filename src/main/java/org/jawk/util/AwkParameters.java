@@ -99,6 +99,7 @@ public class AwkParameters {
 	 *
 	 * @param args The command-line arguments provided by the user.
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public AwkSettings parseCommandLineArguments(String[] args) {
 
 		AwkSettings settings = new AwkSettings();

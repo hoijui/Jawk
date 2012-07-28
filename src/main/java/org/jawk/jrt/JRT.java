@@ -835,6 +835,7 @@ public class JRT {
 		return p;
 	}
 
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public boolean jrtConsumeCommandInput(String cmd) throws IOException {
 		PartitioningReader pr = command_readers.get(cmd);
 		if (pr == null) {
@@ -878,6 +879,7 @@ public class JRT {
 	 * @return The PrintStream which to write to provide
 	 *   input data to the process.
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public PrintStream jrtSpawnForOutput(String cmd) {
 		PrintStream ps = output_streams.get(cmd);
 		if (ps == null) {
@@ -1031,6 +1033,7 @@ public class JRT {
 	 * @return Integer(return_code) of the created
 	 *   process. Integer(-1) is returned on an IO error.
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static Integer jrtSystem(String cmd) {
 		try {
 			Process p = spawnProcess(cmd);
@@ -1091,6 +1094,7 @@ public class JRT {
 	 *
 	 * @see #printfFunctionNoCatch(Object[],String)
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void printfFunction(Object[] arr, String fmt_arg) {
 		System.out.print(sprintfFunction(arr, fmt_arg));
 	}
@@ -1124,6 +1128,7 @@ public class JRT {
 		return String.format(fmt_arg, arr);
 	}
 
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void printfFunctionNoCatch(Object[] arr, String fmt_arg) {
 		System.out.print(sprintfFunctionNoCatch(arr, fmt_arg));
 	}
