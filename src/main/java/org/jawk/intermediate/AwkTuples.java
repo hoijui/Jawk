@@ -15,9 +15,13 @@ import java.util.Map;
 import java.util.Set;
 import org.jawk.util.LinkedListStackImpl;
 import org.jawk.util.MyStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AwkTuples implements Serializable {
+
+	private static final Logger LOG = LoggerFactory.getLogger(AwkTuples.class);
 
 	private static final class AddressImpl implements Address, Serializable {
 
@@ -344,7 +348,7 @@ public class AwkTuples implements Serializable {
 				}
 			}
 		} catch (IllegalAccessException iac) {
-			iac.printStackTrace();
+			LOG.error("Failed to create OP-Code string", iac);
 			return "[" + opcode + ": " + iac + "]";
 		}
 		return "{" + opcode + "}";

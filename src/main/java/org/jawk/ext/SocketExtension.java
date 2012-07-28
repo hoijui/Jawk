@@ -24,6 +24,8 @@ import org.jawk.jrt.BulkBlockObject;
 import org.jawk.jrt.IllegalAwkArgumentException;
 import org.jawk.jrt.JRT;
 import org.jawk.jrt.VariableManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Enable Socket processing in Jawk.
@@ -619,6 +621,8 @@ class MapUnion<K, V> extends AbstractMap<K, V> {
 
 class ThreadedIOStyle implements IOStyle {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ThreadedIOStyle.class);
+
 	private String lastError = null;
 
 	/**
@@ -699,7 +703,7 @@ class ThreadedIOStyle implements IOStyle {
 			accepterThread.start();
 			return handle;
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.error("Failed to create ServerSocket for " + hostname + ":" + port, ioe);
 			lastError = ioe.toString();
 			return "";
 		}
@@ -721,7 +725,7 @@ class ThreadedIOStyle implements IOStyle {
 			accepterThread.start();
 			return handle;
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.error("Failed to create CServerSocket for " + hostName + ":" + port, ioe);
 			lastError = ioe.toString();
 			return "";
 		}
@@ -740,7 +744,7 @@ class ThreadedIOStyle implements IOStyle {
 			readerThread.start();
 			return handle;
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.error("Failed to create Socket for " + hostname + ":" + port, ioe);
 			lastError = ioe.toString();
 			return "";
 		}
@@ -759,7 +763,7 @@ class ThreadedIOStyle implements IOStyle {
 			readerThread.start();
 			return handle;
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.error("Failed to create CSocket for " + hostname + ":" + port, ioe);
 			lastError = ioe.toString();
 			return "";
 		}
@@ -918,7 +922,7 @@ class ThreadedIOStyle implements IOStyle {
 			t.close();
 			retval = 1;
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.warn("Failed to close socket " + handle, ioe);
 			retval = 0;
 		}
 		// interrupt the thread
@@ -977,7 +981,7 @@ class ThreadedIOStyle implements IOStyle {
 				// no big deal
 				// assume we should just shutdown now
 			} catch (IOException ioe) {
-				ioe.printStackTrace();
+				LOG.warn("Failed to accept on the server-socket", ioe);
 				// no big deal
 			}
 			synchronized (closeBlocker) {
@@ -1119,7 +1123,7 @@ class ThreadedIOStyle implements IOStyle {
 				// no big deal
 				// assume we should just shutdown now
 			} catch (IOException ioe) {
-				ioe.printStackTrace();
+				LOG.warn("Failed to read from socket", ioe);
 				// no big deal
 			}
 			synchronized (closeBlocker) {
@@ -1251,7 +1255,7 @@ class ThreadedIOStyle implements IOStyle {
 				getPrintStream().write(b);
 				return 1;
 			} catch (IOException ioe) {
-				ioe.printStackTrace();
+				LOG.warn("Failed to write buffer", ioe);
 				lastError = ioe.toString();
 				return 0;
 			}

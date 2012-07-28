@@ -18,6 +18,8 @@ import org.jawk.intermediate.AwkTuples;
 import org.jawk.intermediate.HasFunctionAddress;
 import org.jawk.jrt.KeyList;
 import org.jawk.util.ScriptSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Converts the AWK script into a syntax tree,
@@ -27,6 +29,8 @@ import org.jawk.util.ScriptSource;
  * </p>
  */
 public class AwkParser {
+
+	private static final Logger LOG = LoggerFactory.getLogger(AwkParser.class);
 
 	/**
 	 * Interface for statement AST nodes that can be interrupted
@@ -385,7 +389,7 @@ public class AwkParser {
 				}
 			}
 		} catch (IllegalAccessException iac) {
-			iac.printStackTrace();
+			LOG.error("Failed to create token string", iac);
 			return "[" + token + ": " + iac + "]";
 		}
 		return "{" + token + "}";

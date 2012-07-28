@@ -3,6 +3,8 @@ package org.jawk.util;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the command-line parameters accepted by Jawk.
@@ -66,8 +68,9 @@ import java.io.StringReader;
  */
 public class AwkParameters {
 
-	private Class mainClass;
+	private static final Logger LOG = LoggerFactory.getLogger(AwkParameters.class);
 
+	private Class mainClass;
 	private String extensionDescription;
 
 	/**
@@ -160,6 +163,7 @@ public class AwkParameters {
 					settings.setUseStdIn(true);
 				} else if (args[argIdx].equals("-h") || args[argIdx].equals("-?")) {
 					usage(System.out);
+					System.exit(0);
 				} else {
 					throw new IllegalArgumentException("unknown parameter: "+args[argIdx]);
 				}
@@ -179,26 +183,25 @@ public class AwkParameters {
 							new StringReader(scriptContent),
 							false));
 				} else {
-					try {
-						// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
-						// initialize the Readers or InputStreams
-						for (ScriptSource scriptSource : settings.getScriptSources()) {
+					// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
+					// initialize the Readers or InputStreams
+					for (ScriptSource scriptSource : settings.getScriptSources()) {
+						try {
 							if (scriptSource.isIntermediate()) {
 								scriptSource.getInputStream();
 							} else {
 								scriptSource.getReader();
 							}
+						} catch (IOException ex) {
+							LOG.error("Failed to read script '" + scriptSource.getDescription() + "'", ex);
+							System.exit(1);
 						}
-					} catch (IOException ex) {
-						ex.printStackTrace();
-						usage(System.err);
 					}
 				}
 			}
 		} catch (IllegalArgumentException iae) {
-			iae.printStackTrace(System.err);
-			usage(System.err);
-			throw iae;
+			LOG.error("Failed to parse arguments. Please see the help/usage output (cmd line switch '-h').", iae);
+			System.exit(1);
 		}
 
 		// name=val or filename mode
@@ -273,12 +276,6 @@ public class AwkParameters {
 		}
 		dest.println();
 		dest.println(" -h or -? = (extension) This help screen.");
-		if (dest == System.out) {
-			System.exit(0);
-		} else {
-			// invalid usage ... return a non-zero error code
-			System.exit(1);
-		}
 	}
 
 	/**

@@ -26,6 +26,8 @@ import org.jawk.util.AwkParameters;
 import org.jawk.util.AwkSettings;
 import org.jawk.util.DestDirClassLoader;
 import org.jawk.util.ScriptSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Entry point into the parsing, analysis, and execution/compilation
@@ -83,11 +85,11 @@ import org.jawk.util.ScriptSource;
 public class Awk {
 
 	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
-	private static final boolean VERBOSE = (System.getProperty("jawk.verbose", null) != null);
 	private static final String DEFAULT_EXTENSIONS
 			= org.jawk.ext.CoreExtension.class.getName()
 			+ "#" + org.jawk.ext.SocketExtension.class.getName()
 			+ "#" + org.jawk.ext.StdinExtension.class.getName();
+	private static final Logger LOG = LoggerFactory.getLogger(Awk.class);
 
 	/**
 	 * Prohibit the instantiation of this class, other than the
@@ -165,12 +167,10 @@ public class Awk {
 			Map<String, JawkExtension> extensions;
 			if (settings.isUserExtensions()) {
 				extensions = getJawkExtensions();
-				if (VERBOSE) {
-					System.err.println("(user extensions = " + extensions.keySet() + ")");
-				}
+				LOG.trace("user extensions = {}", extensions.keySet());
 			} else {
 				extensions = Collections.emptyMap();
-				//if (VERBOSE) System.err.println("(user extensions not enabled)");
+				LOG.trace("user extensions not enabled");
 			}
 
 			AwkTuples tuples = new AwkTuples();
@@ -198,7 +198,7 @@ public class Awk {
 				if (settings.isDumpSyntaxTree()) {
 					// dump the syntax tree of the script to a file
 					String filename = settings.getOutputFilename("syntax_tree.lst");
-					System.err.println("(writing to '" + filename + "')");
+					LOG.info("writing to '{}'", filename);
 					PrintStream ps = new PrintStream(new FileOutputStream(filename));
 					if (ast != null) {
 						ast.dump(ps);
@@ -228,7 +228,7 @@ public class Awk {
 				if (settings.isWriteIntermediateFile()) {
 					// dump the intermediate code to an intermediate code file
 					String filename = settings.getOutputFilename("a.ai");
-					System.err.println("(writing to '" + filename + "')");
+					LOG.info("writing to '{}'", filename);
 					writeObjectToFile(tuples, filename);
 					return 0;
 				}
@@ -236,7 +236,7 @@ public class Awk {
 			if (settings.isDumpIntermediateCode()) {
 				// dump the intermediate code to a human-readable text file
 				String filename = settings.getOutputFilename("avm.lst");
-				System.err.println("(writing to '" + filename + "')");
+				LOG.info("writing to '{}'", filename);
 				PrintStream ps = new PrintStream(new FileOutputStream(filename));
 				tuples.dump(ps);
 				ps.close();
@@ -261,14 +261,14 @@ public class Awk {
 			}
 		} catch (Error err) {
 			if (IS_WINDOWS) {
-				err.printStackTrace(System.out);
+				LOG.error("General problem", err);
 				return 1;
 			} else {
 				throw err;
 			}
 		} catch (RuntimeException re) {
 			if (IS_WINDOWS) {
-				re.printStackTrace(System.out);
+				LOG.error("General problem", re);
 				return 1;
 			} else {
 				throw re;
@@ -285,30 +285,18 @@ public class Awk {
 	 */
 	private static int attemptToCompile(AwkSettings settings, AwkTuples tuples) {
 		try {
-			if (VERBOSE) {
-				System.err.println("(locating AwkCompilerImpl...)");
-			}
+			LOG.trace("locating AwkCompilerImpl...");
 			Class<?> compilerClass = Class.forName("org.jawk.backend.AwkCompilerImpl");
-			if (VERBOSE) {
-				System.err.println("(found: " + compilerClass + ")");
-			}
+			LOG.trace("found: {}", compilerClass);
 			try {
 				Constructor constructor = compilerClass.getConstructor(AwkSettings.class);
 				try {
-					if (VERBOSE) {
-						System.err.println("(allocating new instance of the AwkCompiler class...)");
-					}
+					LOG.trace("allocating new instance of the AwkCompiler class...");
 					AwkCompiler compiler = (AwkCompiler) constructor.newInstance(settings);
-					if (VERBOSE) {
-						System.err.println("(allocated: " + compiler + ")");
-					}
-					if (VERBOSE) {
-						System.err.println("(compiling...)");
-					}
+					LOG.trace("allocated: {}", compiler);
+					LOG.trace("compiling...");
 					compiler.compile(tuples);
-					if (VERBOSE) {
-						System.err.println("(done)");
-					}
+					LOG.trace("done");
 					return 0;
 				} catch (InstantiationException ie) {
 					throw new Error("Cannot instantiate the compiler: " + ie);
@@ -328,22 +316,16 @@ public class Awk {
 	private static int attemptToExecuteCompiledResult(AwkSettings settings) {
 		String classname = settings.getOutputFilename("AwkScript");
 		try {
-			if (VERBOSE) {
-				System.err.println("(locating " + classname + "...)");
-			}
+			LOG.trace("locating {}...", classname);
 			Class<?> scriptClass;
 			String destinationDirectory = settings.getDestinationDirectory();
 			ClassLoader cl = new DestDirClassLoader(destinationDirectory);
 			scriptClass = cl.loadClass(classname);
-			if (VERBOSE) {
-				System.err.println("(found: " + scriptClass + " in " + destinationDirectory + ")");
-			}
+			LOG.trace("found: {} in {}", new Object[] {scriptClass, destinationDirectory});
 			try {
 				Constructor constructor = scriptClass.getConstructor();
 				try {
-					if (VERBOSE) {
-						System.err.println("(allocating and executing new instance of " + classname + " class...)");
-					}
+					LOG.trace("allocating and executing new instance of {} class...", classname);
 					Object obj = constructor.newInstance();
 					Method method = scriptClass.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
 					Object result = method.invoke(obj, new Object[] {settings});
@@ -357,7 +339,6 @@ public class Awk {
 					if (exception == null) {
 						throw new Error("Cannot instantiate the script", ite);
 					} else {
-						exception.printStackTrace();
 						throw new Error("Cannot instantiate the script", exception);
 					}
 				}
@@ -403,9 +384,7 @@ public class Awk {
 		StringTokenizer st = new StringTokenizer(extensionsStr, "#");
 		while (st.hasMoreTokens()) {
 			String cls = st.nextToken();
-			if (VERBOSE) {
-				System.out.println("{cls = " + cls + "}");
-			}
+			LOG.trace("cls = {}", cls);
 			try {
 				Class<?> c = Class.forName(cls);
 				// check if it's a JawkException
@@ -413,7 +392,7 @@ public class Awk {
 					throw new ClassNotFoundException(cls + " does not implement JawkExtension");
 				}
 				if (extensionClasses.contains(c)) {
-					System.err.println("Warning: " + cls + " multiply referred in extension class list. Skipping.");
+					LOG.warn("class {} is multiple times referred in extension class list. Skipping.", cls);
 					continue;
 				} else {
 					extensionClasses.add(c);
@@ -433,12 +412,12 @@ public class Awk {
 						retval.put(keyword, ji);
 					}
 				} catch (InstantiationException ie) {
-					System.err.println("Cannot instantiate " + c + " : " + ie);
+					LOG.warn("Cannot instantiate {} : {}", new Object[] {c, ie});
 				} catch (IllegalAccessException iae) {
-					System.err.println("Cannot instantiate " + c + " : " + iae);
+					LOG.warn("Cannot instantiate {} : {}", new Object[] {c, iae});
 				}
 			} catch (ClassNotFoundException cnfe) {
-				System.err.println("Cannot classload " + cls + " : " + cnfe);
+				LOG.warn("Cannot classload {} : {}", new Object[] {cls, cnfe});
 			}
 		}
 

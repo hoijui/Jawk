@@ -52,6 +52,8 @@ import org.jawk.jrt.VariableManager;
 import org.jawk.util.AwkParameters;
 import org.jawk.util.AwkSettings;
 import org.jawk.util.ScriptSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The reference implementation of the Jawk compiler.
@@ -263,7 +265,7 @@ import org.jawk.util.ScriptSource;
  */
 public class AwkCompilerImpl implements AwkCompiler {
 
-	private static final boolean VERBOSE = (System.getProperty("jawk.verbose", null) != null);
+	private static final Logger LOG = LoggerFactory.getLogger(AwkCompilerImpl.class);
 
 	// These classes should exist in the jrt package because
 	// the jrt.jar file contains the jrt package.
@@ -303,11 +305,10 @@ public class AwkCompilerImpl implements AwkCompiler {
 						Object o = f.get(null);
 						Class cls = (Class) o;
 						if (!cls.getPackage().getName().equals(packagename)) {
-							throw new AssertionError("Error: " + c + " is not contained within '" + packagename + "' package. Field = " + f);
+							throw new AssertionError("class " + c.toString() + " is not contained within '" + packagename + "' package. Field = " + f.toString());
 						}
 					} catch (IllegalAccessException iae) {
-						iae.printStackTrace();
-						throw new AssertionError("Caught: " + iae);
+						throw new AssertionError("", iae);
 					}
 				}
 			}
@@ -806,18 +807,16 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 			fos = new FileOutputStream(clsname + ".class");
 			cg.getJavaClass().dump(fos);
-			if (VERBOSE) {
-				System.err.println("(wrote: " + clsname + ".class)");
-			}
+			LOG.trace("wrote: {}.class", clsname);
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.error("IO Problem", ioe);
 			System.exit(1);
 		} finally {
 			if (fos != null) {
 				try {
 					fos.close();
 				} catch (IOException ex) {
-					ex.printStackTrace();
+					LOG.warn("Failed to close the script class file output stream", ex);
 				}
 			}
 		}
@@ -1351,8 +1350,6 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	private void addPartialParamCall(String func_name, int num_formal_params, int num_actual_params) {
-
-		//System.err.println("PARTIAL_PARAM_CALL: "+func_name+" - "+num_formal_params+" - "+num_actual_params);
 
 		// condition the argument parameters
 

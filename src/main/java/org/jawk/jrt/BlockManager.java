@@ -2,6 +2,8 @@ package org.jawk.jrt;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages multiple blocking code segments simultaneously such that
@@ -12,6 +14,8 @@ import java.util.List;
  * @see BulkBlockObject
  */
 public class BlockManager {
+
+	private static final Logger LOG = LoggerFactory.getLogger(BlockManager.class);
 
 	private final Object notifierLock = "NOTIFIER_LOCK";
 	private String notifier = null;
@@ -115,8 +119,7 @@ public class BlockManager {
 				}
 			} catch (InterruptedException ie) {
 			} catch (RuntimeException re) {
-				re.printStackTrace();
-				System.err.println("(exitting)");
+				LOG.error("exitting", re);
 				System.exit(1);
 			}
 		}

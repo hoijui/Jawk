@@ -8,6 +8,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.jawk.NotImplementedError;
 import org.jawk.jrt.BlockObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Enable stdin processing in Jawk, to be used in conjunction with the -ni parameter.
@@ -73,8 +75,11 @@ import org.jawk.jrt.BlockObject;
  */
 public class StdinExtension extends AbstractExtension implements JawkExtension {
 
-	private final BlockingQueue<Object> getLineInput = new LinkedBlockingQueue<Object>();
+	private static final Logger LOG = LoggerFactory.getLogger(StdinExtension.class);
+
 	private static final Object DONE = new Object();
+
+	private final BlockingQueue<Object> getLineInput = new LinkedBlockingQueue<Object>();
 
 	private final BlockObject blocker = new BlockObject() {
 
@@ -115,17 +120,16 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 						}
 					}
 				} catch (InterruptedException ie) {
+					LOG.error("", ie);
 					// do nothing ... the thread death will signal an issue
-					ie.printStackTrace();
 				} catch (IOException ioe) {
+					LOG.error("", ioe);
 					// do nothing ... the thread death will signal an issue
-					ioe.printStackTrace();
 				}
 				try {
 					getLineInput.put(DONE);
 				} catch (InterruptedException ie) {
-					ie.printStackTrace();
-					System.err.println("Should never be interrupted.");
+					LOG.error("Should never be interrupted.", ie);
 					System.exit(1);
 				}
 				synchronized (blocker) {
@@ -207,7 +211,7 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 			getJrt().jrtParseFields();
 			return 1;
 		} catch (InterruptedException ie) {
-			ie.printStackTrace();
+			LOG.warn("", ie);
 			return -1;
 		}
 	}

@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Jawk runtime coordinator.
@@ -63,6 +65,8 @@ import java.util.regex.Pattern;
  * @see VariableManager
  */
 public class JRT {
+
+	private static final Logger LOG = LoggerFactory.getLogger(JRT.class);
 
 	/**
 	 * The default regular expression for setRecordSeparator.
@@ -566,7 +570,7 @@ public class JRT {
 					return true;
 				}
 			} catch (IOException ioe) {
-				System.err.println("IO Exception: " + ioe);
+				LOG.warn("IO Exception", ioe);
 				continue;
 			}
 		}
@@ -785,7 +789,7 @@ public class JRT {
 				file_readers.put(filename, pr = new PartitioningReader(new FileReader(filename), vm.getRS().toString()));
 				vm.setFILENAME(filename);
 			} catch (IOException ioe) {
-				System.err.println("IO Exception: " + ioe);
+				LOG.warn("IO Exception", ioe);
 				file_readers.remove(filename);
 				throw ioe;
 			}
@@ -830,7 +834,7 @@ public class JRT {
 				command_readers.put(cmd, pr = new PartitioningReader(new InputStreamReader(p.getInputStream()), vm.getRS().toString()));
 				vm.setFILENAME("");
 			} catch (IOException ioe) {
-				System.err.println("IO Exception: " + ioe);
+				LOG.warn("IO Exception", ioe);
 				command_readers.remove(cmd);
 				Process p = command_processes.get(cmd);
 				command_processes.remove(cmd);
@@ -1028,7 +1032,7 @@ public class JRT {
 				return Integer.valueOf(p.exitValue());
 			}
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.warn("IO Exception", ioe);
 			return MINUS_ONE;
 		}
 	}

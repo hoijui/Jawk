@@ -5,11 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.Reader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents one AWK-script file content source.
  */
 public class ScriptFileSource extends ScriptSource {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ScriptFileSource.class);
 
 	private String filePath;
 	private Reader fileReader;
@@ -34,7 +38,7 @@ public class ScriptFileSource extends ScriptSource {
 			try {
 				fileReader = new FileReader(filePath);
 			} catch (FileNotFoundException ex) {
-				ex.printStackTrace();
+				LOG.error("Failed to open script source for reading: " + filePath, ex);
 			}
 		}
 
@@ -48,7 +52,7 @@ public class ScriptFileSource extends ScriptSource {
 			try {
 				fileInputStream = new FileInputStream(filePath);
 			} catch (FileNotFoundException ex) {
-				ex.printStackTrace();
+				LOG.error("Failed to open script source for reading: " + filePath, ex);
 			}
 		}
 
