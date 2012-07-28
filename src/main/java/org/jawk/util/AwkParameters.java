@@ -162,6 +162,9 @@ public class AwkParameters {
 				} else if (args[argIdx].equals("-ni")) {
 					settings.setUseStdIn(true);
 				} else if (args[argIdx].equals("-h") || args[argIdx].equals("-?")) {
+					if (args.length > 1) {
+						throw new IllegalArgumentException("When printing help/usage output, we do not accept other arguments.");
+					}
 					usage(System.out);
 					System.exit(0);
 				} else {
