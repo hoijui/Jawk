@@ -171,7 +171,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CoreExtension extends AbstractExtension implements JawkExtension {
 
-	private static CoreExtension instance = null;
+	private static CoreExtension instance = null; // FIXME Ugly form of singleton implementation (which is ugly by itsself)
 	private static final Object INSTANCE_LOCK = new Object();
 	private static final Logger LOG = LoggerFactory.getLogger(CoreExtension.class);
 
@@ -186,7 +186,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	private final Date dateObj = new Date();
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat();
 
-	private BlockObject timeoutBlocker = new BlockObject() {
+	private final BlockObject timeoutBlocker = new BlockObject() {
 
 		@Override
 		public String getNotifierTag() {
@@ -279,8 +279,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 
 	@Override
 	public Object invoke(String keyword, Object[] args) {
-		if (false) {
-		} else if (keyword.equals("Map") || keyword.equals("HashMap")) {
+		if        (keyword.equals("Map") || keyword.equals("HashMap")) {
 			return map(args, getVm(), AssocArray.MT_HASH);
 		} else if (keyword.equals("LinkedMap")) {
 			return map(args, getVm(), AssocArray.MT_LINKED);
@@ -365,15 +364,17 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	}
 
 	private Object resolve(Object arg, VariableManager vm) {
+
+		Object obj = arg;
 		while (true) {
-			if (arg instanceof AssocArray) {
-				return arg;
+			if (obj instanceof AssocArray) {
+				return obj;
 			}
-			String argCheck = toAwkString(arg);
+			String argCheck = toAwkString(obj);
 			if (referenceMap.get(argCheck) != null) {
-				arg = referenceMap.get(argCheck);
+				obj = referenceMap.get(argCheck);
 			} else {
-				return arg;
+				return obj;
 			}
 		}
 	}
@@ -442,8 +443,8 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		if (!(key instanceof AssocArray)) {
 			// check if key is a reference string!
 			String keyCheck = instance.toAwkString(key);
-			if (instance.referenceMap.get(keyCheck) != null) // assume it is a reference rather than an assoc array key itself
-			{
+			if (instance.referenceMap.get(keyCheck) != null) {
+				// assume it is a reference rather than an assoc array key itself
 				key = instance.referenceMap.get(keyCheck);
 			}
 		}
@@ -536,15 +537,12 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 	}
 
 	private void dumpRefs() {
-		for (Object o1 : referenceMap.keySet()) {
-			Object o2 = referenceMap.get(o1);
-			if (o1 instanceof AssocArray) {
-				o1 = ((AssocArray) o1).mapString();
+		for (Map.Entry<String, Object> entry : referenceMap.entrySet()) {
+			Object value = entry.getValue();
+			if (value instanceof AssocArray) {
+				value = ((AssocArray) value).mapString();
 			}
-			if (o2 instanceof AssocArray) {
-				o2 = ((AssocArray) o2).mapString();
-			}
-			LOG.info("REF : {} = {}", new Object[] {o1, o2});
+			LOG.info("REF : {} = {}", new Object[] {entry.getKey(), value});
 		}
 	}
 

@@ -270,6 +270,18 @@ public class AwkTuples implements Serializable {
 			types[1] = String.class;
 		}
 
+		private boolean hasNext() {
+			return (next != null);
+		}
+
+		private Tuple getNext() {
+			return next;
+		}
+
+		private void setNext(Tuple next) {
+			this.next = next;
+		}
+
 		private void setLineNumber(int lineno) {
 			assert this.lineno == -1 : "The line number was already set to " + this.lineno + ". Later lineno = " + lineno + ".";
 			this.lineno = lineno;
@@ -2149,10 +2161,10 @@ public class AwkTuples implements Serializable {
 	 * </ul>
 	 */
 	public void postProcess() {
-		assert queue.isEmpty() || queue.get(0).next == null : "postProcess() already executed";
+		assert queue.isEmpty() || !queue.get(0).hasNext() : "postProcess() already executed";
 		// allocate nexts
 		for (int i = 0; i < queue.size() - 1; i++) {
-			queue.get(i).next = queue.get(i + 1);
+			queue.get(i).setNext(queue.get(i + 1));
 		}
 		// touch per element
 		for (Tuple tuple : queue) {

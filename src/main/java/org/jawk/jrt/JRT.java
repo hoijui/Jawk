@@ -99,7 +99,6 @@ public class JRT {
 	 */
 	public final void assignInitialVariables(Map<String, Object> initial_var_map) {
 		assert initial_var_map != null;
-		//System.out.println("initial_var_map = "+initial_var_map);
 		for (Map.Entry<String, Object> var : initial_var_map.entrySet()) {
 			vm.assignVariable(var.getKey(), var.getValue());
 		}
@@ -135,8 +134,6 @@ public class JRT {
 		StringBuffer convfmt_sb = new StringBuffer();
 		//private String convfmt = "%.2g";
 		Formatter convfmt_formatter = new Formatter(convfmt_sb);
-
-		//System.out.println("!!!");
 
 		if (o instanceof Number) {
 			double d = ((Number) o).doubleValue();
@@ -326,7 +323,7 @@ public class JRT {
 		}
 	}
 
-	// non-static to reference "input_line"
+	// non-static to reference "inputLine"
 	/**
 	 * Converts an Integer, Double, String, Pattern,
 	 * or PatternPair to a boolean.
@@ -357,11 +354,11 @@ public class JRT {
 			// match against $0
 			// ...
 			Pattern pattern = (Pattern) o;
-			String s = input_line == null ? BLANK : input_line;
+			String s = inputLine == null ? BLANK : inputLine;
 			Matcher matcher = pattern.matcher(s);
 			val = matcher.find();
 		} else if (o instanceof PatternPair) {
-			String s = input_line == null ? BLANK : input_line;
+			String s = inputLine == null ? BLANK : inputLine;
 			val = ((PatternPair) o).matches(s);
 		} else {
 			throw new Error("Unknown operand_stack type: " + o.getClass() + " for value " + o);
@@ -420,9 +417,9 @@ public class JRT {
 	}
 
 	// Paritioning reader for stdin.
-	public PartitioningReader pr = null;
+	private PartitioningReader partitioningReader = null;
 	// Current input line ($0).
-	public String input_line = null;
+	private String inputLine = null;
 	// Current input fields ($0, $1, $2, ...).
 	private List<String> input_fields = new ArrayList<String>(100);
 
@@ -431,6 +428,18 @@ public class JRT {
 	private boolean has_filenames = false;
 
 	private static final String BLANK = "";
+
+	public PartitioningReader getPartitioningReader() {
+		return partitioningReader;
+	}
+
+	public String getInputLine() {
+		return inputLine;
+	}
+
+	public void setInputLine(String inputLine) {
+		this.inputLine = inputLine;
+	}
 
 	/**
 	 * Attempt to consume one line of input, either from stdin
@@ -480,7 +489,7 @@ public class JRT {
 
 		while (true) {
 			try {
-				if (pr == null) {
+				if (partitioningReader == null) {
 					int argc = (int) toDouble(vm.getARGC()); // (vm.getVariable("argc_field", true));
 					Object o = BLANK;
 					while(arglist_idx <= argc) {
@@ -493,26 +502,26 @@ public class JRT {
 					if (!o.equals(BLANK)) {
 						String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
 						if (name_value_or_filename.indexOf('=') == -1) {
-							pr = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
+							partitioningReader = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
 							vm.setFILENAME(name_value_or_filename);
 							vm.resetFNR();
 						} else {
 							setFilelistVariable(name_value_or_filename);
 							if (!has_filenames) {
 								// stdin with a variable!
-								pr = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
+								partitioningReader = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
 								vm.setFILENAME("");
 							} else {
 								continue;
 							}
 						}
 					} else if (!has_filenames) {
-						pr = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
+						partitioningReader = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
 						vm.setFILENAME("");
 					} else {
 						return false;
 					}
-				} else if (input_line == null) {
+				} else if (inputLine == null) {
 					if (has_filenames) {
 						int argc = (int) toDouble(vm.getARGC());
 						Object o = BLANK;
@@ -527,7 +536,7 @@ public class JRT {
 							String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
 							if (name_value_or_filename.indexOf('=') == -1) {
 								// true = from filename list
-								pr = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
+								partitioningReader = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
 								vm.setFILENAME(name_value_or_filename);
 								vm.resetFNR();
 							} else {
@@ -550,8 +559,8 @@ public class JRT {
 				//if (! active_input)
 				//	return false;
 
-				input_line = pr.readRecord();
-				if (input_line == null) {
+				inputLine = partitioningReader.readRecord();
+				if (inputLine == null) {
 					continue;
 				} else {
 					if (for_getline) {
@@ -564,7 +573,7 @@ public class JRT {
 						jrtParseFields();
 					}
 					vm.incNR();
-					if (pr.fromFilenameList()) {
+					if (partitioningReader.fromFilenameList()) {
 						vm.incFNR();
 					}
 					return true;
@@ -606,18 +615,18 @@ public class JRT {
 		String fs_string = vm.getFS().toString();
 		Enumeration<Object> tokenizer;
 		if (fs_string.equals(" ")) {
-			tokenizer = new StringTokenizer(input_line);
+			tokenizer = new StringTokenizer(inputLine);
 		} else if (fs_string.length() == 1) {
-			tokenizer = new SingleCharacterTokenizer(input_line, fs_string.charAt(0));
+			tokenizer = new SingleCharacterTokenizer(inputLine, fs_string.charAt(0));
 		} else if (fs_string.equals("")) {
-			tokenizer = new CharacterTokenizer(input_line);
+			tokenizer = new CharacterTokenizer(inputLine);
 		} else {
-			tokenizer = new RegexTokenizer(input_line, fs_string);
+			tokenizer = new RegexTokenizer(inputLine, fs_string);
 		}
 
-		assert input_line != null;
+		assert inputLine != null;
 		input_fields.clear();
-		input_fields.add(input_line); // $0
+		input_fields.add(inputLine); // $0
 		while (tokenizer.hasMoreElements()) {
 			input_fields.add((String) tokenizer.nextElement());
 		}
@@ -760,7 +769,11 @@ public class JRT {
 	private Map<String, PartitioningReader> file_readers = new HashMap<String, PartitioningReader>();
 	private Map<String, PartitioningReader> command_readers = new HashMap<String, PartitioningReader>();
 	private Map<String, Process> command_processes = new HashMap<String, Process>();
-	public Map<String, PrintStream> output_files = new HashMap<String, PrintStream>();
+	private Map<String, PrintStream> outputFiles = new HashMap<String, PrintStream>();
+
+	public Map<String, PrintStream> getOutputFiles() {
+		return outputFiles;
+	}
 
 	/**
 	 * Retrieve the PrintStream which writes to a particular file,
@@ -770,10 +783,10 @@ public class JRT {
 	 * @param append true to append to the file, false to overwrite the file.
 	 */
 	public final PrintStream jrtGetPrintStream(String filename, boolean append) {
-		PrintStream ps = output_files.get(filename);
+		PrintStream ps = outputFiles.get(filename);
 		if (ps == null) {
 			try {
-				output_files.put(filename, ps = new PrintStream(new FileOutputStream(filename, append), true));	// true = autoflush
+				outputFiles.put(filename, ps = new PrintStream(new FileOutputStream(filename, append), true));	// true = autoflush
 			} catch (IOException ioe) {
 				throw new AwkRuntimeException("Cannot open " + filename + " for writing: " + ioe);
 			}
@@ -795,11 +808,11 @@ public class JRT {
 			}
 		}
 
-		input_line = pr.readRecord();
-		if (input_line == null) {
+		inputLine = pr.readRecord();
+		if (inputLine == null) {
 			return false;
 		} else {
-			jrt_input_string = input_line;
+			jrt_input_string = inputLine;
 			vm.incNR();
 			return true;
 		}
@@ -845,11 +858,11 @@ public class JRT {
 			}
 		}
 
-		input_line = pr.readRecord();
-		if (input_line == null) {
+		inputLine = pr.readRecord();
+		if (inputLine == null) {
 			return false;
 		} else {
-			jrt_input_string = input_line;
+			jrt_input_string = inputLine;
 			vm.incNR();
 			return true;
 		}
@@ -916,7 +929,7 @@ public class JRT {
 		for (String s : command_readers.keySet()) {
 			set.add(s);
 		}
-		for (String s : output_files.keySet()) {
+		for (String s : outputFiles.keySet()) {
 			set.add(s);
 		}
 		for (String s : output_streams.keySet()) {
@@ -928,10 +941,10 @@ public class JRT {
 	}
 
 	private boolean jrtCloseOutputFile(String filename) {
-		PrintStream ps = output_files.get(filename);
+		PrintStream ps = outputFiles.get(filename);
 		if (ps != null) {
 			ps.close();
-			output_files.remove(filename);
+			outputFiles.remove(filename);
 		}
 		return ps != null;
 	}
@@ -1198,8 +1211,8 @@ public class JRT {
 	public void applyRS(Object rs_obj) {
 //	if (rs_obj.toString().equals(BLANK))
 //		rs_obj = DEFAULT_RS_REGEX;
-		if (pr != null) {
-			pr.setRecordSeparator(rs_obj.toString());
+		if (partitioningReader != null) {
+			partitioningReader.setRecordSeparator(rs_obj.toString());
 		}
 	}
 }

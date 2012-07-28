@@ -212,7 +212,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 
 		// same code as _ASSIGN_AS_INPUT_FIELD_
 		if (fieldNum == 0) {
-			jrt.input_line = numString.toString();
+			jrt.setInputLine(numString.toString());
 			jrt.jrtParseFields();
 		} else {
 			jrt.jrtSetInputField(numString, fieldNum);
@@ -287,10 +287,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 						int num_args = position.intArg(0);
 						boolean append = position.boolArg(1);
 						String key = JRT.toAwkString(pop(), getCONVFMT().toString());
-						PrintStream ps = jrt.output_files.get(key);
+						PrintStream ps = jrt.getOutputFiles().get(key);
 						if (ps == null) {
 							try {
-								jrt.output_files.put(key, ps = new PrintStream(new FileOutputStream(key, append), true));	// true = autoflush
+								jrt.getOutputFiles().put(key, ps = new PrintStream(new FileOutputStream(key, append), true));	// true = autoflush
 							} catch (IOException ioe) {
 								throw new AwkRuntimeException(position.lineNumber(), "Cannot open " + key + " for writing: " + ioe);
 							}
@@ -332,10 +332,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 						int num_args = position.intArg(0);
 						boolean append = position.boolArg(1);
 						String key = JRT.toAwkString(pop(), getCONVFMT().toString());
-						PrintStream ps = jrt.output_files.get(key);
+						PrintStream ps = jrt.getOutputFiles().get(key);
 						if (ps == null) {
 							try {
-								jrt.output_files.put(key, ps = new PrintStream(new FileOutputStream(key, append), true));	// true = autoflush
+								jrt.getOutputFiles().put(key, ps = new PrintStream(new FileOutputStream(key, append), true));	// true = autoflush
 							} catch (IOException ioe) {
 								throw new AwkRuntimeException(position.lineNumber(), "Cannot open " + key + " for writing: " + ioe);
 							}
@@ -592,9 +592,9 @@ public class AVM implements AwkInterpreter, VariableManager {
 					}
 					case AwkTuples._ASSIGN_AS_INPUT_: {
 						// stack[0] = value
-						jrt.input_line = pop().toString();
+						jrt.setInputLine(pop().toString());
 						jrt.jrtParseFields();
-						push(jrt.input_line);
+						push(jrt.getInputLine());
 						position.next();
 						break;
 					}
@@ -615,7 +615,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						String value = pop().toString();
 						push(value);	// leave the result on the stack
 						if (field_num == 0) {
-							jrt.input_line = value;
+							jrt.setInputLine(value);
 							jrt.jrtParseFields();
 						} else {
 							jrt.jrtSetInputField(value, field_num);
@@ -974,7 +974,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 							newstring = replaceFirst(orig, ere, repl);
 						}
 						// assign it to "$0"
-						jrt.input_line = newstring;
+						jrt.setInputLine(newstring);
 						jrt.jrtParseFields();
 						position.next();
 						break;
@@ -990,7 +990,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						String newString = execSubOrGSub(position, 0);
 						// assign it to "$0"
 						if (fieldNum == 0) {
-							jrt.input_line = newString;
+							jrt.setInputLine(newString);
 							jrt.jrtParseFields();
 						} else {
 							jrt.jrtSetInputField(newString, fieldNum);
@@ -1583,8 +1583,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 					case AwkTuples._APPLY_RS_: {
 						assert rs_offset != NULL_OFFSET;
 						Object rs_obj = runtime_stack.getVariable(rs_offset, true);	// true = global
-						if (jrt.pr != null) {
-							jrt.pr.setRecordSeparator(rs_obj.toString());
+						if (jrt.getPartitioningReader() != null) {
+							jrt.getPartitioningReader().setRecordSeparator(rs_obj.toString());
 						}
 						position.next();
 						break;
@@ -1940,7 +1940,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private void avmDump(AssocArray[] aa_array) {
 		if (aa_array == null) {
 			// dump the runtime stack
-			Object[] globals = runtime_stack.globals;
+			Object[] globals = runtime_stack.getNumGlobals();
 			for (String name : global_variable_offsets.keySet()) {
 				int idx = global_variable_offsets.get(name);
 				Object value = globals[idx];
@@ -2250,7 +2250,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	{
 		boolean retval = jrt.jrtConsumeFileInput(filename);
 		if (retval) {
-			push(jrt.input_line);
+			push(jrt.getInputLine());
 		}
 		return retval;
 	}
@@ -2260,7 +2260,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	{
 		boolean retval = jrt.jrtConsumeCommandInput(cmd);
 		if (retval) {
-			push(jrt.input_line);
+			push(jrt.getInputLine());
 		}
 		return retval;
 	}
@@ -2270,7 +2270,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	{
 		boolean retval = jrt.jrtConsumeInput(for_getline);
 		if (retval && for_getline) {
-			push(jrt.input_line);
+			push(jrt.getInputLine());
 		}
 		return retval;
 	}
@@ -2349,7 +2349,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 			LOG.info("locals = " + Arrays.toString(locals));
 			LOG.info("locals_stack = " + locals_stack);
 			LOG.info("return_indexes = " + return_indexes);
+		}
 
+		Object[] getNumGlobals() {
+			return globals;
 		}
 
 		/**

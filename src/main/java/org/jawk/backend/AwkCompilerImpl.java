@@ -823,69 +823,69 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	private void addMainMethod() {
-		InstructionList il = new InstructionList();
+		InstructionList tmpIl = new InstructionList();
 
-		MethodGen mg = new MethodGen(ACC_PUBLIC | ACC_STATIC,
+		MethodGen tmpMg = new MethodGen(ACC_PUBLIC | ACC_STATIC,
 				Type.VOID,
 				new Type[] {new ArrayType(getObjectType(String.class), 1)},
 				new String[] {"args"},
 				"main",
 				classname,
-				il, cp);
-		il.append(factory.createNew(classname));
-		il.append(InstructionConstants.DUP);
-		il.append(InstructionConstants.DUP);
+				tmpIl, cp);
+		tmpIl.append(factory.createNew(classname));
+		tmpIl.append(InstructionConstants.DUP);
+		tmpIl.append(InstructionConstants.DUP);
 
 		// ..., mainclass, mainclass, mainclass
-		il.append(factory.createInvoke(classname, "<init>",
+		tmpIl.append(factory.createInvoke(classname, "<init>",
 				Type.VOID,
 				new Type[] {},
 				INVOKESPECIAL));
 		// ..., mainclass, mainclass
 
-		il.append(InstructionConstants.DUP);
-		LocalVariableGen mainclass_arg = mg.addLocalVariable("mainclass_", new ObjectType(classname), null, null);
+		tmpIl.append(InstructionConstants.DUP);
+		LocalVariableGen mainclass_arg = tmpMg.addLocalVariable("mainclass_", new ObjectType(classname), null, null);
 		InstructionHandle ih =
-				il.append(InstructionFactory.createStore(new ObjectType(classname), mainclass_arg.getIndex()));
+				tmpIl.append(InstructionFactory.createStore(new ObjectType(classname), mainclass_arg.getIndex()));
 		mainclass_arg.setStart(ih);
 
 
-		il.append(factory.createNew(AwkParameters.class.getName()));
+		tmpIl.append(factory.createNew(AwkParameters.class.getName()));
 		// ..., mainclass, mainclass, AwkParameters
-		il.append(InstructionConstants.DUP_X1);
+		tmpIl.append(InstructionConstants.DUP_X1);
 		// ..., mainclass, AwkParameters, mainclass, AwkParameters
-		il.append(InstructionConstants.SWAP);
+		tmpIl.append(InstructionConstants.SWAP);
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass
-		il.append(factory.createInvoke(Object.class.getName(), "getClass", getObjectType(Class.class), new Type[] {}, INVOKEVIRTUAL));
+		tmpIl.append(factory.createInvoke(Object.class.getName(), "getClass", getObjectType(Class.class), new Type[] {}, INVOKEVIRTUAL));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class
 
-		il.append(factory.createFieldAccess(classname, "EXTENSION_DESCRIPTION", getObjectType(String.class), Constants.GETSTATIC));
+		tmpIl.append(factory.createFieldAccess(classname, "EXTENSION_DESCRIPTION", getObjectType(String.class), Constants.GETSTATIC));
 		// ..., mainclass, AwkParameters, AwkParameters, mainclass.class, args, desc
-		il.append(factory.createInvoke(AwkParameters.class.getName(), "<init>",
+		tmpIl.append(factory.createInvoke(AwkParameters.class.getName(), "<init>",
 				Type.VOID,
 				new Type[] {
 					getObjectType(Class.class),
 					getObjectType(String.class) },
 				INVOKESPECIAL));
 		// ..., mainclass, AwkParameters
-		il.append(InstructionFactory.createLoad(Type.OBJECT, 0));
+		tmpIl.append(InstructionFactory.createLoad(Type.OBJECT, 0));
 		// ..., mainclass, AwkParameters, args
-		il.append(factory.createInvoke(AwkParameters.class.getName(), "parseCommandLineArguments",
+		tmpIl.append(factory.createInvoke(AwkParameters.class.getName(), "parseCommandLineArguments",
 				getObjectType(AwkSettings.class),
 				new Type[] { new ArrayType(getObjectType(String.class), 1) },
 				INVOKEVIRTUAL));
 		// ..., mainclass, AwkSettings
 
-		il.append(factory.createInvoke(classname, "ScriptMain", Type.INT, new Type[] { getObjectType(AwkSettings.class) }, INVOKEVIRTUAL));
-		il.append(factory.createInvoke(System.class.getName(), "exit", Type.VOID, new Type[] {Type.INT}, INVOKESTATIC));
+		tmpIl.append(factory.createInvoke(classname, "ScriptMain", Type.INT, new Type[] { getObjectType(AwkSettings.class) }, INVOKEVIRTUAL));
+		tmpIl.append(factory.createInvoke(System.class.getName(), "exit", Type.VOID, new Type[] {Type.INT}, INVOKESTATIC));
 		// ??? the return (below) is required, even though we're exit()ing (above) ???
 		// ??? (missing return results in a VerifyError) ???
-		il.append(InstructionFactory.createReturn(Type.VOID));
+		tmpIl.append(InstructionFactory.createReturn(Type.VOID));
 
-		mg.setMaxStack();
-		mg.setMaxLocals();
-		cg.addMethod(mg.getMethod());
-		il.dispose();
+		tmpMg.setMaxStack();
+		tmpMg.setMaxLocals();
+		cg.addMethod(tmpMg.getMethod());
+		tmpIl.dispose();
 	}
 
 	private void createMethods_VariableManager(AwkTuples tuples) {
@@ -912,7 +912,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 	private void createAssignVariableMethod(AwkTuples tuples) {
 
-		InstructionList il = new InstructionList();
+		InstructionList tmpIl = new InstructionList();
 		MethodGen method = new MethodGen(
 				ACC_PUBLIC | ACC_FINAL,
 				getObjectType(Void.TYPE),
@@ -920,7 +920,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				new String[] {"name", "value"},
 				"assignVariable",
 				classname,
-				il, cp);
+				tmpIl, cp);
 
 		// basically:
 		// if (name.equals("field1")) field1 = value;
@@ -951,13 +951,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 			// ...
 
-			il.append(InstructionConstants.ALOAD_1);
+			tmpIl.append(InstructionConstants.ALOAD_1);
 			// ..., name
-			il.append(new PUSH(cp, varname));
+			tmpIl.append(new PUSH(cp, varname));
 			// ..., name, fieldname
-			il.append(factory.createInvoke(String.class.getName(), "equals", Type.BOOLEAN, buildArgs(new Class[] {Object.class}), Constants.INVOKEVIRTUAL));
+			tmpIl.append(factory.createInvoke(String.class.getName(), "equals", Type.BOOLEAN, buildArgs(new Class[] {Object.class}), Constants.INVOKEVIRTUAL));
 			// ..., 0-or-1
-			BranchHandle bh = il.append(new IFEQ(null));
+			BranchHandle bh = tmpIl.append(new IFEQ(null));
 
 			// do the assignment!
 
@@ -966,7 +966,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			if (is_function) {
 				// THROW AN EXCEPTION
 				// ...
-				JVMTools_throwNewException(il, IllegalArgumentException.class, "Cannot assign a scalar to a function name (" + varname + ").");
+				JVMTools_throwNewException(tmpIl, IllegalArgumentException.class, "Cannot assign a scalar to a function name (" + varname + ").");
 			} else {
 				int offset = global_var_offset_map.get(varname);
 				boolean is_aarray = global_var_aarray_map.get(varname);
@@ -974,22 +974,22 @@ public class AwkCompilerImpl implements AwkCompiler {
 				if (is_aarray) {
 					// THROW AN EXCEPTION
 					// ...
-					JVMTools_throwNewException(il, IllegalArgumentException.class, "Cannot assign a scalar to a non-scalar variable (" + varname + ").");
+					JVMTools_throwNewException(tmpIl, IllegalArgumentException.class, "Cannot assign a scalar to a non-scalar variable (" + varname + ").");
 				} else {
 					// ...
-					il.append(InstructionConstants.ALOAD_0);
+					tmpIl.append(InstructionConstants.ALOAD_0);
 					// ..., this
-					il.append(InstructionConstants.ALOAD_2);
+					tmpIl.append(InstructionConstants.ALOAD_2);
 					// ..., this, value
-					il.append(factory.createFieldAccess(classname, "global_" + offset, getObjectType(Object.class), Constants.PUTFIELD));
+					tmpIl.append(factory.createFieldAccess(classname, "global_" + offset, getObjectType(Object.class), Constants.PUTFIELD));
 					// ...
-					il.append(InstructionFactory.createReturn(Type.VOID));
+					tmpIl.append(InstructionFactory.createReturn(Type.VOID));
 				}
 			}
 
 			// otherwise, fall to the next global field to check
 
-			InstructionHandle ih = il.append(InstructionConstants.NOP);
+			InstructionHandle ih = tmpIl.append(InstructionConstants.NOP);
 			bh.setTarget(ih);
 		}
 
@@ -997,12 +997,12 @@ public class AwkCompilerImpl implements AwkCompiler {
 		// This occurs when a variable assignment happens
 		// to a var that does not exist within the script.
 
-		il.append(InstructionFactory.createReturn(Type.VOID));
+		tmpIl.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 	private void createGetMethod(String method_name, String field_name) {
@@ -1010,105 +1010,105 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	private void createGetMethod(int method_access, String method_name, String field_name) {
-		InstructionList il = new InstructionList();
-		MethodGen method = new MethodGen(method_access | ACC_FINAL, getObjectType(Object.class), new Type[] {}, new String[] {}, method_name, classname, il, cp);
+		InstructionList tmpIl = new InstructionList();
+		MethodGen method = new MethodGen(method_access | ACC_FINAL, getObjectType(Object.class), new Type[] {}, new String[] {}, method_name, classname, tmpIl, cp);
 
-		il.append(InstructionConstants.ALOAD_0);
-		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.GETFIELD));
-		il.append(InstructionConstants.DUP);
+		tmpIl.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.GETFIELD));
+		tmpIl.append(InstructionConstants.DUP);
 		BranchHandle bh =
-				il.append(new IFNONNULL(null));
+				tmpIl.append(new IFNONNULL(null));
 
 		// NULL!
-		il.append(InstructionConstants.POP);	// pop the null
-		il.append(new PUSH(cp, ""));
+		tmpIl.append(InstructionConstants.POP);	// pop the null
+		tmpIl.append(new PUSH(cp, ""));
 		InstructionHandle ih =
-				il.append(InstructionFactory.createReturn(getObjectType(Object.class)));
+				tmpIl.append(InstructionFactory.createReturn(getObjectType(Object.class)));
 		bh.setTarget(ih);
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 	private void createIncMethod(String method_name, String field_method, String field_name) {
-		InstructionList il = new InstructionList();
+		InstructionList tmpIl = new InstructionList();
 		// no-arg method
-		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {}), new String[] {}, method_name, classname, il, cp);
+		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {}), new String[] {}, method_name, classname, tmpIl, cp);
 
 		// implement: setXX((int) toDouble(inc(getXX())))
 
-		il.append(InstructionConstants.ALOAD_0);
-		il.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(InstructionConstants.ALOAD_0);
 		// get field
-		il.append(factory.createInvoke(classname, field_method, getObjectType(Object.class), buildArgs(new Class[] {}), INVOKEVIRTUAL));
+		tmpIl.append(factory.createInvoke(classname, field_method, getObjectType(Object.class), buildArgs(new Class[] {}), INVOKEVIRTUAL));
 		// inc
-		il.append(factory.createInvoke(JRT_Class.getName(), "inc", getObjectType(Object.class), buildArgs(new Class[] {Object.class}), INVOKESTATIC));
+		tmpIl.append(factory.createInvoke(JRT_Class.getName(), "inc", getObjectType(Object.class), buildArgs(new Class[] {Object.class}), INVOKESTATIC));
 		// toDouble
-		il.append(factory.createInvoke(JRT_Class.getName(), "toDouble", getObjectType(Double.TYPE), buildArgs(new Class[] {Object.class}), INVOKESTATIC));
+		tmpIl.append(factory.createInvoke(JRT_Class.getName(), "toDouble", getObjectType(Double.TYPE), buildArgs(new Class[] {Object.class}), INVOKESTATIC));
 		// (int)
-		il.append(InstructionConstants.D2I);
+		tmpIl.append(InstructionConstants.D2I);
 		// { convert int to Integer }
-		il.append(factory.createInvoke("java.lang.Integer", "valueOf", getObjectType(Integer.class), buildArgs(new Class[] {Integer.TYPE}), Constants.INVOKESTATIC));
+		tmpIl.append(factory.createInvoke("java.lang.Integer", "valueOf", getObjectType(Integer.class), buildArgs(new Class[] {Integer.TYPE}), Constants.INVOKESTATIC));
 		// set field
-		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
+		tmpIl.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
 
-		il.append(InstructionFactory.createReturn(Type.VOID));
+		tmpIl.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 	private void createResetMethod(String method_name, String field_name) {
-		InstructionList il = new InstructionList();
+		InstructionList tmpIl = new InstructionList();
 		// no-arg method
-		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {}), new String[] {}, method_name, classname, il, cp);
+		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {}), new String[] {}, method_name, classname, tmpIl, cp);
 
 		// implement: setXX(ZERO)
 
-		il.append(InstructionConstants.ALOAD_0);
-		il.append(factory.createFieldAccess(classname, "ZERO", getObjectType(Integer.class), Constants.GETSTATIC));
-		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
+		tmpIl.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(factory.createFieldAccess(classname, "ZERO", getObjectType(Integer.class), Constants.GETSTATIC));
+		tmpIl.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
 
-		il.append(InstructionFactory.createReturn(Type.VOID));
+		tmpIl.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 	private void createSetMethod(String method_name, String field_name, Class field_type) {
-		InstructionList il = new InstructionList();
-		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {field_type}), new String[] {"arg"}, method_name, classname, il, cp);
+		InstructionList tmpIl = new InstructionList();
+		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {field_type}), new String[] {"arg"}, method_name, classname, tmpIl, cp);
 
-		il.append(InstructionConstants.ALOAD_0);
-		il.append(InstructionConstants.ALOAD_1);
-		il.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
-		il.append(InstructionFactory.createReturn(Type.VOID));
+		tmpIl.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(InstructionConstants.ALOAD_1);
+		tmpIl.append(factory.createFieldAccess(classname, field_name, getObjectType(Object.class), Constants.PUTFIELD));
+		tmpIl.append(InstructionFactory.createReturn(Type.VOID));
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 	private void createMethod_getARGV() {
-		InstructionList il = new InstructionList();
-		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, getObjectType(Object.class), new Type[] {}, new String[] {}, "getARGV", classname, il, cp);
+		InstructionList tmpIl = new InstructionList();
+		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, getObjectType(Object.class), new Type[] {}, new String[] {}, "getARGV", classname, tmpIl, cp);
 
-		il.append(InstructionConstants.ALOAD_0);
-		il.append(factory.createFieldAccess(classname, argv_field, getObjectType(Object.class), Constants.GETFIELD));
+		tmpIl.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(factory.createFieldAccess(classname, argv_field, getObjectType(Object.class), Constants.GETFIELD));
 
-		il.append(InstructionFactory.createReturn(getObjectType(Object.class)));
+		tmpIl.append(InstructionFactory.createReturn(getObjectType(Object.class)));
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 	private void getOffsets(AwkTuples tuples) {
@@ -1355,36 +1355,36 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 		List<Class> arg_classes = new ArrayList<Class>();
 		List<String> arg_names = new ArrayList<String>();
-		Map<String, Integer> local_vars = new HashMap<String, Integer>();
+		Map<String, Integer> tmpLocalVars = new HashMap<String, Integer>();
 
 		for (int i = num_actual_params - 1; i >= 0; --i) {
 			arg_classes.add(Object.class);
 			arg_names.add("locals_" + i);
-			local_vars.put("locals_" + i, local_vars.size() + 1);
+			tmpLocalVars.put("locals_" + i, tmpLocalVars.size() + 1);
 		}
 
-		InstructionList il = new InstructionList();
-		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, getObjectType(Object.class), buildArgs(toClassArray(arg_classes)), toStringArray(arg_names), "FUNC_" + func_name, classname, il, cp);
+		InstructionList tmpIl = new InstructionList();
+		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, getObjectType(Object.class), buildArgs(toClassArray(arg_classes)), toStringArray(arg_names), "FUNC_" + func_name, classname, tmpIl, cp);
 
-		il.append(InstructionConstants.ALOAD_0);
+		tmpIl.append(InstructionConstants.ALOAD_0);
 
 		arg_classes.clear();
 		for (int i = num_formal_params - 1; i >= 0; --i) {
 			arg_classes.add(Object.class);
 			if (i >= num_actual_params) {
-				il.append(InstructionConstants.ACONST_NULL);
+				tmpIl.append(InstructionConstants.ACONST_NULL);
 			} else {
-				il.append(InstructionFactory.createLoad(getObjectType(Object.class), local_vars.get("locals_" + i)));
+				tmpIl.append(InstructionFactory.createLoad(getObjectType(Object.class), tmpLocalVars.get("locals_" + i)));
 			}
 		}
-		il.append(factory.createInvoke(classname, "FUNC_" + func_name, getObjectType(Object.class), buildArgs(toClassArray(arg_classes)), Constants.INVOKEVIRTUAL));
+		tmpIl.append(factory.createInvoke(classname, "FUNC_" + func_name, getObjectType(Object.class), buildArgs(toClassArray(arg_classes)), Constants.INVOKEVIRTUAL));
 
-		il.append(InstructionFactory.createReturn(getObjectType(Object.class)));
+		tmpIl.append(InstructionFactory.createReturn(getObjectType(Object.class)));
 
 		method.setMaxStack();
 		method.setMaxLocals();
 		cg.addMethod(method.getMethod());
-		il.dispose();
+		tmpIl.dispose();
 	}
 
 
@@ -1474,8 +1474,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._PUSH_: {
 				Object arg = position.arg(0);
-				if (false) {
-				} else if (arg instanceof Integer) {
+				if        (arg instanceof Integer) {
 					JVMTools_pushInteger(((Integer) arg).intValue());
 				} else if (arg instanceof Double) {
 					JVMTools_pushDouble(((Double) arg).doubleValue());

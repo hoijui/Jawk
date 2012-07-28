@@ -35,7 +35,7 @@ public class AssocArray implements Comparator<Object> {
 	 * The parameter to useMapType to convert
 	 * this associative array to a HashMap.
 	 */
-	public static final int MT_HASH = 2 << 0;
+	public static final int MT_HASH = 2;
 	/**
 	 * The parameter to useMapType to convert
 	 * this associative array to a LinkedHashMap.
