@@ -1807,8 +1807,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 					case AwkTuples._EXEC_: {
 						// stack[0] = Jawk code
 
-						// First attempt. It is not complete by a long-shot.
-						// Use at your own risk.
+						// TODO FIXME First attempt. It is not complete by a long-shot. Use at your own risk.
 
 						String awk_code = JRT.toAwkString(pop(), getCONVFMT().toString());
 						List<ScriptSource> scriptSources = new ArrayList<ScriptSource>(1);

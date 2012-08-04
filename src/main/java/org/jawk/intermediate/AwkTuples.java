@@ -23,6 +23,8 @@ public class AwkTuples implements Serializable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AwkTuples.class);
 
+	private VersionManager version_manager = new VersionManager();
+
 	private static final class AddressImpl implements Address, Serializable {
 
 		private String lbl;
@@ -74,7 +76,7 @@ public class AwkTuples implements Serializable {
 		public void next() {
 			assert tuple != null;
 			++idx;
-			tuple = tuple.next;
+			tuple = tuple.getNext();
 			assert queue.size() == idx || queue.get(idx) == tuple;
 		}
 
@@ -90,67 +92,66 @@ public class AwkTuples implements Serializable {
 
 		@Override
 		public int opcode() {
-			return tuple.opcode;
+			return tuple.getOpcode();
 		}
 
 		@Override
 		public int intArg(int arg_idx) {
-			Class c = tuple.types[arg_idx];
+			Class c = tuple.getTypes()[arg_idx];
 			if (c == Integer.class) {
-				return tuple.ints[arg_idx];
+				return tuple.getInts()[arg_idx];
 			}
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
 		}
 
 		@Override
 		public boolean boolArg(int arg_idx) {
-			Class c = tuple.types[arg_idx];
+			Class c = tuple.getTypes()[arg_idx];
 			if (c == Boolean.class) {
-				return tuple.bools[arg_idx];
+				return tuple.getBools()[arg_idx];
 			}
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
 		}
 
 		@Override
 		public Object arg(int arg_idx) {
-			Class c = tuple.types[arg_idx];
+			Class c = tuple.getTypes()[arg_idx];
 			if (c == Integer.class) {
-				return tuple.ints[arg_idx];
+				return tuple.getInts()[arg_idx];
 			}
 			if (c == Double.class) {
-				return tuple.doubles[arg_idx];
+				return tuple.getDoubles()[arg_idx];
 			}
 			if (c == String.class) {
-				return tuple.strings[arg_idx];
+				return tuple.getStrings()[arg_idx];
 			}
 			if (c == Address.class) {
 				assert arg_idx == 0;
-				return tuple.address;
+				return tuple.getAddress();
 			}
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
 		}
 
 		@Override
 		public Address addressArg() {
-			assert tuple.address != null || tuple.has_func_addr != null : "tuple.address = " + tuple.address + ", tuple.has_func_addr = " + tuple.has_func_addr;
-			if (tuple.address != null) {
-				return tuple.address;
-			} else {
-				return tuple.address = tuple.has_func_addr.getFunctionAddress();
+			assert tuple.getAddress() != null || tuple.getHasFuncAddr() != null : "tuple.address = " + tuple.getAddress() + ", tuple.has_func_addr = " + tuple.getHasFuncAddr();
+			if (tuple.getAddress() == null) {
+				tuple.setAddress(tuple.getHasFuncAddr().getFunctionAddress());
 			}
+			return tuple.getAddress();
 		}
 
 		@Override
 		public Class classArg() {
 			//Tuple tuple = queue.get(idx);
-			assert tuple.cls != null;
-			return tuple.cls;
+			assert tuple.getCls() != null;
+			return tuple.getCls();
 		}
 
 		@Override
 		public int lineNumber() {
-			assert tuple.lineno != -1 : "The line number should have been set by queue.add(), but was not.";
-			return tuple.lineno;
+			assert tuple.getLineno() != -1 : "The line number should have been set by queue.add(), but was not.";
+			return tuple.getLineno();
 		}
 
 		@Override
@@ -175,7 +176,7 @@ public class AwkTuples implements Serializable {
 		private Class[] types = new Class[4];
 		private Address address = null;
 		private Class cls = null;
-		private transient HasFunctionAddress has_func_addr = null;
+		private transient HasFunctionAddress hasFuncAddr = null;
 		// to avoid polluting the constructors,
 		// setLineNumber(int) populates this field
 		// (called by an anonymous inner subclass of ArrayList,
@@ -249,7 +250,7 @@ public class AwkTuples implements Serializable {
 
 		private Tuple(int opcode, HasFunctionAddress has_func_addr, String s2, int i3, int i4) {
 			this(opcode);
-			this.has_func_addr = has_func_addr;
+			this.hasFuncAddr = has_func_addr;
 			strings[1] = s2;
 			types[1] = String.class;
 			ints[2] = i3;
@@ -311,7 +312,7 @@ public class AwkTuples implements Serializable {
 					sb.append(cls);
 				} else if (type == HasFunctionAddress.class) {
 					assert (idx == 0);
-					sb.append(has_func_addr);
+					sb.append(hasFuncAddr);
 				} else {
 					throw new Error("Unknown param type (" + idx + "): " + type);
 				}
@@ -335,8 +336,8 @@ public class AwkTuples implements Serializable {
 		 */
 		public void touch(java.util.List<Tuple> queue) {
 			assert lineno != -1 : "The line number should have been set by queue.add(), but was not.";
-			if (has_func_addr != null) {
-				address = has_func_addr.getFunctionAddress();
+			if (hasFuncAddr != null) {
+				address = hasFuncAddr.getFunctionAddress();
 				types[0] = Address.class;
 			}
 			if (address != null) {
@@ -348,26 +349,58 @@ public class AwkTuples implements Serializable {
 				}
 			}
 		}
-	}
 
-	public static String toOpcodeString(int opcode) {
-		Class c = AwkTuples.class;
-		Field[] fields = c.getDeclaredFields();
-		try {
-			for (Field field : fields) {
-				if ((field.getModifiers() & Modifier.STATIC) > 0 && field.getType() == Integer.TYPE && field.getInt(null) == opcode) {
-					return field.getName();
-				}
-			}
-		} catch (IllegalAccessException iac) {
-			LOG.error("Failed to create OP-Code string", iac);
-			return "[" + opcode + ": " + iac + "]";
+		private int getOpcode() {
+			return opcode;
 		}
-		return "{" + opcode + "}";
+
+		private int[] getInts() {
+			return ints;
+		}
+
+		private boolean[] getBools() {
+			return bools;
+		}
+
+		private double[] getDoubles() {
+			return doubles;
+		}
+
+		private String[] getStrings() {
+			return strings;
+		}
+
+		private Class[] getTypes() {
+			return types;
+		}
+
+		private void setAddress(Address address) {
+			this.address = address;
+		}
+
+		private Address getAddress() {
+			return address;
+		}
+
+		private int getLineno() {
+			return lineno;
+		}
+
+		private void setOpcode(int opcode) {
+			this.opcode = opcode;
+		}
+
+		private Class getCls() {
+			return cls;
+		}
+
+		private HasFunctionAddress getHasFuncAddr() {
+			return hasFuncAddr;
+		}
 	}
 
 	// made public to be accessable via Java Reflection
-	// (see toOpcodeString() method above)
+	// (see toOpcodeString() method below)
 
 	/**
 	 * Pops an item off the operand stack.
@@ -1587,6 +1620,22 @@ public class AwkTuples implements Serializable {
 	private Map<Integer, Address> address_indexes = new HashMap<Integer, Address>();
 	private Map<String, Integer> address_label_counts = new HashMap<String, Integer>();
 
+	public static String toOpcodeString(int opcode) {
+		Class c = AwkTuples.class;
+		Field[] fields = c.getDeclaredFields();
+		try {
+			for (Field field : fields) {
+				if ((field.getModifiers() & Modifier.STATIC) > 0 && field.getType() == Integer.TYPE && field.getInt(null) == opcode) {
+					return field.getName();
+				}
+			}
+		} catch (IllegalAccessException iac) {
+			LOG.error("Failed to create OP-Code string", iac);
+			return "[" + opcode + ": " + iac + "]";
+		}
+		return "{" + opcode + "}";
+	}
+
 	public void pop() {
 		queue.add(new Tuple(_POP_));
 	}
@@ -2250,6 +2299,7 @@ public class AwkTuples implements Serializable {
 	 * class version matches the version supported by the interpreter/compiler.
 	 */
 	private static class VersionManager implements Serializable {
+
 		/**
 		 * Class version number.
 		 * This number is modified by the developer.
@@ -2302,5 +2352,4 @@ public class AwkTuples implements Serializable {
 			return "intermediate file format version = " + INSTANCE_VERSION;
 		}
 	}
-	private VersionManager version_manager = new VersionManager();
 }

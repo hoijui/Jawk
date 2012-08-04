@@ -298,17 +298,17 @@ public class Awk {
 					LOG.trace("done");
 					return 0;
 				} catch (InstantiationException ie) {
-					throw new Error("Cannot instantiate the compiler: " + ie);
+					throw new Error("Cannot instantiate the compiler", ie);
 				} catch (IllegalAccessException iae) {
-					throw new Error("Cannot instantiate the compiler: " + iae);
+					throw new Error("Cannot instantiate the compiler", iae);
 				} catch (java.lang.reflect.InvocationTargetException ite) {
-					throw new Error("Cannot instantiate the compiler: " + ite);
+					throw new Error("Cannot instantiate the compiler", ite);
 				}
 			} catch (NoSuchMethodException nsme) {
-				throw new Error("Cannot find the constructor: " + nsme);
+				throw new Error("Cannot find the constructor", nsme);
 			}
 		} catch (ClassNotFoundException cnfe) {
-			throw new IllegalArgumentException("Cannot find the AwkCompiler.");
+			throw new IllegalArgumentException("Cannot find the AwkCompiler", cnfe);
 		}
 	}
 

@@ -68,6 +68,8 @@ public class JRT {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JRT.class);
 
+	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
+
 	/**
 	 * The default regular expression for setRecordSeparator.
 	 * The AVM refers to this field, so that the field exists
@@ -77,10 +79,34 @@ public class JRT {
 	//public static final String DEFAULT_RS_REGEX = "(\n)|(\r\n)";
 
 	static {
-		assert DEFAULT_RS_REGEX != null : "line.separator not found in System properties ?!";
+		assert (DEFAULT_RS_REGEX != null) : "line.separator not found in System properties ?!";
 	}
 
 	private VariableManager vm;
+
+	private Map<String, Process> output_processes = new HashMap<String, Process>();
+	private Map<String, PrintStream> output_streams = new HashMap<String, PrintStream>();
+
+	// Paritioning reader for stdin.
+	private PartitioningReader partitioningReader = null;
+	// Current input line ($0).
+	private String inputLine = null;
+	// Current input fields ($0, $1, $2, ...).
+	private List<String> input_fields = new ArrayList<String>(100);
+	private AssocArray arglist_aa = null;
+	private int arglist_idx;
+	private boolean has_filenames = false;
+	private static final String BLANK = "";
+
+	private static final Integer ONE = Integer.valueOf(1);
+	private static final Integer ZERO = Integer.valueOf(0);
+	private static final Integer MINUS_ONE = Integer.valueOf(-1);
+	private String jrt_input_string;
+
+	private Map<String, PartitioningReader> file_readers = new HashMap<String, PartitioningReader>();
+	private Map<String, PartitioningReader> command_readers = new HashMap<String, PartitioningReader>();
+	private Map<String, Process> command_processes = new HashMap<String, Process>();
+	private Map<String, PrintStream> outputFiles = new HashMap<String, PrintStream>();
 
 	/**
 	 * Create a JRT with a VariableManager
@@ -220,9 +246,12 @@ public class JRT {
 	 *   <li>&gt; 0 - Return true if o1 &gt; o2.</li>
 	 *   </ul>
 	 */
-	public static boolean compare2(Object o1, Object o2, int mode) {
+	public static boolean compare2(Object obj1, Object obj2, int mode) {
 
-		// check for hybrid analysis
+		// TODO check for hybrid analysis
+
+		Object o1 = obj1;
+		Object o2 = obj2;
 
 		if (!(o1 instanceof Number)) {
 			try {
@@ -416,19 +445,6 @@ public class JRT {
 		return cnt;
 	}
 
-	// Paritioning reader for stdin.
-	private PartitioningReader partitioningReader = null;
-	// Current input line ($0).
-	private String inputLine = null;
-	// Current input fields ($0, $1, $2, ...).
-	private List<String> input_fields = new ArrayList<String>(100);
-
-	private AssocArray arglist_aa = null;
-	private int arglist_idx;
-	private boolean has_filenames = false;
-
-	private static final String BLANK = "";
-
 	public PartitioningReader getPartitioningReader() {
 		return partitioningReader;
 	}
@@ -554,9 +570,9 @@ public class JRT {
 
 
 				// when active_input == false, usually means
-				// to instantiate "pr" (partitioningreader for $0, etc)
+				// to instantiate "pr" (PartitioningReader for $0, etc)
 				// for Jawk extensions
-				//if (! active_input)
+				//if (!active_input)
 				//	return false;
 
 				inputLine = partitioningReader.readRecord();
@@ -715,10 +731,6 @@ public class JRT {
 		}
 		input_fields.set(0, new_dollar_zero_sb.toString());
 	}
-	private static final Integer ONE = Integer.valueOf(1);
-	private static final Integer ZERO = Integer.valueOf(0);
-	private static final Integer MINUS_ONE = Integer.valueOf(-1);
-	private String jrt_input_string;
 
 	public Integer jrtConsumeFileInputForGetline(String filename) {
 		try {
@@ -765,11 +777,6 @@ public class JRT {
 	public String jrtGetInputString() {
 		return jrt_input_string;
 	}
-
-	private Map<String, PartitioningReader> file_readers = new HashMap<String, PartitioningReader>();
-	private Map<String, PartitioningReader> command_readers = new HashMap<String, PartitioningReader>();
-	private Map<String, Process> command_processes = new HashMap<String, Process>();
-	private Map<String, PrintStream> outputFiles = new HashMap<String, PrintStream>();
 
 	public Map<String, PrintStream> getOutputFiles() {
 		return outputFiles;
@@ -950,7 +957,6 @@ public class JRT {
 		}
 		return ps != null;
 	}
-	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
 
 	private boolean jrtCloseOutputStream(String cmd) {
 		Process p = output_processes.get(cmd);
@@ -1015,9 +1021,6 @@ public class JRT {
 			return false;
 		}
 	}
-
-	private Map<String, Process> output_processes = new HashMap<String, Process>();
-	private Map<String, PrintStream> output_streams = new HashMap<String, PrintStream>();
 
 	/**
 	 * Executes the command specified by cmd and waits

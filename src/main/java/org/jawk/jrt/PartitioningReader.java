@@ -80,7 +80,7 @@ public class PartitioningReader extends FilterReader {
 	 *
 	 * @param recordSeparator The new record separator, as a regular expression.
 	 */
-	public void setRecordSeparator(String recordSeparator) {
+	public final void setRecordSeparator(String recordSeparator) {
 		//assert !recordSeparator.equals("") : "recordSeparator cannot be BLANK";
 		if (!recordSeparator.equals(priorRecordSeparator)) {
 			if (recordSeparator.equals("")) {
