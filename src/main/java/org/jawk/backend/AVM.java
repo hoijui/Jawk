@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jawk.ExitException;
 import org.jawk.ext.JawkExtension;
 import org.jawk.frontend.AwkSyntaxTree;
 import org.jawk.intermediate.Address;
@@ -251,8 +252,9 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 */
 	@Override
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public int interpret(AwkTuples tuples) {
-
+	public void interpret(AwkTuples tuples)
+			throws ExitException
+	{
 		Map<String, Pattern> regexps = new HashMap<String, Pattern>();
 		Map<Integer, PatternPair> pattern_pairs = new HashMap<Integer, PatternPair>();
 
@@ -1742,7 +1744,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 							jrt.jrtCloseAll();
 							// clear operand stack
 							operand_stack.clear();
-							return exit_code;
+							throw new ExitException(exit_code, "The AWK script requested an exit");
 							//position.next();
 						}
 						break;
@@ -1830,8 +1832,13 @@ public class AVM implements AwkInterpreter, VariableManager {
 								new_tuples.postProcess();
 								ap.populateGlobalVariableNameToOffsetMappings(new_tuples);
 								AVM new_avm = new AVM(settings, extensions);
-								int retcode = new_avm.interpret(new_tuples);
-								push(retcode);
+								int subScriptExitCode = 0;
+								try {
+									new_avm.interpret(new_tuples);
+								} catch (ExitException ex) {
+									subScriptExitCode = ex.getCode();
+								}
+								push(subScriptExitCode);
 							} else {
 								push(-1);
 							}
@@ -1898,7 +1905,6 @@ public class AVM implements AwkInterpreter, VariableManager {
 			}
 			jrt.jrtCloseAll();
 			assert operand_stack.size() == 0 : "operand stack is NOT empty upon script termination. operand_stack (size=" + operand_stack.size() + ") = " + operand_stack;
-			return exit_code;
 		} catch (RuntimeException re) {
 			LOG.error("", re);
 			LOG.error("operand_stack = {}", operand_stack);

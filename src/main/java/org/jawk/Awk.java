@@ -22,7 +22,6 @@ import org.jawk.ext.JawkExtension;
 import org.jawk.frontend.AwkParser;
 import org.jawk.frontend.AwkSyntaxTree;
 import org.jawk.intermediate.AwkTuples;
-import org.jawk.util.AwkParameters;
 import org.jawk.util.AwkSettings;
 import org.jawk.util.DestDirClassLoader;
 import org.jawk.util.ScriptSource;
@@ -32,6 +31,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Entry point into the parsing, analysis, and execution/compilation
  * of a Jawk script.
+ * This entry point is used when Jawk is executed as a library.
+ * If you want to use Jawk as a stand-alone application, please use {@see Main}.
  * <p>
  * The overall process to execute a Jawk script is as follows:
  * <ul>
@@ -84,61 +85,13 @@ import org.slf4j.LoggerFactory;
  */
 public class Awk {
 
-	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
 	private static final String DEFAULT_EXTENSIONS
 			= org.jawk.ext.CoreExtension.class.getName()
 			+ "#" + org.jawk.ext.SocketExtension.class.getName()
 			+ "#" + org.jawk.ext.StdinExtension.class.getName();
 	private static final Logger LOG = LoggerFactory.getLogger(Awk.class);
 
-	/**
-	 * Prohibit the instantiation of this class, other than the
-	 * way required by JSR 223.
-	 */
-	private Awk() {}
-
-	/**
-	 * Class constructor to support the JSR 223 scripting interface
-	 * already provided by Java SE 6.
-	 *
-	 * @param args String arguments from the command-line.
-	 * @param is The input stream to use as stdin.
-	 * @param os The output stream to use as stdout.
-	 * @param es The output stream to use as stderr.
-	 * @throws Exception enables exceptions to propagate to the callee.
-	 */
-	public Awk(String[] args, InputStream is, PrintStream os, PrintStream es)
-			throws Exception
-	{
-		System.setIn(is);
-		System.setOut(os);
-		System.setErr(es);
-		main(args);
-	}
-
-	/**
-	 * The entry point to Jawk for the VM.
-	 * <p>
-	 * The main method is a simple call to the invoke method.
-	 * The current implementation is as follows:
-	 * <blockquote>
-	 * <pre>
-	 * System.exit(invoke(args));
-	 * </pre>
-	 * </blockquote>
-	 * </p>
-	 *
-	 * @param args Command line arguments to the VM.
-	 *
-	 * @throws IOException upon an IO error.
-	 * @throws ClassNotFoundException if compilation is requested,
-	 *	 but no compilation implementation class is found.
-	 */
-	public static void main(String[] args)
-			throws IOException, ClassNotFoundException
-	{
-		System.exit(invoke(args));
-	}
+	public Awk() {}
 
 	/**
 	 * An entry point to Jawk that provides the exit code of the script
@@ -146,7 +99,9 @@ public class Awk {
 	 * If compiled, a non-zero exit status indicates that there
 	 * was a compilation problem.
 	 *
-	 * @param args Command line arguments to the VM.
+	 * @param settings This tells AWK what to do
+	 *   (where to get input from, where to write it to, in what mode to run,
+	 *   ...)
 	 *
 	 * @return The exit code to the script if interpreted, or exit code
 	 * 	 of the compiler.
@@ -154,15 +109,14 @@ public class Awk {
 	 * @throws IOException upon an IO error.
 	 * @throws ClassNotFoundException if compilation is requested,
 	 *	 but no compilation implementation class is found.
+	 * @throws ExitException if interpretation is requested,
+	 *	 and a specific exit code is requested.
 	 */
-	public static int invoke(String[] args)
-			throws IOException, ClassNotFoundException
+	public void invoke(AwkSettings settings)
+			throws IOException, ClassNotFoundException, ExitException
 	{
 		AVM avm = null;
 		try {
-			AwkParameters parameters = new AwkParameters(Awk.class, null); // null = NO extension description ==> require awk script
-			AwkSettings settings = parameters.parseCommandLineArguments(args);
-
 			// key = Keyword, value = JawkExtension
 			Map<String, JawkExtension> extensions;
 			if (settings.isUserExtensions()) {
@@ -203,7 +157,7 @@ public class Awk {
 						ast.dump(ps);
 					}
 					ps.close();
-					return 0;
+					return;
 				}
 				// otherwise, attempt to traverse the syntax tree and build
 				// the intermediate code
@@ -229,7 +183,7 @@ public class Awk {
 					String filename = settings.getOutputFilename("a.ai");
 					LOG.info("writing to '{}'", filename);
 					writeObjectToFile(tuples, filename);
-					return 0;
+					return;
 				}
 			}
 			if (settings.isDumpIntermediateCode()) {
@@ -239,38 +193,19 @@ public class Awk {
 				PrintStream ps = new PrintStream(new FileOutputStream(filename));
 				tuples.dump(ps);
 				ps.close();
-				return 0;
+				return;
 			}
 
 			if (settings.isCompileRun() || settings.isCompile()) {
 				// compile!
-				int retcode = attemptToCompile(settings, tuples);
-				if (retcode != 0) {
-					return retcode;
-				}
+				attemptToCompile(settings, tuples);
 				if (settings.isCompileRun()) {
-					return attemptToExecuteCompiledResult(settings);
-				} else {
-					return retcode;
+					attemptToExecuteCompiledResult(settings);
 				}
 			} else {
 				// interpret!
 				avm = new AVM(settings, extensions);
-				return avm.interpret(tuples);
-			}
-		} catch (Error err) {
-			if (IS_WINDOWS) {
-				LOG.error("General problem", err);
-				return 1;
-			} else {
-				throw err;
-			}
-		} catch (RuntimeException re) {
-			if (IS_WINDOWS) {
-				LOG.error("General problem", re);
-				return 1;
-			} else {
-				throw re;
+				avm.interpret(tuples);
 			}
 		} finally {
 			if (avm != null) {
@@ -282,7 +217,7 @@ public class Awk {
 	/**
 	 * Use reflection in attempt to access the compiler.
 	 */
-	private static int attemptToCompile(AwkSettings settings, AwkTuples tuples) {
+	private static void attemptToCompile(AwkSettings settings, AwkTuples tuples) {
 		try {
 			LOG.trace("locating AwkCompilerImpl...");
 			Class<?> compilerClass = Class.forName("org.jawk.backend.AwkCompilerImpl");
@@ -296,7 +231,6 @@ public class Awk {
 					LOG.trace("compiling...");
 					compiler.compile(tuples);
 					LOG.trace("done");
-					return 0;
 				} catch (InstantiationException ie) {
 					throw new Error("Cannot instantiate the compiler", ie);
 				} catch (IllegalAccessException iae) {
@@ -312,7 +246,7 @@ public class Awk {
 		}
 	}
 
-	private static int attemptToExecuteCompiledResult(AwkSettings settings) {
+	private static void attemptToExecuteCompiledResult(AwkSettings settings) {
 		String classname = settings.getOutputFilename("AwkScript");
 		try {
 			LOG.trace("locating {}...", classname);
@@ -328,7 +262,6 @@ public class Awk {
 					Object obj = constructor.newInstance();
 					Method method = scriptClass.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
 					Object result = method.invoke(obj, new Object[] {settings});
-					return 0;
 				} catch (InstantiationException ie) {
 					throw new Error("Cannot instantiate the script", ie);
 				} catch (IllegalAccessException iae) {

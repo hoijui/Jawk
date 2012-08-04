@@ -1,8 +1,6 @@
 package org.jawk;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,8 +27,8 @@ public class AwkTest {
 		return vals;
 	}
 
-	static int awk(String ... args) throws ClassNotFoundException, IOException {
-		return Awk.invoke(args);
+	static void awk(String ... args) throws ClassNotFoundException, IOException {
+		Main.main(args);
 	}
 
 	static File classpathFile(final Class<?> c, String path) {
@@ -64,7 +62,7 @@ public class AwkTest {
 	@Test @Ignore // FIXME this doesn't work because usage calls exit!
 	public void testEmpty() throws Exception {
 		willThrow.expect(IllegalArgumentException.class);
-		assertNotEquals(0, awk(""));
+		awk("");
 	}
 
 	/**
@@ -74,7 +72,7 @@ public class AwkTest {
 	@Test
 	public void test1() throws Exception {
 		final String devnull = IS_WINDOWS ? pathTo("empty.txt") : "/dev/null";
-		assertEquals(0, awk("1", devnull));
+		awk("1", devnull);
 	}
 
 	/**
@@ -83,7 +81,7 @@ public class AwkTest {
 	 */
 	@Test
 	public void testDontPanic() throws Exception {
-		assertEquals(0, awk("BEGIN { print \"Don\47t Panic!\" }"));
+		awk("BEGIN { print \"Don\47t Panic!\" }");
 		assertArrayEquals(array("Don't Panic!"), linesOutput());
 	}
 
@@ -94,7 +92,7 @@ public class AwkTest {
 	 */
 	@Test
 	public void testDontPanicAdvice() throws Exception {
-		assertEquals(0, awk("-f", pathTo("advice.awk")));
+		awk("-f", pathTo("advice.awk"));
 		assertArrayEquals(array("Don't Panic!"), linesOutput());
 	}
 
@@ -105,7 +103,7 @@ public class AwkTest {
 	 */
 	@Test
 	public void testMailListLiList() throws Exception {
-		assertEquals(0, awk("/li/ {print $0}", pathTo("mail-list")));
+		awk("/li/ {print $0}", pathTo("mail-list"));
 		assertArrayEquals(array(
 				"Amelia       555-5553     amelia.zodiacusque@gmail.com    F",
 				"Broderick    555-0542     broderick.aliquotiens@yahoo.com R",
@@ -119,7 +117,7 @@ public class AwkTest {
 	 */
 	@Test
 	public void testTwoRules() throws Exception {
-		assertEquals(0, awk("/12/ {print $0} /21/ {print $0}", pathTo("mail-list"), pathTo("inventory-shipped")));
+		awk("/12/ {print $0} /21/ {print $0}", pathTo("mail-list"), pathTo("inventory-shipped"));
 		assertArrayEquals(array(
 				"Anthony      555-3412     anthony.asserturo@hotmail.com   A",
 				"Camilla      555-2912     camilla.infusarum@skynet.be     R",

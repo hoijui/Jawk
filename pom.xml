@@ -6,7 +6,7 @@
 		<project.build.sourceEncoding>${project.build.encoding}</project.build.sourceEncoding>
 		<project.build.resourceEncoding>${project.build.encoding}</project.build.resourceEncoding>
 		<project.pkgName>org.jawk</project.pkgName>
-		<project.mainClass>org.jawk.Awk</project.mainClass>
+		<project.mainClass>org.jawk.Main</project.mainClass>
 	</properties>
 
 	<parent>

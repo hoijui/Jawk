@@ -1,5 +1,6 @@
 package org.jawk.backend;
 
+import org.jawk.ExitException;
 import org.jawk.intermediate.AwkTuples;
 
 /**
@@ -15,7 +16,8 @@ public interface AwkInterpreter {
 	 *
 	 * @param tuples The tuples to compile.
 	 *
-	 * @return the exit code returned by the script.
+	 * @throws ExitException indicates that the interpreter would like
+	 *   the application to exit.
 	 */
-	int interpret(AwkTuples tuples);
+	void interpret(AwkTuples tuples) throws ExitException;
 }
