@@ -308,7 +308,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 							throw new AssertionError("class " + c.toString() + " is not contained within '" + packagename + "' package. Field = " + f.toString());
 						}
 					} catch (IllegalAccessException iae) {
-						throw new AssertionError("", iae);
+						throw new AssertionError(iae); // NOTE Thought there is an AssertionError#AssertionError(String, Throwable) ctor aswell, it was only introduced in Java 1.7, so we should not yet use it.
 					}
 				}
 			}
