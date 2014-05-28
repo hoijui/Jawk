@@ -137,7 +137,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		jrt = new JRT(this);	// this = VariableManager
 		this.extensions = extensions;
 		for (JawkExtension ext : extensions.values()) {
-			ext.init(this, jrt);	// this = VariableManager
+			ext.init(this, jrt, settings);	// this = VariableManager
 		}
 	}
 
@@ -2274,7 +2274,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private boolean avmConsumeInput(boolean for_getline)
 			throws IOException
 	{
-		boolean retval = jrt.jrtConsumeInput(for_getline);
+		boolean retval = jrt.jrtConsumeInput(settings.getInput(), for_getline);
 		if (retval && for_getline) {
 			push(jrt.getInputLine());
 		}

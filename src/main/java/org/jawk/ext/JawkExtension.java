@@ -2,6 +2,7 @@ package org.jawk.ext;
 
 import org.jawk.jrt.JRT;
 import org.jawk.jrt.VariableManager;
+import org.jawk.util.AwkSettings;
 
 /**
  * A Jawk Extension.
@@ -53,7 +54,7 @@ public interface JawkExtension {
 	 * It is guaranteed init() is called before invoke() is called.
 	 * </p>
 	 */
-	void init(VariableManager vm, JRT jrt);
+	void init(VariableManager vm, JRT jrt, final AwkSettings settings);
 
 	/**
 	 * The name of the extension package.

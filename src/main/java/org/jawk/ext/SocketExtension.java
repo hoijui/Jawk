@@ -24,6 +24,7 @@ import org.jawk.jrt.BulkBlockObject;
 import org.jawk.jrt.IllegalAwkArgumentException;
 import org.jawk.jrt.JRT;
 import org.jawk.jrt.VariableManager;
+import org.jawk.util.AwkSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,8 +264,8 @@ public class SocketExtension extends AbstractExtension {
 	private IOStyle implDelegate;
 
 	@Override
-	public final void init(VariableManager vm, JRT jrt) {
-		super.init(vm, jrt);
+	public final void init(VariableManager vm, JRT jrt, final AwkSettings settings) {
+		super.init(vm, jrt, settings);
 		implDelegate = new ThreadedIOStyle(vm);
 	}
 

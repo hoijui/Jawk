@@ -1,5 +1,6 @@
 package org.jawk.util;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,12 @@ import java.util.Map;
  * or when invoking Jawk programmatically, from within Java code.
  */
 public class AwkSettings {
+
+	/**
+	 * Where input is read from.
+	 * By default, this is {@link System#in}.
+	 */
+	private InputStream input = System.in;
 
 	/**
 	 * Contains variable assignments which are applied prior to
@@ -248,6 +255,24 @@ public class AwkSettings {
 
 	public void addScriptSource(ScriptSource scriptSource) {
 		scriptSources.add(scriptSource);
+	}
+
+	/**
+	 * Where input is read from.
+	 * By default, this is {@link System#in}.
+	 * @return the input
+	 */
+	public InputStream getInput() {
+		return input;
+	}
+
+	/**
+	 * Where input is read from.
+	 * By default, this is {@link System#in}.
+	 * @param input the input to set
+	 */
+	public void setInput(InputStream input) {
+		this.input = input;
 	}
 
 	/**
@@ -564,5 +589,4 @@ public class AwkSettings {
 	public void setUseStdIn(boolean useStdIn) {
 		this.useStdIn = useStdIn;
 	}
-
 }

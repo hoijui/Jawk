@@ -3,6 +3,7 @@ package org.jawk.ext;
 import org.jawk.jrt.IllegalAwkArgumentException;
 import org.jawk.jrt.JRT;
 import org.jawk.jrt.VariableManager;
+import org.jawk.util.AwkSettings;
 
 /**
  * Base class of various extensions.
@@ -16,11 +17,13 @@ public abstract class AbstractExtension implements JawkExtension {
 
 	private JRT jrt;
 	private VariableManager vm;
+	private AwkSettings settings;
 
 	@Override
-	public void init(VariableManager vm, JRT jrt) {
+	public void init(VariableManager vm, JRT jrt, final AwkSettings settings) {
 		this.vm = vm;
 		this.jrt = jrt;
+		this.settings = settings;
 	}
 
 	/**
@@ -79,5 +82,9 @@ public abstract class AbstractExtension implements JawkExtension {
 
 	protected VariableManager getVm() {
 		return vm;
+	}
+
+	protected AwkSettings getSettings() {
+		return settings;
 	}
 }

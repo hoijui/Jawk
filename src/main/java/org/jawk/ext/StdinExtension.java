@@ -8,6 +8,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.jawk.NotImplementedError;
 import org.jawk.jrt.BlockObject;
+import org.jawk.jrt.JRT;
+import org.jawk.jrt.VariableManager;
+import org.jawk.util.AwkSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,16 +105,16 @@ public class StdinExtension extends AbstractExtension implements JawkExtension {
 
 	private boolean isEof = false;
 
-	public StdinExtension()
-			throws IOException
-	{
-		Thread getLineInputThread = new Thread("getLineInputThread") {
+	@Override
+	public void init(VariableManager vm, JRT jrt, final AwkSettings settings) {
+		super.init(vm, jrt, settings);
 
+		Thread getLineInputThread = new Thread("getLineInputThread") {
 			@Override
 			public final void run() {
 				try {
 					BufferedReader br = new BufferedReader(
-							new InputStreamReader(System.in));
+							new InputStreamReader(settings.getInput()));
 					String line;
 					while ((line = br.readLine()) != null) {
 						getLineInput.put(line);

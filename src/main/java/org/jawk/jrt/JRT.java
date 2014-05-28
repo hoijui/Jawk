@@ -9,6 +9,7 @@ package org.jawk.jrt;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -468,7 +469,7 @@ public class JRT {
 	 *
 	 * @throws IOException upon an IO error.
 	 */
-	public boolean jrtConsumeInput(boolean for_getline) throws IOException {
+	public boolean jrtConsumeInput(final InputStream input, boolean for_getline) throws IOException {
 		// first time!
 		if (arglist_aa == null) {
 			Object arglist_obj = vm.getARGV(); // vm.getVariable("argv_field", true);
@@ -525,14 +526,14 @@ public class JRT {
 							setFilelistVariable(name_value_or_filename);
 							if (!has_filenames) {
 								// stdin with a variable!
-								partitioningReader = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
+								partitioningReader = new PartitioningReader(new InputStreamReader(input), vm.getRS().toString());
 								vm.setFILENAME("");
 							} else {
 								continue;
 							}
 						}
 					} else if (!has_filenames) {
-						partitioningReader = new PartitioningReader(new InputStreamReader(System.in), vm.getRS().toString());
+						partitioningReader = new PartitioningReader(new InputStreamReader(input), vm.getRS().toString());
 						vm.setFILENAME("");
 					} else {
 						return false;
