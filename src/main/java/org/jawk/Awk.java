@@ -215,7 +215,7 @@ public class Awk {
 				return 0;
 			}
 
-			if (settings.isCompileRun() || settings.isCompileRun()) {
+			if (settings.isCompileRun() || settings.isCompile()) {
 				// compile!
 				int retcode = attemptToCompile(settings, tuples);
 				if (retcode != 0) {
