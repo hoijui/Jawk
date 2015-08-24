@@ -20,7 +20,7 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings("static-method")
 public class AwkTest {
 
-	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
+	private static final boolean IS_WINDOWS = (System.getProperty("os.name").contains("Windows"));
 
 	private static final String LF = System.getProperty("line.separator");
 
