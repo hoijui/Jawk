@@ -169,8 +169,6 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * <code>false</code> otherwise.
 	 */
 	private boolean within_end_blocks = false;
-	// use a return code of 0 by default
-	private int exit_code = 0;
 
 	/**
 	 * Maps global variable names to their global array offsets.
@@ -1731,7 +1729,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 					}
 					case AwkTuples._EXIT_WITH_CODE_: {
 						// stack[0] = exit code
-						exit_code = (int) JRT.toDouble(pop());
+						final int exit_code = (int) JRT.toDouble(pop());
 						if (!within_end_blocks) {
 							assert exit_address != null;
 							// clear runtime stack
