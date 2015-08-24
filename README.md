@@ -11,7 +11,7 @@ can be found in the project documentation site (see below),
 or the project file (`pom.xml`).
 
 
-## How to use
+## How to build
 
 Jawk uses Maven 2+ as build system, which you have to install first.
 If you did so, you can:
