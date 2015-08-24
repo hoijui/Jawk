@@ -65,8 +65,8 @@
 				<configuration>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<showDeprecation>true</showDeprecation>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.${java.old.version}</source>
+					<target>1.${java.old.version}</target>
 				</configuration>
 			</plugin>
 
