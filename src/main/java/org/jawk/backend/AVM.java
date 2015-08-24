@@ -1423,6 +1423,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 					case AwkTuples._USE_AS_FILE_INPUT_: {
 						// stack[0] = filename
 						String s = JRT.toAwkString(pop(), getCONVFMT().toString());
+System.out.println("s: " + s);
 						avmConsumeFileInputForGetline(s);
 						position.next();
 						break;
