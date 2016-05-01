@@ -799,9 +799,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			String path = extractDirname(clsname, File.separator);
 			if (path != null) {
-				boolean dirCreated = new File(path).mkdirs();
-				if (!dirCreated) {
-					throw new IOException("Failed to create directory \"" + path + "\".");
+				File p = new File(path);
+				if (!p.exists()){
+					if (!p.mkdirs()) {
+						throw new IOException("Failed to create directory \"" + path + "\".");
+					}
 				}
 			}
 
