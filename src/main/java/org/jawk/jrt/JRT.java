@@ -257,12 +257,20 @@ public class JRT {
 		if (!(o1 instanceof Number)) {
 			try {
 				o1 = Double.parseDouble(o1.toString());
-			} catch (NumberFormatException nfe) {}
+			} catch (NumberFormatException nfe) {
+                //Empty variable treated as 0
+                if (o1.toString().length() == 0)
+                    o1 = 0.0;
+            }
 		}
 		if (!(o2 instanceof Number)) {
 			try {
 				o2 = Double.parseDouble(o2.toString());
-			} catch (NumberFormatException nfe) {}
+			} catch (NumberFormatException nfe) {
+                //Empty variable treated as 0
+                if (o2.toString().length() == 0)
+                    o2 = 0.0;
+            }
 		}
 
 		if ((o1 instanceof Number) && (o2 instanceof Number)) {
