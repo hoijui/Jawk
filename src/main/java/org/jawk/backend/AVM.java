@@ -929,7 +929,20 @@ public class AVM implements AwkInterpreter, VariableManager {
 						String convfmt = getCONVFMT().toString();
 						String s = JRT.toAwkString(pop(), convfmt);
 						String ere = JRT.toAwkString(pop(), convfmt);
-						Pattern pattern = Pattern.compile(ere);
+
+                        //check if IGNORECASE set
+                        int flags = 0;
+
+                        if (global_variable_offsets.containsKey("IGNORECASE")) {
+                            Integer offset_obj = global_variable_offsets.get("IGNORECASE");
+                            Object ignorecase = runtime_stack.getVariable(offset_obj, true);
+
+                            if (JRT.toDouble(ignorecase) != 0) {
+                                flags |= Pattern.CASE_INSENSITIVE;
+                            }
+                        }
+
+                        Pattern pattern = Pattern.compile(ere, flags);
 						Matcher matcher = pattern.matcher(s);
 						boolean result = matcher.find();
 						if (result) {
