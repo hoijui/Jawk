@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A simple container for the parameters of a single AWK invocation.
  * These values have defaults.
- * These default may be changed through command line arguments,
+ * These defaults may be changed through command line arguments,
  * or when invoking Jawk programmatically, from within Java code.
  */
 public class AwkSettings {
