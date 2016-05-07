@@ -795,14 +795,16 @@ public class AwkCompilerImpl implements AwkCompiler {
 			if (new File(destDir).exists()) {
 				clsname = destDir + File.separator + clsname;
 			} else {
-				throw new IOException("Directory \"" + destDir + "\" does not exist.");
+				throw new IOException("Output directory for the AWK compiled script \"" + destDir + "\" does not exist.");
 			}
 			String path = extractDirname(clsname, File.separator);
 			if (path != null) {
-				File p = new File(path);
-				if (!p.exists()){
-					if (!p.mkdirs()) {
-						throw new IOException("Failed to create directory \"" + path + "\".");
+				final File classFileDir = new File(path);
+				if (!classFileDir.exists()) {
+					if (classFileDir.mkdirs()) {
+						LOG.info("Created output directory for the AWK compiled script \"{}\"", path);
+					} else {
+						throw new IOException("Failed to create output directory for the AWK compiled script \"" + path + "\".");
 					}
 				}
 			}
