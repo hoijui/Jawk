@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -25,6 +26,10 @@ public class AwkTest {
 	@SafeVarargs
 	static <T> T[] array(T ... vals) {
 		return vals;
+	}
+
+	static String[] monotoneArray(final String val, final int num) {
+		return Collections.nCopies(num, val).toArray(new String[num]);
 	}
 
 	static void awk(String ... args) throws ClassNotFoundException, IOException {
@@ -158,25 +163,7 @@ public class AwkTest {
 	public void testUninitializedVarible() throws Exception {
 		awk("//{ if (v == 0) {print \"uninitialize variable\"} else {print}}",
 				pathTo("inventory-shipped"));
-		assertArrayEquals(
-				array(
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable",
-					"uninitialize variable"),
+		assertArrayEquals(monotoneArray("uninitialize variable", 17),
 				linesOutput());
 	}
 
@@ -210,51 +197,13 @@ public class AwkTest {
 	public void testArrayStringKey() throws Exception {
 		awk("//{i=1; j=\"1\"; v[i] = 100; print v[i] v[j];}",
 				pathTo("inventory-shipped"));
-		assertArrayEquals(
-				array(
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100"),
-				linesOutput());
+		assertArrayEquals(monotoneArray("100100", 17), linesOutput());
 	}
 
 	@Test
 	public void testArrayStringKey2() throws Exception {
 		awk("//{i=1; j=\"1\"; v[j] = 100; print v[i] v[j];}",
 				pathTo("inventory-shipped"));
-		assertArrayEquals(
-				array(
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100",
-					"100100"),
-				linesOutput());
+		assertArrayEquals(monotoneArray("100100", 17), linesOutput());
 	}
 }
