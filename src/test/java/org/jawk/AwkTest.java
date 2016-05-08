@@ -132,124 +132,129 @@ public class AwkTest {
 	@Test
 	public void testEmptyPattern() throws Exception {
 		awk("//", pathTo("inventory-shipped"));
-		assertArrayEquals(array(
-		    "Jan  13  25  15 115",
-		    "Feb  15  32  24 226",
-		    "Mar  15  24  34 228",
-		    "Apr  31  52  63 420",
-		    "May  16  34  29 208",
-		    "Jun  31  42  75 492",
-		    "Jul  24  34  67 436",
-		    "Aug  15  34  47 316",
-		    "Sep  13  55  37 277",
-		    "Oct  29  54  68 525",
-		    "Nov  20  87  82 577",
-		    "Dec  17  35  61 401",
-		    "",
-		    "Jan  21  36  64 620",
-		    "Feb  26  58  80 652",
-		    "Mar  24  75  70 495",
-		    "Apr  21  70  74 514"),
-		                  linesOutput());
+		assertArrayEquals(
+				array(
+					"Jan  13  25  15 115",
+					"Feb  15  32  24 226",
+					"Mar  15  24  34 228",
+					"Apr  31  52  63 420",
+					"May  16  34  29 208",
+					"Jun  31  42  75 492",
+					"Jul  24  34  67 436",
+					"Aug  15  34  47 316",
+					"Sep  13  55  37 277",
+					"Oct  29  54  68 525",
+					"Nov  20  87  82 577",
+					"Dec  17  35  61 401",
+					"",
+					"Jan  21  36  64 620",
+					"Feb  26  58  80 652",
+					"Mar  24  75  70 495",
+					"Apr  21  70  74 514"),
+				linesOutput());
 	}
 
-    @Test
-    public void testUninitializedVarible() throws Exception {
-        awk("//{ if (v == 0) {print \"uninitialize variable\"} else {print}}", pathTo("inventory-shipped"));
+	@Test
+	public void testUninitializedVarible() throws Exception {
+		awk("//{ if (v == 0) {print \"uninitialize variable\"} else {print}}",
+				pathTo("inventory-shipped"));
+		assertArrayEquals(
+				array(
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable",
+					"uninitialize variable"),
+				linesOutput());
+	}
 
-        assertArrayEquals(array(
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable",
-            "uninitialize variable"
-                                ), linesOutput());
-    }
+	@Test
+	public void testUninitializedVarible2() throws Exception {
+		awk("//{ v = 1; if (v == 0) {print \"uninitialize variable\"} else {print}}",
+				pathTo("inventory-shipped"));
+		assertArrayEquals(
+				array(
+					"Jan  13  25  15 115",
+					"Feb  15  32  24 226",
+					"Mar  15  24  34 228",
+					"Apr  31  52  63 420",
+					"May  16  34  29 208",
+					"Jun  31  42  75 492",
+					"Jul  24  34  67 436",
+					"Aug  15  34  47 316",
+					"Sep  13  55  37 277",
+					"Oct  29  54  68 525",
+					"Nov  20  87  82 577",
+					"Dec  17  35  61 401",
+					"",
+					"Jan  21  36  64 620",
+					"Feb  26  58  80 652",
+					"Mar  24  75  70 495",
+					"Apr  21  70  74 514"),
+				linesOutput());
+	}
 
-    @Test
-    public void testUninitializedVarible2() throws Exception {
-        awk("//{ v = 1; if (v == 0) {print \"uninitialize variable\"} else {print}}", pathTo("inventory-shipped"));
+	@Test
+	public void testArrayStringKey() throws Exception {
+		awk("//{i=1; j=\"1\"; v[i] = 100; print v[i] v[j];}",
+				pathTo("inventory-shipped"));
+		assertArrayEquals(
+				array(
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100"),
+				linesOutput());
+	}
 
-        assertArrayEquals(array(
-		    "Jan  13  25  15 115",
-		    "Feb  15  32  24 226",
-		    "Mar  15  24  34 228",
-		    "Apr  31  52  63 420",
-		    "May  16  34  29 208",
-		    "Jun  31  42  75 492",
-		    "Jul  24  34  67 436",
-		    "Aug  15  34  47 316",
-		    "Sep  13  55  37 277",
-		    "Oct  29  54  68 525",
-		    "Nov  20  87  82 577",
-		    "Dec  17  35  61 401",
-		    "",
-		    "Jan  21  36  64 620",
-		    "Feb  26  58  80 652",
-		    "Mar  24  75  70 495",
-		    "Apr  21  70  74 514"),
-                          linesOutput());
-    }
-
-    @Test
-    public void testArrayStringKey() throws Exception {
-        awk("//{i=1; j=\"1\"; v[i] = 100; print v[i] v[j];}", pathTo("inventory-shipped"));
-
-        assertArrayEquals(array(
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100"),
-                          linesOutput());
-    }
-
-    @Test
-    public void testArrayStringKey2() throws Exception {
-        awk("//{i=1; j=\"1\"; v[j] = 100; print v[i] v[j];}", pathTo("inventory-shipped"));
-
-        assertArrayEquals(array(
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100",
-            "100100"),
-                          linesOutput());
-    }
+	@Test
+	public void testArrayStringKey2() throws Exception {
+		awk("//{i=1; j=\"1\"; v[j] = 100; print v[i] v[j];}",
+				pathTo("inventory-shipped"));
+		assertArrayEquals(
+				array(
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100",
+					"100100"),
+				linesOutput());
+	}
 }

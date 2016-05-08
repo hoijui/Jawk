@@ -129,17 +129,17 @@ public class AssocArray implements Comparator<Object> {
 	public Object get(Object key) {
 		Object result = map.get(key);
 		if (result == null) {
-            if (key != null) {
-                try {
-                    //try a primitive version key
-                    int iKey = Integer.parseInt(key.toString());
-                    result = map.get(iKey);
+			if (key != null) {
+				try {
+					// try a primitive version key
+					int iKey = Integer.parseInt(key.toString());
+					result = map.get(iKey);
 
-                    if (result != null)
-                        return result;
-                } catch(Exception e) {
-                }
-            }
+					if (result != null)
+						return result;
+				} catch (Exception e) {
+				}
+			}
 			// based on the AWK specification:
 			// Any reference (except for IN expressions) to a non-existent
 			// array element will automatically create it.
@@ -150,15 +150,15 @@ public class AssocArray implements Comparator<Object> {
 	}
 
 	public Object put(Object key, Object value) {
-        if (key != null) {
-            try {
-                //Save a primitive version
-                int iKey = Integer.parseInt(key.toString());
-                put(iKey, value);
-            } catch(Exception e) {
-            }
-        }
-        
+		if (key != null) {
+			try {
+				// Save a primitive version
+				int iKey = Integer.parseInt(key.toString());
+				put(iKey, value);
+			} catch (Exception e) {
+			}
+		}
+
 		return map.put(key, value);
 	}
 
