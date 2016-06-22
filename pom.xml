@@ -184,6 +184,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
+					<compilerArgument>-Xlint:unchecked</compilerArgument>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<showDeprecation>true</showDeprecation>
 					<source>1.${java.old.version}</source>
