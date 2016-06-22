@@ -65,6 +65,7 @@
 		<connection>scm:git:git://github.com/hoijui/Jawk</connection>
 		<developerConnection>scm:git:git@github.com:hoijui/Jawk.git</developerConnection>
 		<url>http://github.com/hoijui/Jawk</url>
+		<tag>HEAD</tag>
 	</scm>
 
 
