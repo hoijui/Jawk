@@ -7,8 +7,8 @@
 		<project.build.resourceEncoding>${project.build.encoding}</project.build.resourceEncoding>
 		<project.pkgName>org.jawk</project.pkgName>
 		<project.mainClass>org.jawk.Main</project.mainClass>
-		<java.old.version>5</java.old.version>
-		<java.old.home>${env.JAVA5_HOME}</java.old.home>
+		<java.old.version>6</java.old.version>
+		<java.old.home>${env.JAVA6_HOME}</java.old.home>
 	</properties>
 
 	<parent>
