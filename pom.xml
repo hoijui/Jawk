@@ -40,6 +40,11 @@
 		</license>
 	</licenses>
 
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/hoijui/Jawk/issues/</url>
+	</issueManagement>
+
 	<developers>
 		<developer>
 			<name>Danny Daglas (ddaglas)</name>
