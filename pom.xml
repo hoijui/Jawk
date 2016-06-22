@@ -320,6 +320,77 @@
 
 	<profiles>
 		<profile>
+			<id>Extensive-Reports</id>
+			<!--
+				This profile adds additional reports to the site phase.
+				The reports in here create a lot of output (in MB).
+				Thus we do not want to use them to generate the default site,
+				which is uploaded on the web (for potentially many versions).
+			-->
+			<reporting>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jxr-plugin</artifactId>
+						<version>2.5</version>
+						<configuration>
+							<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.10.4</version>
+						<configuration>
+							<charset>${project.build.sourceEncoding}</charset>
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-changelog-plugin</artifactId>
+						<version>2.3</version>
+					</plugin>
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<version>2.7</version>
+					</plugin>
+
+					<!--<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-linkcheck-plugin</artifactId>
+						<version>1.1</version>
+					</plugin>-->
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>javancss-maven-plugin</artifactId>
+						<version>2.1</version>
+					</plugin>
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>sonar-maven-plugin</artifactId>
+						<version>3.0.2</version>
+					</plugin>
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>emma-maven-plugin</artifactId>
+						<version>1.0-alpha-3</version>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+
+		<profile>
 			<id>compileWithOldJava</id>
 			<!--
 				NOTE
