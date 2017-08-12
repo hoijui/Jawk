@@ -2054,6 +2054,17 @@ public class AVM implements AwkInterpreter, VariableManager {
 		return replace_all_sb.toString();
 	}
 
+	private StringBuffer replace_all_new_sb = new StringBuffer();
+
+	/**
+	 * gensub() functionality
+	 */
+	private String replaceAllNew(final String orig, final String ere, final String repl) {
+		replace_all_sb.setLength(0);
+		push(JRT.replaceAll(orig, repl, ere, replace_all_sb, getCONVFMT().toString()));
+		return replace_all_sb.toString();
+	}
+
 	/**
 	 * Awk variable assignment functionality.
 	 */
