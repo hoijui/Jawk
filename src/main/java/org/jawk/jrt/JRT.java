@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,12 +77,12 @@ public class JRT {
 	 * The AVM refers to this field, so that the field exists
 	 * in one place.
 	 */
-	public static final String DEFAULT_RS_REGEX = System.getProperty("line.separator", null);
-	//public static final String DEFAULT_RS_REGEX = "(\n)|(\r\n)";
+	//public static final String DEFAULT_RS_REGEX = System.getProperty("line.separator", null);
+	public static final String DEFAULT_RS_REGEX = "(\n)|(\r\n)";
 
-	static {
-		assert (DEFAULT_RS_REGEX != null) : "line.separator not found in System properties ?!";
-	}
+//	static {
+//		assert (DEFAULT_RS_REGEX != null) : "line.separator not found in System properties ?!";
+//	}
 
 	private VariableManager vm;
 
@@ -162,23 +163,27 @@ public class JRT {
 		//private String convfmt = "%.2g";
 		Formatter convfmt_formatter = new Formatter(convfmt_sb);
 
-		if (o instanceof Number) {
-			double d = ((Number) o).doubleValue();
-			if (d == (int) d) {
-				return Integer.toString((int) d);
-			} else {
-				convfmt_sb.setLength(0);
-				try {
-					//convfmt_formatter.format(getCONVFMT(), d);
-					convfmt_formatter.format(convfmt, d);
-					//return Double.toString(d);
-					return convfmt_sb.toString();
-				} catch (java.util.UnknownFormatConversionException ufce) {
-					return "";
+		try {
+			if (o instanceof Number) {
+				double d = ((Number) o).doubleValue();
+				if (d == (int) d) {
+					return Integer.toString((int) d);
+				} else {
+					convfmt_sb.setLength(0);
+					try {
+						//convfmt_formatter.format(getCONVFMT(), d);
+						convfmt_formatter.format(convfmt, d);
+						//return Double.toString(d);
+						return convfmt_sb.toString();
+					} catch (java.util.UnknownFormatConversionException ufce) {
+						return "";
+					}
 				}
+			} else {
+				return o.toString();
 			}
-		} else {
-			return o.toString();
+		} finally {
+			convfmt_formatter.close();
 		}
 	}
 
@@ -204,6 +209,7 @@ public class JRT {
 					StringBuffer ofmt_sb = new StringBuffer();
 					Formatter ofmt_formatter = new Formatter(ofmt_sb);
 					ofmt_formatter.format(ofmt, d);
+					ofmt_formatter.close();
 					return ofmt_sb.toString();
 				} catch (java.util.UnknownFormatConversionException ufce) {
 					return "";
@@ -851,7 +857,6 @@ public class JRT {
 		return p;
 	}
 
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public boolean jrtConsumeCommandInput(String cmd) throws IOException {
 		PartitioningReader pr = command_readers.get(cmd);
 		if (pr == null) {
@@ -895,7 +900,6 @@ public class JRT {
 	 * @return The PrintStream which to write to provide
 	 *   input data to the process.
 	 */
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public PrintStream jrtSpawnForOutput(String cmd) {
 		PrintStream ps = output_streams.get(cmd);
 		if (ps == null) {
@@ -1045,7 +1049,6 @@ public class JRT {
 	 * @return Integer(return_code) of the created
 	 *   process. Integer(-1) is returned on an IO error.
 	 */
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static Integer jrtSystem(String cmd) {
 		try {
 			Process p = spawnProcess(cmd);
@@ -1106,7 +1109,6 @@ public class JRT {
 	 *
 	 * @see #printfFunctionNoCatch(Object[],String)
 	 */
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void printfFunction(Object[] arr, String fmt_arg) {
 		System.out.print(sprintfFunction(arr, fmt_arg));
 	}
@@ -1140,7 +1142,6 @@ public class JRT {
 		return String.format(fmt_arg, arr);
 	}
 
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void printfFunctionNoCatch(Object[] arr, String fmt_arg) {
 		System.out.print(sprintfFunctionNoCatch(arr, fmt_arg));
 	}
