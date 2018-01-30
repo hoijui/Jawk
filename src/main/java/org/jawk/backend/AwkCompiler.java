@@ -17,5 +17,5 @@ public interface AwkCompiler {
 	 *
 	 * @param tuples The tuples to compile.
 	 */
-	void compile(AwkTuples tuples);
+	byte[] compile(AwkTuples tuples);
 }

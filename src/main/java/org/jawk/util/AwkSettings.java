@@ -1,6 +1,7 @@
 package org.jawk.util;
 
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +125,13 @@ public class AwkSettings {
 	 * which means the appropriate default file-name will get used.
 	 */
 	private String outputFilename = null;
+	
+	/**
+	 * Output stream;
+	 * <code>System.out</code> by default,
+	 * which means we will print to stdout by default
+	 */
+	private PrintStream outputStream = System.out;
 
 	/**
 	 * Compiled destination directory (if provided);
@@ -207,6 +215,7 @@ public class AwkSettings {
 	}
 
 
+	@SuppressWarnings("unused")
 	private void addInitialVariable(String keyValue) {
 		int equalsIdx = keyValue.indexOf('=');
 		assert equalsIdx >= 0;
@@ -527,6 +536,24 @@ public class AwkSettings {
 	 */
 	public void setOutputFilename(String outputFilename) {
 		this.outputFilename = outputFilename;
+	}
+	
+	/**
+	 * Output stream;
+	 * <code>System.out</code> by default,
+	 * which means we will print to stdout by default
+	 * @return the output stream
+	 */
+	public PrintStream getOutputStream() {
+		return outputStream;
+	}
+	
+	/**
+	 * Sets the OutputStream to print to (instead of System.out by default)
+	 * @param pOutputStream
+	 */
+	public void setOutputStream(PrintStream pOutputStream) {
+		outputStream = pOutputStream;
 	}
 
 	/**
