@@ -4043,9 +4043,9 @@ public class AwkParser {
 
 	private final class Integer_AST extends ScalarExpression_AST implements NonStatement_AST {
 
-		private Integer I;
+		private Long I;
 
-		private Integer_AST(Integer I) {
+		private Integer_AST(Long I) {
 			this.I = I;
 		}
 
@@ -5090,7 +5090,7 @@ public class AwkParser {
 		// can report accurate line numbers upon errors
 
 		AST addINTEGER(String integer) {
-			return new Integer_AST(Integer.parseInt(integer));
+			return new Integer_AST(Long.parseLong(integer));
 		}
 
 		AST addDOUBLE(String dbl) {

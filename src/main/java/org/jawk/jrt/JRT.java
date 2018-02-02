@@ -15,7 +15,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IllegalFormatException;
@@ -27,6 +26,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jawk.intermediate.UninitializedObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +98,7 @@ public class JRT {
 	private AssocArray arglist_aa = null;
 	private int arglist_idx;
 	private boolean has_filenames = false;
-	private static final String BLANK = "";
+	private static final UninitializedObject BLANK = new UninitializedObject();
 
 	private static final Integer ONE = Integer.valueOf(1);
 	private static final Integer ZERO = Integer.valueOf(0);
@@ -159,31 +159,37 @@ public class JRT {
 	 * @return A String representation of o.
 	 */
 	public static String toAwkString(Object o, String convfmt) {
-		StringBuffer convfmt_sb = new StringBuffer();
-		//private String convfmt = "%.2g";
-		Formatter convfmt_formatter = new Formatter(convfmt_sb);
-
-		try {
-			if (o instanceof Number) {
-				double d = ((Number) o).doubleValue();
-				if (d == (int) d) {
-					return Integer.toString((int) d);
-				} else {
-					convfmt_sb.setLength(0);
-					try {
-						//convfmt_formatter.format(getCONVFMT(), d);
-						convfmt_formatter.format(convfmt, d);
-						//return Double.toString(d);
-						return convfmt_sb.toString();
-					} catch (java.util.UnknownFormatConversionException ufce) {
-						return "";
-					}
-				}
+		
+		if (o instanceof Number) {
+			// It is a number, some processing is required here
+			double d = ((Number) o).doubleValue();
+			if (d == (long) d) {
+				// If an integer, represent it as an integer (no floating point and decimals)
+				return Long.toString((long) d);
 			} else {
-				return o.toString();
+				// It's not a integer, represent it with the specified format
+				try {
+					String s = String.format(convfmt, d);
+					// Surprisingly, while %.6g is the official representation of numbers in AWK
+					// which should include trailing zeroes, AWK seems to trim them. So, we will
+					// do the same: trim the trailing zeroes
+					if (s.indexOf('.') > -1 && (s.indexOf('e') + s.indexOf('E') == -2)) {
+						while (s.endsWith("0")) {
+							s = s.substring(0, s.length() - 1);
+						}
+						if (s.endsWith(".")) {
+							s = s.substring(0, s.length() - 1);
+						}
+					}
+					return s;
+				} catch (java.util.UnknownFormatConversionException ufce) {
+					// Impossible case
+					return "";
+				}
 			}
-		} finally {
-			convfmt_formatter.close();
+		} else {
+			// It's not a number, easy
+			return o.toString();
 		}
 	}
 
@@ -199,41 +205,64 @@ public class JRT {
 	 * @return A String representation of o.
 	 */
 	public static String toAwkStringForOutput(Object o, String ofmt) {
-		if (o instanceof Number) {
-			double d = ((Number) o).doubleValue();
-			if (d == (int) d) {
-				return Integer.toString((int) d);
-			} else {
-				//ofmt_sb.setLength(0);
-				try {
-					StringBuffer ofmt_sb = new StringBuffer();
-					Formatter ofmt_formatter = new Formatter(ofmt_sb);
-					ofmt_formatter.format(ofmt, d);
-					ofmt_formatter.close();
-					return ofmt_sb.toString();
-				} catch (java.util.UnknownFormatConversionException ufce) {
-					return "";
-				}
+
+		// Even if specified Object o is not officially a number, we try to convert
+		// it to a Double. Because if it's a litteral representation of a number,
+		// we will need to display it as a number ("12.00" --> 12)
+		if (!(o instanceof Number)) {
+			try {
+				o = Double.parseDouble(o.toString());
+			} catch (NumberFormatException e) {
+				// Do nothing here
 			}
-		} else {
-			return o.toString();
 		}
+		
+		return toAwkString(o, ofmt);
 	}
 
 	/*
 	 * Convert a String, Integer, or Double to Double.
 	 *
 	 * @param o Object to convert.
-	 * @param convfmt The contents of the CONVFMT variable.
 	 *
-	 * @return A String representation of o.
+	 * @return the "double" value of o, or 0 if invalid 
 	 */
 	public static double toDouble(Object o) {
 		if (o instanceof Number) {
 			return ((Number) o).doubleValue();
 		} else {
+			// Try to convert the string to a number.
+			// If failed, try with one character less.
+			// This is to be able to handle the (original) way
+			// that AWK converts strings to numbers, i.e.:
+			// 25fix will convert to 25 (any numeric prefix
+			// will work)
+			String s = o.toString();
+			while (s.length() > 0) {
+				try {
+					return Double.parseDouble(s);
+				} catch (NumberFormatException nfe) {
+				}
+				s = s.substring(0, s.length() - 1);
+			}
+			// Failed (not even with one char)
+			return 0;
+		}
+	}
+	
+	/*
+	 * Convert a String, Long, or Double to Long.
+	 *
+	 * @param o Object to convert.
+	 *
+	 * @return the "long" value of o, or 0 if invalid 
+	 */
+	public static long toLong(Object o) {
+		if (o instanceof Number) {
+			return ((Number)o).longValue();
+		} else {
 			try {
-				return Double.parseDouble(o.toString());
+				return Long.parseLong(o.toString());
 			} catch (NumberFormatException nfe) {
 				return 0;
 			}
@@ -255,27 +284,38 @@ public class JRT {
 	 */
 	public static boolean compare2(Object obj1, Object obj2, int mode) {
 
-		// TODO check for hybrid analysis
-
 		Object o1 = obj1;
 		Object o2 = obj2;
 
+		// Special case of Uninitialized objects
+		if (o1 instanceof UninitializedObject) {
+			if (o2 instanceof UninitializedObject ||
+					"".equals(o2.toString()) ||
+					"0".equals(o2.toString())) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (o2 instanceof UninitializedObject) {
+			if (o1 instanceof UninitializedObject ||
+					"".equals(o1.toString()) ||
+					"0".equals(o1.toString())) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
 		if (!(o1 instanceof Number)) {
 			try {
 				o1 = Double.parseDouble(o1.toString());
 			} catch (NumberFormatException nfe) {
-				// Empty variable treated as 0
-				if (o1.toString().length() == 0)
-					o1 = 0.0;
 			}
 		}
 		if (!(o2 instanceof Number)) {
 			try {
 				o2 = Double.parseDouble(o2.toString());
 			} catch (NumberFormatException nfe) {
-				// Empty variable treated as 0
-				if (o2.toString().length() == 0)
-					o2 = 0.0;
 			}
 		}
 
@@ -327,8 +367,8 @@ public class JRT {
 				ans = 1;
 			}
 		}
-		if (ans == (int) ans) {
-			return (int) ans;
+		if (ans == (long) ans) {
+			return (long) ans;
 		} else {
 			return ans;
 		}
@@ -360,8 +400,8 @@ public class JRT {
 				ans = 1;
 			}
 		}
-		if (ans == (int) ans) {
-			return (int) ans;
+		if (ans == (long) ans) {
+			return (long) ans;
 		} else {
 			return ans;
 		}
@@ -377,8 +417,10 @@ public class JRT {
 	 * @return For the following class types for o:
 	 * 	<ul>
 	 * 	<li><strong>Integer</strong> - o.intValue() != 0
+	 * 	<li><strong>Long</strong> - o.longValue() != 0
 	 * 	<li><strong>Double</strong> - o.doubleValue() != 0
 	 * 	<li><strong>String</strong> - o.length() &gt; 0
+	 * 	<li><strong>UninitializedObject</strong> - false
 	 * 	<li><strong>Pattern</strong> - $0 ~ o
 	 * 	<li><strong>PatternPair</strong> - $0 ~ o (with some state information)
 	 * 	</ul>
@@ -390,19 +432,23 @@ public class JRT {
 		boolean val;
 		if (o instanceof Integer) {
 			val = ((Integer)o).intValue() != 0;
+		} else if (o instanceof Long) {
+			val = ((Long)o).longValue() != 0;
 		} else if (o instanceof Double) {
 			val = ((Double)o).doubleValue() != 0;
 		} else if (o instanceof String) {
 			val = (o.toString().length() > 0);
+		} else if (o instanceof UninitializedObject) {
+			val = false;
 		} else if (o instanceof Pattern) {
 			// match against $0
 			// ...
 			Pattern pattern = (Pattern) o;
-			String s = inputLine == null ? BLANK : inputLine;
+			String s = inputLine == null ? "" : inputLine;
 			Matcher matcher = pattern.matcher(s);
 			val = matcher.find();
 		} else if (o instanceof PatternPair) {
-			String s = inputLine == null ? BLANK : inputLine;
+			String s = inputLine == null ? "" : inputLine;
 			val = ((PatternPair) o).matches(s);
 		} else {
 			throw new Error("Unknown operand_stack type: " + o.getClass() + " for value " + o);
@@ -502,7 +548,7 @@ public class JRT {
 			// ARGV[1]="a"
 			// ARGV[2]="b"
 			// ARGV[3]="c"
-			for (int i = 1; i < argc; i++) {
+			for (long i = 1; i < argc; i++) {
 				if (arglist_aa.isIn(i)) {
 					Object namevalue_or_filename_object = arglist_aa.get(i);
 					String namevalue_or_filename = toAwkString(namevalue_or_filename_object, vm.getCONVFMT().toString());
@@ -526,11 +572,11 @@ public class JRT {
 					while(arglist_idx <= argc) {
 						o = arglist_aa.get(arglist_idx);
 						++arglist_idx;
-						if (!o.toString().equals(BLANK)) {
+						if (!(o instanceof UninitializedObject || o.toString().isEmpty())) {
 							break;
 						}
 					}
-					if (!o.equals(BLANK)) {
+					if (!(o instanceof UninitializedObject || o.toString().isEmpty())) {
 						String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
 						if (name_value_or_filename.indexOf('=') == -1) {
 							partitioningReader = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
@@ -559,11 +605,11 @@ public class JRT {
 						while(arglist_idx <= argc) {
 							o = arglist_aa.get(arglist_idx);
 							++arglist_idx;
-							if (!o.toString().equals(BLANK)) {
+							if (!(o instanceof UninitializedObject || o.toString().isEmpty())) {
 								break;
 							}
 						}
-						if (!o.equals(BLANK)) {
+						if (!(o instanceof UninitializedObject || o.toString().isEmpty())) {
 							String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
 							if (name_value_or_filename.indexOf('=') == -1) {
 								// true = from filename list
@@ -717,14 +763,14 @@ public class JRT {
 		assert value_obj != null;
 		String value = value_obj.toString();
 		// if the value is BLANK
-		if (value.equals(BLANK)) {
+		if (value_obj instanceof UninitializedObject) {
 			if (field_num < input_fields.size()) {
-				input_fields.set(field_num, BLANK);
+				input_fields.set(field_num, "");
 			}
 		} else {
 			// append the list to accommodate the new value
 			for (int i = input_fields.size() - 1; i < field_num; i++) {
-				input_fields.add(BLANK);
+				input_fields.add("");
 			}
 			input_fields.set(field_num, value);
 		}
@@ -1084,11 +1130,58 @@ public class JRT {
 	 * @see #sprintfFunctionNoCatch(Object[],String)
 	 */
 	public static String sprintfFunction(Object[] arr, String fmt_arg) {
-		try {
-			return String.format(fmt_arg, arr);
-		} catch (IllegalFormatException ife) {
-			return "";
+		
+		// Try to adapt the object types to the specified formats
+		Pattern percentPattern = Pattern.compile("(%%)|(%n)|(%[ -\\+\\(#0]?[0-9]*(\\.[0-9]+)?[bhscdoxefgat])", Pattern.CASE_INSENSITIVE);
+		Matcher percentMatcher = percentPattern.matcher(fmt_arg);
+		StringBuffer formatResultBuffer = new StringBuffer();
+		int i = 0;
+		while (percentMatcher.find()) {
+			if (percentMatcher.group(1) != null) {
+				percentMatcher.appendReplacement(formatResultBuffer, "%");
+			} else if (percentMatcher.group(2) != null) {
+				percentMatcher.appendReplacement(formatResultBuffer, "\n");
+			} else {
+				String format1Arg = percentMatcher.group(3);
+				if (format1Arg != null) {
+					if (i >= arr.length) {
+						percentMatcher.appendReplacement(formatResultBuffer, format1Arg);
+					} else {
+						if (format1Arg.endsWith("d") || 
+								format1Arg.endsWith("x") ||
+								format1Arg.endsWith("X") ||
+								format1Arg.endsWith("o")) {
+							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, toLong(arr[i])));
+						} else if (format1Arg.endsWith("e") ||
+								format1Arg.endsWith("E") ||
+								format1Arg.endsWith("f") ||
+								format1Arg.endsWith("g") ||
+								format1Arg.endsWith("G") ||
+								format1Arg.endsWith("a") ||
+								format1Arg.endsWith("A")) {
+							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, toDouble(arr[i])));
+						} else {
+							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, arr[i]));
+						}
+						i++;
+					}
+				}
+			}
 		}
+		percentMatcher.appendTail(formatResultBuffer);
+		return formatResultBuffer.toString();
+
+//		try {
+//			return String.format(fmt_arg, arr);
+//		} catch (IllegalFormatException ife) {
+//			fmt_arg = fmt_arg.replace("%.0f", "%s").replace("%d", "%s");
+//
+//			try {
+//				return String.format(fmt_arg, arr);
+//			} catch (IllegalFormatException ife2) {
+//				return "";
+//			}
+//		}
 	}
 
 	/**

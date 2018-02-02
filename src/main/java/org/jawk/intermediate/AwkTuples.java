@@ -106,9 +106,9 @@ public class AwkTuples implements Serializable {
 		}
 
 		@Override
-		public int intArg(int arg_idx) {
+		public long intArg(int arg_idx) {
 			Class<?> c = tuple.getTypes()[arg_idx];
-			if (c == Integer.class) {
+			if (c == Long.class) {
 				return tuple.getInts()[arg_idx];
 			}
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
@@ -126,7 +126,7 @@ public class AwkTuples implements Serializable {
 		@Override
 		public Object arg(int arg_idx) {
 			Class<?> c = tuple.getTypes()[arg_idx];
-			if (c == Integer.class) {
+			if (c == Long.class) {
 				return tuple.getInts()[arg_idx];
 			}
 			if (c == Double.class) {
@@ -183,7 +183,7 @@ public class AwkTuples implements Serializable {
 		 */
 		private static final long serialVersionUID = 8105941219003992817L;
 		private int opcode;
-		private int[] ints = new int[4];
+		private long[] ints = new long[4];
 		private boolean[] bools = new boolean[4];
 		private double[] doubles = new double[4];
 		private String[] strings = new String[4];
@@ -202,25 +202,25 @@ public class AwkTuples implements Serializable {
 			this.opcode = opcode;
 		}
 
-		private Tuple(int opcode, int i1) {
+		private Tuple(int opcode, long i1) {
 			this(opcode);
 			ints[0] = i1;
-			types[0] = Integer.class;
+			types[0] = Long.class;
 		}
 
-		private Tuple(int opcode, int i1, int i2) {
+		private Tuple(int opcode, long i1, long i2) {
 			this(opcode, i1);
 			ints[1] = i2;
-			types[1] = Integer.class;
+			types[1] = Long.class;
 		}
 
-		private Tuple(int opcode, int i1, boolean b2) {
+		private Tuple(int opcode, long i1, boolean b2) {
 			this(opcode, i1);
 			bools[1] = b2;
 			types[1] = Boolean.class;
 		}
 
-		private Tuple(int opcode, int i1, boolean b2, boolean b3) {
+		private Tuple(int opcode, long i1, boolean b2, boolean b3) {
 			this(opcode, i1, b2);
 			bools[2] = b3;
 			types[2] = Boolean.class;
@@ -244,7 +244,7 @@ public class AwkTuples implements Serializable {
 			types[0] = Boolean.class;
 		}
 
-		private Tuple(int opcode, String s1, int i2) {
+		private Tuple(int opcode, String s1, long i2) {
 			this(opcode, s1);
 			ints[1] = i2;
 			types[1] = Integer.class;
@@ -256,21 +256,21 @@ public class AwkTuples implements Serializable {
 			types[0] = Address.class;
 		}
 
-		private Tuple(int opcode, String strarg, int intarg, boolean boolarg) {
+		private Tuple(int opcode, String strarg, long intarg, boolean boolarg) {
 			this(opcode, strarg, intarg);
 			bools[2] = boolarg;
 			types[2] = Boolean.class;
 		}
 
-		private Tuple(int opcode, HasFunctionAddress has_func_addr, String s2, int i3, int i4) {
+		private Tuple(int opcode, HasFunctionAddress has_func_addr, String s2, long i3, long i4) {
 			this(opcode);
 			this.hasFuncAddr = has_func_addr;
 			strings[1] = s2;
 			types[1] = String.class;
 			ints[2] = i3;
-			types[2] = Integer.class;
+			types[2] = Long.class;
 			ints[3] = i4;
-			types[3] = Integer.class;
+			types[3] = Long.class;
 		}
 
 		private Tuple(int opcode, Class<?> cls) {
@@ -310,7 +310,7 @@ public class AwkTuples implements Serializable {
 			while ((idx < types.length) && (types[idx] != null)) {
 				sb.append(", ");
 				Class<?> type = types[idx];
-				if (type == Integer.class) {
+				if (type == Long.class) {
 					sb.append(ints[idx]);
 				} else if (type == Boolean.class) {
 					sb.append(bools[idx]);
@@ -368,7 +368,7 @@ public class AwkTuples implements Serializable {
 			return opcode;
 		}
 
-		private int[] getInts() {
+		private long[] getInts() {
 			return ints;
 		}
 
@@ -1622,9 +1622,6 @@ public class AwkTuples implements Serializable {
 	 */
 	private java.util.List<Tuple> queue = new ArrayList<Tuple>(100) {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -6334362156408598578L;
 
 		@Override
@@ -1634,6 +1631,7 @@ public class AwkTuples implements Serializable {
 		}
 	};
 	private Set<Address> unresolved_addresses = new HashSet<Address>();
+
 	/**
 	 * Needed only for dumping intermediate code to text such that address labels are provided.
 	 */
@@ -1645,7 +1643,7 @@ public class AwkTuples implements Serializable {
 		Field[] fields = c.getDeclaredFields();
 		try {
 			for (Field field : fields) {
-				if ((field.getModifiers() & Modifier.STATIC) > 0 && field.getType() == Integer.TYPE && field.getInt(null) == opcode) {
+				if ((field.getModifiers() & Modifier.STATIC) > 0 && field.getType() == Long.TYPE && field.getLong(null) == opcode) {
 					return field.getName();
 				}
 			}
@@ -1661,11 +1659,13 @@ public class AwkTuples implements Serializable {
 	}
 
 	public void push(Object o) {
-		assert (o instanceof String) || (o instanceof Integer) || (o instanceof Double); //  || (o instanceof Pattern); //  || (o instanceof PatternPair);
+		assert (o instanceof String) || (o instanceof Long) || (o instanceof Integer) || (o instanceof Double); //  || (o instanceof Pattern); //  || (o instanceof PatternPair);
 		if (o instanceof String) {
 			queue.add(new Tuple(_PUSH_, o.toString()));
 		} else if (o instanceof Integer) {
 			queue.add(new Tuple(_PUSH_, (Integer) o));
+		} else if (o instanceof Long) {
+			queue.add(new Tuple(_PUSH_, (Long) o));
 		} else if (o instanceof Double) {
 			queue.add(new Tuple(_PUSH_, (Double) o));
 		} else {
@@ -2248,13 +2248,13 @@ public class AwkTuples implements Serializable {
 	 * Accept a {variable_name -&gt; offset} mapping such that global variables can be
 	 * assigned while processing name=value and filename command-line arguments.
 	 */
-	public void addGlobalVariableNameToOffsetMapping(String varname, int offset, boolean is_aarray) {
+	public void addGlobalVariableNameToOffsetMapping(String varname, int offset, boolean is_array) {
 		if (global_var_offset_map.get(varname) != null) {
 			assert global_var_aarray_map.get(varname) != null;
 			return;
 		}
 		global_var_offset_map.put(varname, offset);
-		global_var_aarray_map.put(varname, is_aarray);
+		global_var_aarray_map.put(varname, is_array);
 	}
 
 	/**
@@ -2320,9 +2320,6 @@ public class AwkTuples implements Serializable {
 	 */
 	private static class VersionManager implements Serializable {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -2015316238483923915L;
 
 		/**
