@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.jawk.ExitException;
 import org.jawk.ext.JawkExtension;
 import org.jawk.frontend.AwkSyntaxTree;
@@ -249,7 +250,6 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * @return The return code (the value passed into the exit call).
 	 */
 	@Override
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void interpret(AwkTuples tuples)
 			throws ExitException
 	{
@@ -274,7 +274,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = item 2
 						// etc.
 						int num_args = position.intArg(0);
-						printTo(System.out, num_args);
+						printTo(settings.getOutputStream(), num_args);
 						position.next();
 						break;
 					}
@@ -319,7 +319,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = item 1
 						// etc.
 						int num_args = position.intArg(0);
-						printfTo(System.out, num_args);
+						printfTo(settings.getOutputStream(), num_args);
 						position.next();
 						break;
 					}
@@ -1612,7 +1612,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = second actual parameter
 						// etc.
 						Address func_addr = position.addressArg();
-						String func_name = position.arg(1).toString();
+						//String func_name = position.arg(1).toString();
 						int num_formal_params = position.intArg(2);
 						int num_actual_params = position.intArg(3);
 						assert num_formal_params >= num_actual_params;
@@ -1687,10 +1687,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// etc.
 						int count = position.intArg(0);
 						assert count >= 1;
-						String s;
+						//String s;
 						String convfmt = getCONVFMT().toString();
 						if (count == 1) {
-							s = JRT.toAwkString(pop(), convfmt);
+							//s = JRT.toAwkString(pop(), convfmt);
 						} else {
 							StringBuilder sb = new StringBuilder();
 							sb.append(JRT.toAwkString(pop(), convfmt));
@@ -2150,6 +2150,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 *
 	 * @param name_value The variable assignment in <i>name=value</i> form.
 	 */
+	@SuppressWarnings("unused")
 	private void setFilelistVariable(String name_value) {
 		int eq_idx = name_value.indexOf('=');
 		// variable name should be non-blank
@@ -2361,6 +2362,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		private MyStack<Object[]> locals_stack = new ArrayStackImpl<Object[]>();
 		private MyStack<Integer> return_indexes = new LinkedListStackImpl<Integer>();
 
+		@SuppressWarnings("unused")
 		public void dump() {
 			LOG.info("globals = " + Arrays.toString(globals));
 			LOG.info("locals = " + Arrays.toString(locals));

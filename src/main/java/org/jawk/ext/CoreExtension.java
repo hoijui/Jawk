@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.jawk.NotImplementedError;
 import org.jawk.jrt.AssocArray;
 import org.jawk.jrt.AwkRuntimeException;
@@ -177,7 +178,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 
 	private int refMapIdx = 0;
 	private Map<String, Object> referenceMap = new HashMap<String, Object>();
-	private Map<AssocArray, Iterator> iterators = new HashMap<AssocArray, Iterator>();
+	private Map<AssocArray, Iterator<?>> iterators = new HashMap<AssocArray, Iterator<?>>();
 	private static final Integer ZERO = Integer.valueOf(0);
 	private static final Integer ONE = Integer.valueOf(1);
 	private int waitInt = 0;
@@ -480,7 +481,7 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		// use an inMap to keep track of existing iterators
 
 		//Iterator<Object> iter = iterators.get(aa);
-		Iterator iter = iterators.get(aa);
+		Iterator<?> iter = iterators.get(aa);
 		if (iter == null) //iterators.put(aa, iter = aa.keySet().iterator());
 		// without a new Collection, modification to the
 		// assoc array during iteration causes a ConcurrentModificationException
@@ -563,12 +564,14 @@ public class CoreExtension extends AbstractExtension implements JawkExtension {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private int get(AssocArray retval, AssocArray map, Object key) {
 		retval.clear();
 		retval.put(0, map.get(key));
 		return 1;
 	}
 
+	@SuppressWarnings("unused")
 	private Object toScalar(AssocArray aa) {
 		return aa.get(0);
 	}

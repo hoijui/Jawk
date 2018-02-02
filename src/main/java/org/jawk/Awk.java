@@ -223,7 +223,7 @@ public class Awk {
 			Class<?> compilerClass = Class.forName("org.jawk.backend.AwkCompilerImpl");
 			LOG.trace("found: {}", compilerClass);
 			try {
-				Constructor constructor = compilerClass.getConstructor(AwkSettings.class);
+				Constructor<?> constructor = compilerClass.getConstructor(AwkSettings.class);
 				try {
 					LOG.trace("allocating new instance of the AwkCompiler class...");
 					AwkCompiler compiler = (AwkCompiler) constructor.newInstance(settings);
@@ -256,12 +256,12 @@ public class Awk {
 			scriptClass = cl.loadClass(classname);
 			LOG.trace("found: {} in {}", new Object[] {scriptClass, destinationDirectory});
 			try {
-				Constructor constructor = scriptClass.getConstructor();
+				Constructor<?> constructor = scriptClass.getConstructor();
 				try {
 					LOG.trace("allocating and executing new instance of {} class...", classname);
 					Object obj = constructor.newInstance();
 					Method method = scriptClass.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
-					Object result = method.invoke(obj, new Object[] {settings});
+					method.invoke(obj, new Object[] {settings});
 				} catch (InstantiationException ie) {
 					throw new Error("Cannot instantiate the script", ie);
 				} catch (IllegalAccessException iae) {
@@ -310,7 +310,7 @@ public class Awk {
 
 		// use reflection to obtain extensions
 
-		Set<Class> extensionClasses = new HashSet<Class>();
+		Set<Class<?>> extensionClasses = new HashSet<Class<?>>();
 		Map<String, JawkExtension> retval = new HashMap<String, JawkExtension>();
 
 		StringTokenizer st = new StringTokenizer(extensionsStr, "#");

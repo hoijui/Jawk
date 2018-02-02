@@ -3,6 +3,7 @@ package org.jawk;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+
 import org.jawk.util.AwkParameters;
 import org.jawk.util.AwkSettings;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class Main {
 	 * Prohibit the instantiation of this class, other than the
 	 * way required by JSR 223.
 	 */
+	@SuppressWarnings("unused")
 	private Main() {}
 
 	/**

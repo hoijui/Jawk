@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.jawk.util.LinkedListStackImpl;
 import org.jawk.util.MyStack;
 import org.slf4j.Logger;
@@ -21,12 +22,21 @@ import org.slf4j.LoggerFactory;
 
 public class AwkTuples implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3261725178303196488L;
+
 	private static final Logger LOG = LoggerFactory.getLogger(AwkTuples.class);
 
 	private VersionManager version_manager = new VersionManager();
 
 	private static final class AddressImpl implements Address, Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 109610985341478678L;
 		private String lbl;
 		private int idx = -1;
 
@@ -97,7 +107,7 @@ public class AwkTuples implements Serializable {
 
 		@Override
 		public int intArg(int arg_idx) {
-			Class c = tuple.getTypes()[arg_idx];
+			Class<?> c = tuple.getTypes()[arg_idx];
 			if (c == Integer.class) {
 				return tuple.getInts()[arg_idx];
 			}
@@ -106,7 +116,7 @@ public class AwkTuples implements Serializable {
 
 		@Override
 		public boolean boolArg(int arg_idx) {
-			Class c = tuple.getTypes()[arg_idx];
+			Class<?> c = tuple.getTypes()[arg_idx];
 			if (c == Boolean.class) {
 				return tuple.getBools()[arg_idx];
 			}
@@ -115,7 +125,7 @@ public class AwkTuples implements Serializable {
 
 		@Override
 		public Object arg(int arg_idx) {
-			Class c = tuple.getTypes()[arg_idx];
+			Class<?> c = tuple.getTypes()[arg_idx];
 			if (c == Integer.class) {
 				return tuple.getInts()[arg_idx];
 			}
@@ -142,7 +152,7 @@ public class AwkTuples implements Serializable {
 		}
 
 		@Override
-		public Class classArg() {
+		public Class<?> classArg() {
 			//Tuple tuple = queue.get(idx);
 			assert tuple.getCls() != null;
 			return tuple.getCls();
@@ -168,14 +178,18 @@ public class AwkTuples implements Serializable {
 	// made public to access static members of AwkTuples via Java Reflection
 	private static final class Tuple implements Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8105941219003992817L;
 		private int opcode;
 		private int[] ints = new int[4];
 		private boolean[] bools = new boolean[4];
 		private double[] doubles = new double[4];
 		private String[] strings = new String[4];
-		private Class[] types = new Class[4];
+		private Class<?>[] types = new Class[4];
 		private Address address = null;
-		private Class cls = null;
+		private Class<?> cls = null;
 		private transient HasFunctionAddress hasFuncAddr = null;
 		// to avoid polluting the constructors,
 		// setLineNumber(int) populates this field
@@ -259,7 +273,7 @@ public class AwkTuples implements Serializable {
 			types[3] = Integer.class;
 		}
 
-		private Tuple(int opcode, Class cls) {
+		private Tuple(int opcode, Class<?> cls) {
 			this(opcode);
 			this.cls = cls;
 			types[0] = Class.class;
@@ -295,7 +309,7 @@ public class AwkTuples implements Serializable {
 			int idx = 0;
 			while ((idx < types.length) && (types[idx] != null)) {
 				sb.append(", ");
-				Class type = types[idx];
+				Class<?> type = types[idx];
 				if (type == Integer.class) {
 					sb.append(ints[idx]);
 				} else if (type == Boolean.class) {
@@ -370,7 +384,7 @@ public class AwkTuples implements Serializable {
 			return strings;
 		}
 
-		private Class[] getTypes() {
+		private Class<?>[] getTypes() {
 			return types;
 		}
 
@@ -386,11 +400,12 @@ public class AwkTuples implements Serializable {
 			return lineno;
 		}
 
+		@SuppressWarnings("unused")
 		private void setOpcode(int opcode) {
 			this.opcode = opcode;
 		}
 
-		private Class getCls() {
+		private Class<?> getCls() {
 			return cls;
 		}
 
@@ -1607,6 +1622,11 @@ public class AwkTuples implements Serializable {
 	 */
 	private java.util.List<Tuple> queue = new ArrayList<Tuple>(100) {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6334362156408598578L;
+
 		@Override
 		public boolean add(Tuple t) {
 			t.setLineNumber(lineno_stack.peek());
@@ -1621,7 +1641,7 @@ public class AwkTuples implements Serializable {
 	private Map<String, Integer> address_label_counts = new HashMap<String, Integer>();
 
 	public static String toOpcodeString(int opcode) {
-		Class c = AwkTuples.class;
+		Class<?> c = AwkTuples.class;
 		Field[] fields = c.getDeclaredFields();
 		try {
 			for (Field field : fields) {
@@ -2013,7 +2033,7 @@ public class AwkTuples implements Serializable {
 		queue.add(new Tuple(_GET_FIRST_AND_REMOVE_FROM_KEYLIST_));
 	}
 
-	public boolean checkClass(Class cls) {
+	public boolean checkClass(Class<?> cls) {
 		queue.add(new Tuple(_CHECK_CLASS_, cls));
 		return true;
 	}
@@ -2299,6 +2319,11 @@ public class AwkTuples implements Serializable {
 	 * class version matches the version supported by the interpreter/compiler.
 	 */
 	private static class VersionManager implements Serializable {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2015316238483923915L;
 
 		/**
 		 * Class version number.

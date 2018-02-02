@@ -67,4 +67,5 @@ public interface VariableManager {
 	 * @param value The new contents of the variable.
 	 */
 	void assignVariable(String name, Object value);
+	
 }
