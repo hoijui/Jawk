@@ -2515,6 +2515,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._GETLINE_INPUT_: {
 				JVMTools_getField(JRT_Class, "input_runtime");
+				JVMToold_invokeSettings("getInput", InputStream.class);
 				il.append(new PUSH(cp, true));
 				JVMTools_invokeVirtual(Boolean.TYPE, JRT_Class, "jrtConsumeInput", InputStream.class, Boolean.TYPE);
 				JVMTools_DUP();
@@ -3389,7 +3390,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		JVMTools_getField(AwkSettings.class, "settings"); 
 		return il.append(factory.createInvoke(AwkSettings.class.getName(), methodName, getObjectType(returnType), 
 				buildArgs(argumentTypes), INVOKEVIRTUAL)); 
-		} 
+	} 
 	
 	private void JVMTools_allocateLocalVariable(Class<?> vartype, String varname) {
 		assert local_vars.get(varname) == null;
