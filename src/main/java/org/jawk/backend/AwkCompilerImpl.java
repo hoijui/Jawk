@@ -1,9 +1,6 @@
 package org.jawk.backend;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -148,6 +145,7 @@ import org.slf4j.LoggerFactory;
  *	private JRT input_runtime;
  *	private HashMap regexps;
  *	private HashMap pattern_pairs;
+ *	private AwkSettings settings;
  *	private int exit_code;
  *
  *	private int oldseed;
@@ -197,6 +195,7 @@ import org.slf4j.LoggerFactory;
  *		pattern_pairs = new HashMap();
  *		oldseed = 0;
  *		random_number_generator = new Random(null);
+ *		this.settings = settings;
  *		exit_code = 0;
  *
  *		// script execution
@@ -660,6 +659,10 @@ public class AwkCompilerImpl implements AwkCompiler {
 		JVMTools_allocateField(Map.class, "pattern_pairs");
 		JVMTools_new("java.util.HashMap");
 		JVMTools_storeField(Map.class, "pattern_pairs");
+
+		JVMTools_allocateField(AwkSettings.class, "settings");
+		il.append(InstructionConstants.ALOAD_1);
+		JVMTools_storeField(AwkSettings.class, "settings");
 
 		// for EXIT
 		JVMTools_allocateField(Integer.TYPE, "exit_code");
@@ -2498,15 +2501,17 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._CONSUME_INPUT_: {
 				JVMTools_getField(JRT_Class, "input_runtime");
+				JVMToold_invokeSettings("getInput", InputStream.class);
 				il.append(new PUSH(cp, false));
-				JVMTools_invokeVirtual(Boolean.TYPE, JRT_Class, "jrtConsumeInput", Boolean.TYPE);
+				JVMTools_invokeVirtual(Boolean.TYPE, JRT_Class, "jrtConsumeInput", InputStream.class, Boolean.TYPE);
 				JVMTools_IFEQ(position.addressArg());
 				break;
 			}
 			case AwkTuples._GETLINE_INPUT_: {
 				JVMTools_getField(JRT_Class, "input_runtime");
+				JVMToold_invokeSettings("getInput", InputStream.class);
 				il.append(new PUSH(cp, true));
-				JVMTools_invokeVirtual(Boolean.TYPE, JRT_Class, "jrtConsumeInput", Boolean.TYPE);
+				JVMTools_invokeVirtual(Boolean.TYPE, JRT_Class, "jrtConsumeInput", InputStream.class, Boolean.TYPE);
 				JVMTools_DUP();
 				JVMTools_invokeStatic(Integer.class, Integer.class, "valueOf", Integer.TYPE);
 				JVMTools_SWAP();
@@ -3375,6 +3380,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg_type2, arg_type3}), INVOKEVIRTUAL));
 	}
 
+	private InstructionHandle JVMToold_invokeSettings(String methodName, Class<?> returnType, Class... argumentTypes) {
+
+		JVMTools_getField(AwkSettings.class, "settings");
+		return il.append(factory.createInvoke(AwkSettings.class.getName(), methodName, getObjectType(returnType),
+                    buildArgs(argumentTypes), INVOKEVIRTUAL));
+	}
+
 	private void JVMTools_allocateLocalVariable(Class vartype, String varname) {
 		assert local_vars.get(varname) == null;
 		LocalVariableGen lg = mg.addLocalVariable(varname, getObjectType(vartype), null, null);
@@ -3733,7 +3745,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private static Type[] buildArgs(Class[] arguments) {
+	private static Type[] buildArgs(Class... arguments) {
 		java.util.List<Type> arg_list = new ArrayList<Type>();
 		for (Class cls : arguments) {
 			arg_list.add(getObjectType(cls));
