@@ -1155,11 +1155,21 @@ public class JRT {
 						} else if (format1Arg.endsWith("e") ||
 								format1Arg.endsWith("E") ||
 								format1Arg.endsWith("f") ||
-								format1Arg.endsWith("g") ||
-								format1Arg.endsWith("G") ||
 								format1Arg.endsWith("a") ||
 								format1Arg.endsWith("A")) {
 							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, toDouble(arr[i])));
+						} else if (format1Arg.endsWith("g") ||
+								format1Arg.endsWith("G")) {
+							String tempFormatResult = String.format(format1Arg, toDouble(arr[i]));
+							if (tempFormatResult.indexOf('.') > -1 && tempFormatResult.indexOf('e') == -1 && tempFormatResult.indexOf('E') == -1) {
+								while (tempFormatResult.endsWith("0")) {
+									tempFormatResult = tempFormatResult.substring(0, tempFormatResult.length() - 1);
+								}
+								if (tempFormatResult.endsWith(".")) {
+									tempFormatResult = tempFormatResult.substring(0, tempFormatResult.length() - 1);
+								}
+							}
+							percentMatcher.appendReplacement(formatResultBuffer, tempFormatResult);
 						} else {
 							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, arr[i]));
 						}
