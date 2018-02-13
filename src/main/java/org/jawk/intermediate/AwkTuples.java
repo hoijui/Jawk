@@ -247,7 +247,7 @@ public class AwkTuples implements Serializable {
 		private Tuple(int opcode, String s1, long i2) {
 			this(opcode, s1);
 			ints[1] = i2;
-			types[1] = Integer.class;
+			types[1] = Long.class;
 		}
 
 		private Tuple(int opcode, Address address) {
