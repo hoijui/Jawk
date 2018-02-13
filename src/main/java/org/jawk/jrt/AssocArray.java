@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.jawk.intermediate.UninitializedObject;
+
 /**
  * An AWK associative array.
  * <p>
@@ -105,7 +107,7 @@ public class AssocArray implements Comparator<Object> {
 	}
 
 	/** a "null" value in Awk */
-	private static final String BLANK = "";
+	private static final UninitializedObject BLANK = new UninitializedObject();
 
 	/**
 	 * Test whether a particular key is
@@ -127,36 +129,42 @@ public class AssocArray implements Comparator<Object> {
 	 * with this key, and the null value is returned.
 	 */
 	public Object get(Object key) {
-		Object result = map.get(key);
-		if (result == null) {
-			if (key != null) {
-				try {
-					// try a primitive version key
-					int iKey = Integer.parseInt(key.toString());
-					result = map.get(iKey);
-
-					if (result != null)
-						return result;
-				} catch (Exception e) {
-				}
-			}
-			// based on the AWK specification:
-			// Any reference (except for IN expressions) to a non-existent
-			// array element will automatically create it.
-			result = BLANK;
-			map.put(key, result);
+		if (key == null || key instanceof UninitializedObject) {
+			key = (long)0;
 		}
+		Object result = map.get(key);
+		if (result != null) {
+			return result;
+		}
+
+		// Did not find it?
+		try {
+			// try a integer version key
+			key = Long.parseLong(key.toString());
+			result = map.get(key);
+			if (result != null) {
+				return result;
+			}
+		} catch (Exception e) {}
+
+		// based on the AWK specification:
+		// Any reference (except for IN expressions) to a non-existent
+		// array element will automatically create it.
+		result = BLANK;
+		map.put(key, result);
+
 		return result;
 	}
 
 	public Object put(Object key, Object value) {
-		if (key != null) {
-			try {
-				// Save a primitive version
-				int iKey = Integer.parseInt(key.toString());
-				put(iKey, value);
-			} catch (Exception e) {
-			}
+		if (key == null || key instanceof UninitializedObject) {
+			key = (long)0;
+		}
+		try {
+			// Save a primitive version
+			long iKey = Long.parseLong(key.toString());
+			return map.put(iKey, value);
+		} catch (Exception e) {
 		}
 
 		return map.put(key, value);
@@ -165,7 +173,7 @@ public class AssocArray implements Comparator<Object> {
 	/**
 	 * Added to support insertion of primitive key types.
 	 */
-	public Object put(int key, Object value) {
+	public Object put(long key, Object value) {
 		return map.put(key, value);
 	}
 

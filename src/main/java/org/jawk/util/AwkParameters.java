@@ -70,7 +70,7 @@ public class AwkParameters {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AwkParameters.class);
 
-	private Class mainClass;
+	private Class<?> mainClass;
 	private String extensionDescription;
 
 	/**
@@ -78,7 +78,7 @@ public class AwkParameters {
 	 * @param extensionDescription a text description of extensions that
 	 *   are enabled (for compiled scripts)
 	 */
-	public AwkParameters(Class mainClass, String extensionDescription) {
+	public AwkParameters(Class<?> mainClass, String extensionDescription) {
 		this.mainClass = mainClass;
 		this.extensionDescription = extensionDescription;
 	}
@@ -99,7 +99,6 @@ public class AwkParameters {
 	 *
 	 * @param args The command-line arguments provided by the user.
 	 */
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public AwkSettings parseCommandLineArguments(String[] args) {
 
 		AwkSettings settings = new AwkSettings();

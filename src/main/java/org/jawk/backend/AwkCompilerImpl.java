@@ -1,6 +1,10 @@
 package org.jawk.backend;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -12,8 +16,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.bcel.Constants;
+
 import static org.apache.bcel.Constants.*;
+
 import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.BranchInstruction;
@@ -269,13 +276,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 	// These classes should exist in the jrt package because
 	// the jrt.jar file contains the jrt package.
 
-	private static final Class AssocArrayClass = AssocArray.class;
-	private static final Class PatternPairClass = PatternPair.class;
-	private static final Class KeyListImplClass = KeyListImpl.class;
-	private static final Class EndExceptionClass = EndException.class;
-	private static final Class AwkRuntimeExceptionClass = AwkRuntimeException.class;
-	private static final Class VariableManagerClass = VariableManager.class;
-	private static final Class JRT_Class = JRT.class;
+	private static final Class<?> AssocArrayClass = AssocArray.class;
+	private static final Class<PatternPair> PatternPairClass = PatternPair.class;
+	private static final Class<KeyListImpl> KeyListImplClass = KeyListImpl.class;
+	private static final Class<?> EndExceptionClass = EndException.class;
+	private static final Class<?> AwkRuntimeExceptionClass = AwkRuntimeException.class;
+	private static final Class<?> VariableManagerClass = VariableManager.class;
+	private static final Class<?> JRT_Class = JRT.class;
 
 	static {
 		assert assertStaticClassVarsAreFromPackage();
@@ -288,7 +295,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			// use reflection to get all static Class definitions
 			// and verify that they are members of the
 			// runtime package
-			Class c = AwkCompilerImpl.class;
+			Class<AwkCompilerImpl> c = AwkCompilerImpl.class;
 			// foreach field in declared in the class...
 			for (Field f : c.getDeclaredFields()) {
 				int mod = f.getModifiers();
@@ -302,7 +309,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 						// obtain the value of the field
 						// and apply it here!
 						Object o = f.get(null);
-						Class cls = (Class) o;
+						Class<?> cls = (Class<?>) o;
 						if (!cls.getPackage().getName().equals(packagename)) {
 							throw new AssertionError("class " + c.toString() + " is not contained within '" + packagename + "' package. Field = " + f.toString());
 						}
@@ -370,6 +377,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * </p>
 	 */
 	private static final class MyInstructionList extends InstructionList {
+
+		private static final long serialVersionUID = 5888590372873344733L;
 
 		private InstructionHandle marked_handle = null;
 		private boolean marked = false;
@@ -452,7 +461,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		assert className != null;
 		// - check for non-blank classname
 		if (className.length() == 0) {
-			throw new IllegalArgumentException("classname cannot be black");
+			throw new IllegalArgumentException("classname cannot be blank");
 		}
 		// - check for a valid java identifier
 		if (className.charAt(0) != '.' && !Character.isJavaIdentifierStart(className.charAt(0))) {
@@ -469,7 +478,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 		// - check for no ..'s in classname
 		if (className.indexOf("..") >= 0) {
-			throw new IllegalArgumentException("null-package (..) found in classname");
+			throw new IllegalArgumentException("empty package (..) found in classname");
 		}
 
 		// otherwise, all is good
@@ -595,8 +604,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		LocalVariableGen sb_reb = mg_reb.addLocalVariable("sb", new ObjectType("java.lang.StringBuffer"), null, null);
 		lv_reb.put("dregister", dregister_reb.getIndex());
 		lv_reb.put("sb", sb_reb.getIndex());
-		InstructionHandle ih =
-				il_reb.append(factory.createNew("java.lang.StringBuffer"));
+		InstructionHandle ih = il_reb.append(factory.createNew("java.lang.StringBuffer"));
 		il_reb.append(InstructionConstants.DUP);
 		il_reb.append(factory.createInvoke("java.lang.StringBuffer", "<init>", Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
 		il_reb.append(InstructionFactory.createStore(new ObjectType("java.lang.StringBuffer"), sb_reb.getIndex()));
@@ -660,10 +668,10 @@ public class AwkCompilerImpl implements AwkCompiler {
 		JVMTools_new("java.util.HashMap");
 		JVMTools_storeField(Map.class, "pattern_pairs");
 
-		JVMTools_allocateField(AwkSettings.class, "settings");
-		il.append(InstructionConstants.ALOAD_1);
-		JVMTools_storeField(AwkSettings.class, "settings");
-
+		JVMTools_allocateField(AwkSettings.class, "settings"); 
+		il.append(InstructionConstants.ALOAD_1); 
+		JVMTools_storeField(AwkSettings.class, "settings"); 
+		
 		// for EXIT
 		JVMTools_allocateField(Integer.TYPE, "exit_code");
 		il.append(new PUSH(cp, 0));
@@ -692,7 +700,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 * @see org.jawk.intermediate.Address
 	 */
 	@Override
-	public final void compile(AwkTuples tuples) {
+	public final byte[] compile(AwkTuples tuples) {
 		precompile();
 		getOffsets(tuples);
 
@@ -728,6 +736,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 		resolveBranchHandleTargets();
 
 		postcompile(tuples);
+
+		return cg.getJavaClass().getBytes();
 	}
 
 	private void addExitCode(InstructionList il, MethodGen mg) {
@@ -751,19 +761,16 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 		// try2
 		// run end blocks here!
-		InstructionHandle ih_reb =
-				il.append(InstructionConstants.ALOAD_0);
+		InstructionHandle ih_reb = il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createInvoke(classname, "runEndBlocks", Type.VOID, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
-		InstructionHandle ih2_end =
-				il.append(InstructionConstants.ALOAD_0);
+		InstructionHandle ih2_end = il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, "exit_code", Type.INT, Constants.GETFIELD));
 		il.append(InstructionFactory.createReturn(Type.INT));
 		bh1.setTarget(ih_reb);
 
 		// catch2
 		// (again, do nothing)
-		InstructionHandle ih2_catch =
-				il.append(InstructionConstants.POP);
+		InstructionHandle ih2_catch = il.append(InstructionConstants.POP);
 		il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, "exit_code", Type.INT, Constants.GETFIELD));
 		il.append(InstructionFactory.createReturn(Type.INT));
@@ -814,6 +821,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 			fos = new FileOutputStream(clsname + ".class");
 			cg.getJavaClass().dump(fos);
+
 			LOG.trace("wrote: {}.class", clsname);
 		} catch (IOException ioe) {
 			LOG.error("IO Problem", ioe);
@@ -1088,7 +1096,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		tmpIl.dispose();
 	}
 
-	private void createSetMethod(String method_name, String field_name, Class field_type) {
+	private void createSetMethod(String method_name, String field_name, Class<?> field_type) {
 		InstructionList tmpIl = new InstructionList();
 		MethodGen method = new MethodGen(ACC_PUBLIC | ACC_FINAL, Type.VOID, buildArgs(new Class[] {field_type}), new String[] {"arg"}, method_name, classname, tmpIl, cp);
 
@@ -1314,21 +1322,21 @@ public class AwkCompilerImpl implements AwkCompiler {
 	 */
 	private void createPartialParamCalls(AwkTuples tuples) {
 
-		Map<String, Set<Integer>> visited_funcs = new HashMap<String, Set<Integer>>();
+		Map<String, Set<Long>> visited_funcs = new HashMap<String, Set<Long>>();
 
 		PositionForCompilation position = (PositionForCompilation) tuples.top();
 		while (!position.isEOF()) {
 			int opcode = position.opcode();
 			if (opcode == AwkTuples._CALL_FUNCTION_) {
 				String func_name = position.arg(1).toString();
-				int num_formal_params = position.intArg(2);
-				int num_actual_params = position.intArg(3);
+				long num_formal_params = position.intArg(2);
+				long num_actual_params = position.intArg(3);
 				assert num_formal_params >= num_actual_params;
 
 				if (num_formal_params > num_actual_params) {
-					Set<Integer> visited_arg_count = visited_funcs.get(func_name);
+					Set<Long> visited_arg_count = visited_funcs.get(func_name);
 					if (visited_arg_count == null) {
-						visited_funcs.put(func_name, visited_arg_count = new HashSet<Integer>());
+						visited_funcs.put(func_name, visited_arg_count = new HashSet<Long>());
 					}
 					if (!visited_arg_count.contains(num_actual_params)) {
 						visited_arg_count.add(num_actual_params);
@@ -1348,23 +1356,23 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return retval;
 	}
 
-	private static Class[] toClassArray(List<Class> list) {
-		Class[] retval = new Class[list.size()];
+	private static Class<?>[] toClassArray(List<Class<?>> list) {
+		Class<?>[] retval = new Class[list.size()];
 		for (int i = 0; i < retval.length; i++) {
 			retval[i] = list.get(i);
 		}
 		return retval;
 	}
 
-	private void addPartialParamCall(String func_name, int num_formal_params, int num_actual_params) {
+	private void addPartialParamCall(String func_name, long num_formal_params, long num_actual_params) {
 
 		// condition the argument parameters
 
-		List<Class> arg_classes = new ArrayList<Class>();
+		List<Class<?>> arg_classes = new ArrayList<Class<?>>();
 		List<String> arg_names = new ArrayList<String>();
 		Map<String, Integer> tmpLocalVars = new HashMap<String, Integer>();
 
-		for (int i = num_actual_params - 1; i >= 0; --i) {
+		for (long i = num_actual_params - 1; i >= 0; --i) {
 			arg_classes.add(Object.class);
 			arg_names.add("locals_" + i);
 			tmpLocalVars.put("locals_" + i, tmpLocalVars.size() + 1);
@@ -1376,7 +1384,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		tmpIl.append(InstructionConstants.ALOAD_0);
 
 		arg_classes.clear();
-		for (int i = num_formal_params - 1; i >= 0; --i) {
+		for (long i = num_formal_params - 1; i >= 0; --i) {
 			arg_classes.add(Object.class);
 			if (i >= num_actual_params) {
 				tmpIl.append(InstructionConstants.ACONST_NULL);
@@ -1416,13 +1424,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 	private String argc_field = null;
 	private String argv_field = null;
 
-	private int convfmt_offset = -1;
-	private int environ_offset = -1;
-	private int subsep_offset = -1;
-	private int ofmt_offset = -1;
-	private int argv_offset = -1;
-	private int argc_offset = -1;
-	private int rs_offset = -1;
+	private long convfmt_offset = -1;
+	private long environ_offset = -1;
+	private long subsep_offset = -1;
+	private long ofmt_offset = -1;
+	private long argv_offset = -1;
+	private long argc_offset = -1;
+	private long rs_offset = -1;
 
 	private int ps_arg_idx = 0;
 	private int fmt_arg_idx = 0;
@@ -1458,8 +1466,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 					local_vars = lvs_temp;
 				} // else , do nothing
 
-				int num_globals = position.intArg(0);
-				for (int i = 0; i < num_globals; i++) {
+				long num_globals = position.intArg(0);
+				for (long i = 0; i < num_globals; i++) {
 					JVMTools_allocateField(Object.class, "global_" + i);
 				}
 
@@ -1540,7 +1548,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				MethodGen lmg = mg;
 				// ..., {args}
 
-				int num_args = position.intArg(0);
+				long num_args = position.intArg(0);
 				if (num_args == 0) {
 					// WITHOUT arguments
 					// (use $0)
@@ -1554,7 +1562,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 				assert num_args >= 1;
 
-				for (int i = 0; i < num_args; i++) {
+				for (long i = 0; i < num_args; i++) {
 					// stack contains objects
 					//JVMTools_DEBUG_TOS();	// TOS = top-of-stack
 					// ..., {args}, arg
@@ -1591,7 +1599,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._PRINT_TO_FILE_:
 			case AwkTuples._PRINT_TO_PIPE_: {
 				// ..., argN, ..., arg2, arg1, output-filename or cmd-string
-				int num_args = position.intArg(0);
+				long num_args = position.intArg(0);
 				if (num_args == 0) {
 					// WITHOUT arguments
 					// (use $0)
@@ -1647,8 +1655,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 						JVMTools_POP();
 						JVMTools_pushString(" ");
 
-						InstructionHandle ih =
-								JVMTools_SWAP();
+						InstructionHandle ih = JVMTools_SWAP();
 						bh.setTarget(ih);
 						JVMTools_printStringWithPS();
 					}
@@ -1660,7 +1667,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._PRINTF_:
 			case AwkTuples._SPRINTF_: {
 				MethodGen lmg = mg;
-				int num_args = position.intArg(0);
+				long num_args = position.intArg(0);
 				// ..., {args}
 				JVMTools_toAwkString();
 				LocalVariableGen fmt_arg = lmg.addLocalVariable("fmt_arg_" + (++fmt_arg_idx), getObjectType(String.class), null, null);
@@ -1670,7 +1677,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				il.append(new PUSH(cp, num_args - 1));
 				il.append(factory.createNewArray(getObjectType(Object.class), (short) 1));
 				// ..., {args}, array
-				for (int i = 0; i < num_args - 1; i++) {
+				for (long i = 0; i < num_args - 1; i++) {
 					// ..., {args}, array
 					JVMTools_DUP_X1();
 					// ..., {args}, array, arg, array
@@ -1706,7 +1713,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._PRINTF_TO_FILE_:
 			case AwkTuples._PRINTF_TO_PIPE_: {
 				MethodGen lmg = mg;
-				int num_args = position.intArg(0);
+				long num_args = position.intArg(0);
 
 				// ..., {args-with-fmt}, output-filename or cmd-string
 				// convert output-filename or cmd-string to printstream
@@ -1734,8 +1741,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				JVMTools_toAwkString();
 				// ..., {args}, ps, format_string
 				LocalVariableGen fmt_arg = lmg.addLocalVariable("fmt_arg_" + (++fmt_arg_idx), getObjectType(String.class), null, null);
-				InstructionHandle ih =
-						il.append(InstructionFactory.createStore(getObjectType(String.class), fmt_arg.getIndex()));
+				InstructionHandle ih = il.append(InstructionFactory.createStore(getObjectType(String.class), fmt_arg.getIndex()));
 				fmt_arg.setStart(ih);
 
 				// ..., {args}, ps
@@ -1802,7 +1808,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._ASSIGN_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				JVMTools_DUP();
 				JVMTools_setVariable(offset, is_global);
@@ -1815,7 +1821,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._ASSIGN_ARRAY_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				// ..., value, array_index
 				JVMTools_SWAP();
@@ -1834,7 +1840,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._APPLY_SUBSEP_: {
-				int num_args = position.intArg(0);
+				long num_args = position.intArg(0);
 
 				// ..., arg2, arg1
 				JVMTools_getLocalVariable(StringBuffer.class, "sb");
@@ -1902,7 +1908,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._DEREFERENCE_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_array = position.boolArg(1);
 				boolean is_global = position.boolArg(2);
 				JVMTools_getVariable(offset, is_global, is_array);
@@ -1991,7 +1997,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._DIV_EQ_:
 			case AwkTuples._MOD_EQ_:
 			case AwkTuples._POW_EQ_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				/*
 				if (is_global)
@@ -2037,7 +2043,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._DIV_EQ_ARRAY_:
 			case AwkTuples._MOD_EQ_ARRAY_:
 			case AwkTuples._POW_EQ_ARRAY_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				// ..., value, array-idx
 
@@ -2097,7 +2103,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._INC_:
 			case AwkTuples._DEC_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 
 				JVMTools_getVariable(offset, is_global, false);	// false = not an array
@@ -2117,7 +2123,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._INC_ARRAY_REF_:
 			case AwkTuples._DEC_ARRAY_REF_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				// ..., idx
 				JVMTools_DUP();
@@ -2160,7 +2166,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._FUNCTION_: {
 				String func_name = position.arg(0).toString();
-				int num_params = position.intArg(1);
+				long num_params = position.intArg(1);
 
 				assert mg_temp == null && il_temp == null || mg_temp != null && il_temp != null;
 
@@ -2180,8 +2186,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 				}
 
 				// build arg array
-				Type[] params = new Type[num_params];
-				String[] names = new String[num_params];
+				Type[] params = new Type[(int) num_params];
+				String[] names = new String[(int) num_params];
 				for (int i = 0; i < num_params; i++) {
 					params[i] = getObjectType(Object.class);
 					names[i] = "locals_" + (num_params - i - 1);
@@ -2240,8 +2246,8 @@ public class AwkCompilerImpl implements AwkCompiler {
 			case AwkTuples._CALL_FUNCTION_: {
 				// do nothing, for now
 				String func_name = position.arg(1).toString();
-				int num_formal_params = position.intArg(2);
-				int num_actual_params = position.intArg(3);
+				long num_formal_params = position.intArg(2);
+				long num_actual_params = position.intArg(3);
 				assert num_formal_params >= num_actual_params;
 
 				// what will occur is the following:
@@ -2255,7 +2261,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 				// build arg list
 
-				Class[] arg_array = new Class[num_actual_params];
+				Class<?>[] arg_array = new Class[(int) num_actual_params];
 				for (int i = 0; i < num_actual_params; i++) {
 					arg_array[i] = Object.class;
 				}
@@ -2421,7 +2427,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._SPLIT_: {
-				int numargs = position.intArg(0);
+				long numargs = position.intArg(0);
 				JVMTools_getVariable(convfmt_offset, true, false);	// true = is_global, false = NOT an array
 				JVMTools_invokeVirtual(String.class, Object.class, "toString");
 				if (numargs == 2) {
@@ -2488,7 +2494,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._SUBSTR_: {
-				int numargs = position.intArg(0);
+				long numargs = position.intArg(0);
 				// ..., [endpos], startpos, string_obj
 				JVMTools_toAwkString();
 				// ..., [endpos], startpos, string
@@ -2678,7 +2684,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._SUB_FOR_VARIABLE_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				boolean is_gsub = position.boolArg(2);
 				// ..., orig_value, repl, ere
@@ -2757,7 +2763,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 			case AwkTuples._SUB_FOR_ARRAY_REFERENCE_: {
 				MethodGen lmg = mg;
-				int arr_offset = position.intArg(0);
+				long arr_offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 				boolean is_gsub = position.boolArg(2);
 
@@ -2798,7 +2804,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._DELETE_ARRAY_ELEMENT_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 
 				JVMTools_getVariable(offset, is_global, true);	// true = is an array
@@ -2811,7 +2817,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._DELETE_ARRAY_: {
-				int offset = position.intArg(0);
+				long offset = position.intArg(0);
 				boolean is_global = position.boolArg(1);
 
 				il.append(InstructionConstants.ACONST_NULL);
@@ -2940,7 +2946,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._SRAND_: {
-				int numargs = position.intArg(0);
+				long numargs = position.intArg(0);
 				if (numargs == 0) {
 					JVMTools_getField(Integer.TYPE, "oldseed");
 					il.append(InstructionConstants.ALOAD_0);
@@ -3010,7 +3016,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 				break;
 			}
 			case AwkTuples._LENGTH_: {
-				int numargs = position.intArg(0);
+				long numargs = position.intArg(0);
 				if (numargs == 0) {
 					il.append(factory.createFieldAccess(classname, "ZERO", getObjectType(Integer.class), Constants.GETSTATIC));
 					getInputField();
@@ -3027,7 +3033,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 
 			case AwkTuples._SLEEP_: {
-				int numargs = position.intArg(0);
+				long numargs = position.intArg(0);
 				if (numargs == 0) {
 					il.append(new PUSH(cp, 1000L));
 				} else {
@@ -3041,7 +3047,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 			}
 
 			case AwkTuples._DUMP_: {
-				int numargs = position.intArg(0);
+				long numargs = position.intArg(0);
 				if (numargs == 0) {
 					// no args
 					// dump all variables
@@ -3170,11 +3176,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
-	private void JVMTools_allocateStaticField(Class vartype, String varname) {
+	private void JVMTools_allocateStaticField(Class<?> vartype, String varname) {
 		JVMTools_allocateStaticField(vartype, varname, ACC_PRIVATE);
 	}
 
-	private void JVMTools_allocateStaticField(Class vartype, String varname, int public_or_private) {
+	private void JVMTools_allocateStaticField(Class<?> vartype, String varname, int public_or_private) {
 		FieldGen fg = new FieldGen(public_or_private | ACC_STATIC | ACC_FINAL,
 				getObjectType(vartype),
 				varname,
@@ -3182,7 +3188,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		cg.addField(fg.getField());
 	}
 
-	private void JVMTools_allocateField(Class vartype, String varname) {
+	private void JVMTools_allocateField(Class<?> vartype, String varname) {
 		FieldGen fg = new FieldGen(ACC_PRIVATE,
 				getObjectType(vartype),
 				varname,
@@ -3328,66 +3334,65 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(new PUSH(cp, b));
 	}
 
-	private void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name) {
+	private void JVMTools_invokeInterface(Class<?> return_type, Class<?> orig_class, String method_name) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {}), INVOKEINTERFACE));
 	}
 
-	private void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name, Class arg_type) {
+	private void JVMTools_invokeInterface(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type}), INVOKEINTERFACE));
 	}
 
-	private void JVMTools_invokeInterface(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type) {
+	private void JVMTools_invokeInterface(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg2_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type}), INVOKEINTERFACE));
 	}
 
-	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name) {
+	private void JVMTools_invokeStatic(Class<?> return_type, Class<?> orig_class, String method_name) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {}), INVOKESTATIC));
 	}
 
-	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type) {
+	private void JVMTools_invokeStatic(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type}), INVOKESTATIC));
 	}
 
-	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type) {
+	private void JVMTools_invokeStatic(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg2_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type}), INVOKESTATIC));
 	}
 
-	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type) {
+	private void JVMTools_invokeStatic(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg2_type, Class<?> arg3_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type, arg3_type}), INVOKESTATIC));
 	}
 
-	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type, Class arg4_type) {
+	private void JVMTools_invokeStatic(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg2_type, Class<?> arg3_type, Class<?> arg4_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type, arg3_type, arg4_type}), INVOKESTATIC));
 	}
 
-	private void JVMTools_invokeStatic(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg2_type, Class arg3_type, Class arg4_type, Class arg5_type) {
+	private void JVMTools_invokeStatic(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg2_type, Class<?> arg3_type, Class<?> arg4_type, Class<?> arg5_type) {
 		il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg2_type, arg3_type, arg4_type, arg5_type}), INVOKESTATIC));
 	}
 
-	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name) {
+	private InstructionHandle JVMTools_invokeVirtual(Class<?> return_type, Class<?> orig_class, String method_name) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {}), INVOKEVIRTUAL));
 	}
 
-	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type) {
+	private InstructionHandle JVMTools_invokeVirtual(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type}), INVOKEVIRTUAL));
 	}
 
-	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg_type2) {
+	private InstructionHandle JVMTools_invokeVirtual(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg_type2) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg_type2}), INVOKEVIRTUAL));
 	}
 
-	private InstructionHandle JVMTools_invokeVirtual(Class return_type, Class orig_class, String method_name, Class arg_type, Class arg_type2, Class arg_type3) {
+	private InstructionHandle JVMTools_invokeVirtual(Class<?> return_type, Class<?> orig_class, String method_name, Class<?> arg_type, Class<?> arg_type2, Class<?> arg_type3) {
 		return il.append(factory.createInvoke(orig_class.getName(), method_name, getObjectType(return_type), buildArgs(new Class[] {arg_type, arg_type2, arg_type3}), INVOKEVIRTUAL));
 	}
 
-	private InstructionHandle JVMToold_invokeSettings(String methodName, Class<?> returnType, Class... argumentTypes) {
-
-		JVMTools_getField(AwkSettings.class, "settings");
-		return il.append(factory.createInvoke(AwkSettings.class.getName(), methodName, getObjectType(returnType),
-                    buildArgs(argumentTypes), INVOKEVIRTUAL));
-	}
-
-	private void JVMTools_allocateLocalVariable(Class vartype, String varname) {
+	private InstructionHandle JVMToold_invokeSettings(String methodName, Class<?> returnType, Class... argumentTypes) { 
+		JVMTools_getField(AwkSettings.class, "settings"); 
+		return il.append(factory.createInvoke(AwkSettings.class.getName(), methodName, getObjectType(returnType), 
+				buildArgs(argumentTypes), INVOKEVIRTUAL)); 
+	} 
+	
+	private void JVMTools_allocateLocalVariable(Class<?> vartype, String varname) {
 		assert local_vars.get(varname) == null;
 		LocalVariableGen lg = mg.addLocalVariable(varname, getObjectType(vartype), null, null);
 		local_vars.put(varname, lg.getIndex());
@@ -3401,7 +3406,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private InstructionHandle JVMTools_getLocalVariable(Class vartype, String varname) {
+	private InstructionHandle JVMTools_getLocalVariable(Class<?> vartype, String varname) {
 		Integer I = local_vars.get(varname);
 		if (I == null) {
 			throw new Error(varname + " not found as a local variable");
@@ -3409,7 +3414,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 		return il.append(InstructionFactory.createLoad(getObjectType(vartype), I));
 	}
 
-	private void JVMTools_storeToLocalVariable(Class vartype, String varname) {
+	private void JVMTools_storeToLocalVariable(Class<?> vartype, String varname) {
 		Integer I = local_vars.get(varname);
 		if (I == null) {
 			throw new Error(varname + " not found as a local variable");
@@ -3443,21 +3448,21 @@ public class AwkCompilerImpl implements AwkCompiler {
 		// ..., ps
 	}
 
-	private InstructionHandle JVMTools_getStaticField(String classname, String fieldname, Class fieldtype) {
+	private InstructionHandle JVMTools_getStaticField(String classname, String fieldname, Class<?> fieldtype) {
 		return il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.GETSTATIC));
 	}
 
-	private InstructionHandle JVMTools_getField(Class fieldtype, String fieldname) {
+	private InstructionHandle JVMTools_getField(Class<?> fieldtype, String fieldname) {
 		InstructionHandle ih = il.append(InstructionConstants.ALOAD_0);
 		il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.GETFIELD));
 		return ih;
 	}
 
-	private void JVMTools_storeStaticField(Class fieldtype, String fieldname) {
+	private void JVMTools_storeStaticField(Class<?> fieldtype, String fieldname) {
 		il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.PUTSTATIC));
 	}
 
-	private void JVMTools_storeField(Class fieldtype, String fieldname) {
+	private void JVMTools_storeField(Class<?> fieldtype, String fieldname) {
 		il.append(InstructionConstants.ALOAD_0);
 		JVMTools_SWAP();
 		il.append(factory.createFieldAccess(classname, fieldname, getObjectType(fieldtype), Constants.PUTFIELD));
@@ -3485,18 +3490,18 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(newtype, "<init>", Type.VOID, buildArgs(new Class[] {}), INVOKESPECIAL));
 	}
 
-	private void JVMTools_new(String newtype, Class paramtype) {
+	private void JVMTools_new(String newtype, Class<?> paramtype) {
 		JVMTools_new(il, newtype, paramtype);
 	}
 
-	private void JVMTools_new(InstructionList il, String newtype, Class paramtype) {
+	private void JVMTools_new(InstructionList il, String newtype, Class<?> paramtype) {
 		il.append(factory.createNew(newtype));
 		il.append(InstructionConstants.DUP_X1);
 		il.append(InstructionConstants.SWAP);
 		il.append(factory.createInvoke(newtype, "<init>", Type.VOID, buildArgs(new Class[] {paramtype}), INVOKESPECIAL));
 	}
 
-	private void JVMTools_new(String newtype, Class paramtype1, Class paramtype2) {
+	private void JVMTools_new(String newtype, Class<?> paramtype1, Class<?> paramtype2) {
 		// ..., param1, param2
 		il.append(factory.createNew(newtype));
 		// ..., param1, param2, objref
@@ -3507,11 +3512,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 		il.append(factory.createInvoke(newtype, "<init>", Type.VOID, buildArgs(new Class[] {paramtype1, paramtype2}), INVOKESPECIAL));
 	}
 
-	private void JVMTools_instanceOf(Class checkclass) {
+	private void JVMTools_instanceOf(Class<?> checkclass) {
 		il.append(factory.createInstanceOf(new ObjectType(checkclass.getName())));
 	}
 
-	private InstructionHandle JVMTools_cast(Class to) {
+	private InstructionHandle JVMTools_cast(Class<?> to) {
 		return il.append(factory.createCheckCast(new ObjectType(to.getName())));
 	}
 
@@ -3623,13 +3628,13 @@ public class AwkCompilerImpl implements AwkCompiler {
 				INVOKESPECIAL));
 	}
 
-	private InstructionHandle JVMTools_getVariable(int offset, boolean is_global, boolean is_array) {
-		if (offset < 0) {
-			throw new IllegalArgumentException("offset = " + offset + " ?! is_global=" + is_global + ", is_array=" + is_array);
+	private InstructionHandle JVMTools_getVariable(long environ_offset2, boolean is_global, boolean is_array) {
+		if (environ_offset2 < 0) {
+			throw new IllegalArgumentException("offset = " + environ_offset2 + " ?! is_global=" + is_global + ", is_array=" + is_array);
 		}
 		InstructionHandle retval;
 		if (is_global) {
-			retval = JVMTools_getField(Object.class, "global_" + offset);
+			retval = JVMTools_getField(Object.class, "global_" + environ_offset2);
 			JVMTools_DUP();
 			BranchHandle bh = JVMTools_IFNONNULL();
 			JVMTools_POP();
@@ -3639,11 +3644,11 @@ public class AwkCompilerImpl implements AwkCompiler {
 				JVMTools_pushString("");
 			}
 			JVMTools_DUP();
-			JVMTools_storeField(Object.class, "global_" + offset);
+			JVMTools_storeField(Object.class, "global_" + environ_offset2);
 			InstructionHandle ih = JVMTools_NOP();
 			bh.setTarget(ih);
 		} else {
-			retval = JVMTools_getLocalVariable(Object.class, "locals_" + offset);
+			retval = JVMTools_getLocalVariable(Object.class, "locals_" + environ_offset2);
 			JVMTools_DUP();
 			BranchHandle bh = JVMTools_IFNONNULL();
 			JVMTools_POP();
@@ -3653,26 +3658,26 @@ public class AwkCompilerImpl implements AwkCompiler {
 				JVMTools_pushString("");
 			}
 			JVMTools_DUP();
-			JVMTools_storeToLocalVariable(Object.class, "locals_" + offset);
+			JVMTools_storeToLocalVariable(Object.class, "locals_" + environ_offset2);
 			InstructionHandle ih = JVMTools_NOP();
 			bh.setTarget(ih);
 		}
 		return retval;
 	}
 
-	private void JVMTools_setVariable(int offset, boolean is_global) {
+	private void JVMTools_setVariable(long argc_offset2, boolean is_global) {
 		if (is_global) {
-			JVMTools_storeField(Object.class, "global_" + offset);
+			JVMTools_storeField(Object.class, "global_" + argc_offset2);
 		} else {
-			JVMTools_storeToLocalVariable(Object.class, "locals_" + offset);
+			JVMTools_storeToLocalVariable(Object.class, "locals_" + argc_offset2);
 		}
 	}
 
-	private void JVMTools_throwNewException(Class cls, String msg) {
+	private void JVMTools_throwNewException(Class<?> cls, String msg) {
 		JVMTools_throwNewException(il, cls, msg);
 	}
 
-	private void JVMTools_throwNewException(InstructionList il, Class cls, String msg) {
+	private void JVMTools_throwNewException(InstructionList il, Class<?> cls, String msg) {
 		il.append(new PUSH(cp, msg));
 		JVMTools_new(il, cls.getName(), String.class);
 		//JVMTools_DEBUG("Throwing end exception: "+msg);
@@ -3713,7 +3718,7 @@ public class AwkCompilerImpl implements AwkCompiler {
 
 	////////////////////////////////////////////////////////////////////////////////
 
-	private static Type getObjectType(Class cls) {
+	private static Type getObjectType(Class<?> cls) {
 		if (cls.isArray()) {
 			return new ArrayType(getObjectType(cls.getComponentType()), 1);
 		} else if (cls == Boolean.TYPE) {
@@ -3745,9 +3750,9 @@ public class AwkCompilerImpl implements AwkCompiler {
 		}
 	}
 
-	private static Type[] buildArgs(Class... arguments) {
+	private static Type[] buildArgs(Class<?>... arguments) {
 		java.util.List<Type> arg_list = new ArrayList<Type>();
-		for (Class cls : arguments) {
+		for (Class<?> cls : arguments) {
 			arg_list.add(getObjectType(cls));
 		}
 		return arg_list.toArray(new Type[0]);

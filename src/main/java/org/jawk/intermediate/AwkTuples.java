@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.jawk.util.LinkedListStackImpl;
 import org.jawk.util.MyStack;
 import org.slf4j.Logger;
@@ -21,12 +22,21 @@ import org.slf4j.LoggerFactory;
 
 public class AwkTuples implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3261725178303196488L;
+
 	private static final Logger LOG = LoggerFactory.getLogger(AwkTuples.class);
 
 	private VersionManager version_manager = new VersionManager();
 
 	private static final class AddressImpl implements Address, Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 109610985341478678L;
 		private String lbl;
 		private int idx = -1;
 
@@ -96,9 +106,9 @@ public class AwkTuples implements Serializable {
 		}
 
 		@Override
-		public int intArg(int arg_idx) {
-			Class c = tuple.getTypes()[arg_idx];
-			if (c == Integer.class) {
+		public long intArg(int arg_idx) {
+			Class<?> c = tuple.getTypes()[arg_idx];
+			if (c == Long.class) {
 				return tuple.getInts()[arg_idx];
 			}
 			throw new Error("Invalid arg type: " + c + ", arg_idx = " + arg_idx + ", tuple = " + tuple);
@@ -106,7 +116,7 @@ public class AwkTuples implements Serializable {
 
 		@Override
 		public boolean boolArg(int arg_idx) {
-			Class c = tuple.getTypes()[arg_idx];
+			Class<?> c = tuple.getTypes()[arg_idx];
 			if (c == Boolean.class) {
 				return tuple.getBools()[arg_idx];
 			}
@@ -115,8 +125,8 @@ public class AwkTuples implements Serializable {
 
 		@Override
 		public Object arg(int arg_idx) {
-			Class c = tuple.getTypes()[arg_idx];
-			if (c == Integer.class) {
+			Class<?> c = tuple.getTypes()[arg_idx];
+			if (c == Long.class) {
 				return tuple.getInts()[arg_idx];
 			}
 			if (c == Double.class) {
@@ -142,7 +152,7 @@ public class AwkTuples implements Serializable {
 		}
 
 		@Override
-		public Class classArg() {
+		public Class<?> classArg() {
 			//Tuple tuple = queue.get(idx);
 			assert tuple.getCls() != null;
 			return tuple.getCls();
@@ -168,14 +178,18 @@ public class AwkTuples implements Serializable {
 	// made public to access static members of AwkTuples via Java Reflection
 	private static final class Tuple implements Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8105941219003992817L;
 		private int opcode;
-		private int[] ints = new int[4];
+		private long[] ints = new long[4];
 		private boolean[] bools = new boolean[4];
 		private double[] doubles = new double[4];
 		private String[] strings = new String[4];
-		private Class[] types = new Class[4];
+		private Class<?>[] types = new Class[4];
 		private Address address = null;
-		private Class cls = null;
+		private Class<?> cls = null;
 		private transient HasFunctionAddress hasFuncAddr = null;
 		// to avoid polluting the constructors,
 		// setLineNumber(int) populates this field
@@ -188,25 +202,25 @@ public class AwkTuples implements Serializable {
 			this.opcode = opcode;
 		}
 
-		private Tuple(int opcode, int i1) {
+		private Tuple(int opcode, long i1) {
 			this(opcode);
 			ints[0] = i1;
-			types[0] = Integer.class;
+			types[0] = Long.class;
 		}
 
-		private Tuple(int opcode, int i1, int i2) {
+		private Tuple(int opcode, long i1, long i2) {
 			this(opcode, i1);
 			ints[1] = i2;
-			types[1] = Integer.class;
+			types[1] = Long.class;
 		}
 
-		private Tuple(int opcode, int i1, boolean b2) {
+		private Tuple(int opcode, long i1, boolean b2) {
 			this(opcode, i1);
 			bools[1] = b2;
 			types[1] = Boolean.class;
 		}
 
-		private Tuple(int opcode, int i1, boolean b2, boolean b3) {
+		private Tuple(int opcode, long i1, boolean b2, boolean b3) {
 			this(opcode, i1, b2);
 			bools[2] = b3;
 			types[2] = Boolean.class;
@@ -230,10 +244,10 @@ public class AwkTuples implements Serializable {
 			types[0] = Boolean.class;
 		}
 
-		private Tuple(int opcode, String s1, int i2) {
+		private Tuple(int opcode, String s1, long i2) {
 			this(opcode, s1);
 			ints[1] = i2;
-			types[1] = Integer.class;
+			types[1] = Long.class;
 		}
 
 		private Tuple(int opcode, Address address) {
@@ -242,24 +256,24 @@ public class AwkTuples implements Serializable {
 			types[0] = Address.class;
 		}
 
-		private Tuple(int opcode, String strarg, int intarg, boolean boolarg) {
+		private Tuple(int opcode, String strarg, long intarg, boolean boolarg) {
 			this(opcode, strarg, intarg);
 			bools[2] = boolarg;
 			types[2] = Boolean.class;
 		}
 
-		private Tuple(int opcode, HasFunctionAddress has_func_addr, String s2, int i3, int i4) {
+		private Tuple(int opcode, HasFunctionAddress has_func_addr, String s2, long i3, long i4) {
 			this(opcode);
 			this.hasFuncAddr = has_func_addr;
 			strings[1] = s2;
 			types[1] = String.class;
 			ints[2] = i3;
-			types[2] = Integer.class;
+			types[2] = Long.class;
 			ints[3] = i4;
-			types[3] = Integer.class;
+			types[3] = Long.class;
 		}
 
-		private Tuple(int opcode, Class cls) {
+		private Tuple(int opcode, Class<?> cls) {
 			this(opcode);
 			this.cls = cls;
 			types[0] = Class.class;
@@ -295,8 +309,8 @@ public class AwkTuples implements Serializable {
 			int idx = 0;
 			while ((idx < types.length) && (types[idx] != null)) {
 				sb.append(", ");
-				Class type = types[idx];
-				if (type == Integer.class) {
+				Class<?> type = types[idx];
+				if (type == Long.class) {
 					sb.append(ints[idx]);
 				} else if (type == Boolean.class) {
 					sb.append(bools[idx]);
@@ -354,7 +368,7 @@ public class AwkTuples implements Serializable {
 			return opcode;
 		}
 
-		private int[] getInts() {
+		private long[] getInts() {
 			return ints;
 		}
 
@@ -370,7 +384,7 @@ public class AwkTuples implements Serializable {
 			return strings;
 		}
 
-		private Class[] getTypes() {
+		private Class<?>[] getTypes() {
 			return types;
 		}
 
@@ -386,11 +400,12 @@ public class AwkTuples implements Serializable {
 			return lineno;
 		}
 
+		@SuppressWarnings("unused")
 		private void setOpcode(int opcode) {
 			this.opcode = opcode;
 		}
 
-		private Class getCls() {
+		private Class<?> getCls() {
 			return cls;
 		}
 
@@ -1607,6 +1622,8 @@ public class AwkTuples implements Serializable {
 	 */
 	private java.util.List<Tuple> queue = new ArrayList<Tuple>(100) {
 
+		private static final long serialVersionUID = -6334362156408598578L;
+
 		@Override
 		public boolean add(Tuple t) {
 			t.setLineNumber(lineno_stack.peek());
@@ -1614,6 +1631,7 @@ public class AwkTuples implements Serializable {
 		}
 	};
 	private Set<Address> unresolved_addresses = new HashSet<Address>();
+
 	/**
 	 * Needed only for dumping intermediate code to text such that address labels are provided.
 	 */
@@ -1621,11 +1639,11 @@ public class AwkTuples implements Serializable {
 	private Map<String, Integer> address_label_counts = new HashMap<String, Integer>();
 
 	public static String toOpcodeString(int opcode) {
-		Class c = AwkTuples.class;
+		Class<?> c = AwkTuples.class;
 		Field[] fields = c.getDeclaredFields();
 		try {
 			for (Field field : fields) {
-				if ((field.getModifiers() & Modifier.STATIC) > 0 && field.getType() == Integer.TYPE && field.getInt(null) == opcode) {
+				if ((field.getModifiers() & Modifier.STATIC) > 0 && field.getType() == Long.TYPE && field.getLong(null) == opcode) {
 					return field.getName();
 				}
 			}
@@ -1641,11 +1659,13 @@ public class AwkTuples implements Serializable {
 	}
 
 	public void push(Object o) {
-		assert (o instanceof String) || (o instanceof Integer) || (o instanceof Double); //  || (o instanceof Pattern); //  || (o instanceof PatternPair);
+		assert (o instanceof String) || (o instanceof Long) || (o instanceof Integer) || (o instanceof Double); //  || (o instanceof Pattern); //  || (o instanceof PatternPair);
 		if (o instanceof String) {
 			queue.add(new Tuple(_PUSH_, o.toString()));
 		} else if (o instanceof Integer) {
 			queue.add(new Tuple(_PUSH_, (Integer) o));
+		} else if (o instanceof Long) {
+			queue.add(new Tuple(_PUSH_, (Long) o));
 		} else if (o instanceof Double) {
 			queue.add(new Tuple(_PUSH_, (Double) o));
 		} else {
@@ -2013,7 +2033,7 @@ public class AwkTuples implements Serializable {
 		queue.add(new Tuple(_GET_FIRST_AND_REMOVE_FROM_KEYLIST_));
 	}
 
-	public boolean checkClass(Class cls) {
+	public boolean checkClass(Class<?> cls) {
 		queue.add(new Tuple(_CHECK_CLASS_, cls));
 		return true;
 	}
@@ -2228,13 +2248,13 @@ public class AwkTuples implements Serializable {
 	 * Accept a {variable_name -&gt; offset} mapping such that global variables can be
 	 * assigned while processing name=value and filename command-line arguments.
 	 */
-	public void addGlobalVariableNameToOffsetMapping(String varname, int offset, boolean is_aarray) {
+	public void addGlobalVariableNameToOffsetMapping(String varname, int offset, boolean is_array) {
 		if (global_var_offset_map.get(varname) != null) {
 			assert global_var_aarray_map.get(varname) != null;
 			return;
 		}
 		global_var_offset_map.put(varname, offset);
-		global_var_aarray_map.put(varname, is_aarray);
+		global_var_aarray_map.put(varname, is_array);
 	}
 
 	/**
@@ -2299,6 +2319,8 @@ public class AwkTuples implements Serializable {
 	 * class version matches the version supported by the interpreter/compiler.
 	 */
 	private static class VersionManager implements Serializable {
+
+		private static final long serialVersionUID = -2015316238483923915L;
 
 		/**
 		 * Class version number.
