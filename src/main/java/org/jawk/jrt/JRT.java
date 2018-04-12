@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -72,24 +73,12 @@ public class JRT {
 
 	private static final boolean IS_WINDOWS = (System.getProperty("os.name").indexOf("Windows") >= 0);
 
-	/**
-	 * The default regular expression for setRecordSeparator.
-	 * The AVM refers to this field, so that the field exists
-	 * in one place.
-	 */
-	//public static final String DEFAULT_RS_REGEX = System.getProperty("line.separator", null);
-	public static final String DEFAULT_RS_REGEX = "(\n)|(\r\n)";
-
-//	static {
-//		assert (DEFAULT_RS_REGEX != null) : "line.separator not found in System properties ?!";
-//	}
-
 	private VariableManager vm;
-
+	
 	private Map<String, Process> output_processes = new HashMap<String, Process>();
 	private Map<String, PrintStream> output_streams = new HashMap<String, PrintStream>();
 
-	// Paritioning reader for stdin.
+	// Partitioning reader for stdin.
 	private PartitioningReader partitioningReader = null;
 	// Current input line ($0).
 	private String inputLine = null;
@@ -158,7 +147,7 @@ public class JRT {
 	 *
 	 * @return A String representation of o.
 	 */
-	public static String toAwkString(Object o, String convfmt) {
+	public static String toAwkString(Object o, String convfmt, Locale locale) {
 		
 		if (o instanceof Number) {
 			// It is a number, some processing is required here
@@ -169,15 +158,15 @@ public class JRT {
 			} else {
 				// It's not a integer, represent it with the specified format
 				try {
-					String s = String.format(convfmt, d);
+					String s = String.format(locale, convfmt, d);
 					// Surprisingly, while %.6g is the official representation of numbers in AWK
 					// which should include trailing zeroes, AWK seems to trim them. So, we will
 					// do the same: trim the trailing zeroes
-					if (s.indexOf('.') > -1 && (s.indexOf('e') + s.indexOf('E') == -2)) {
+					if ((s.indexOf('.') > -1 || s.indexOf(',') > -1) && (s.indexOf('e') + s.indexOf('E') == -2)) {
 						while (s.endsWith("0")) {
 							s = s.substring(0, s.length() - 1);
 						}
-						if (s.endsWith(".")) {
+						if (s.endsWith(".") || s.endsWith(",")) {
 							s = s.substring(0, s.length() - 1);
 						}
 					}
@@ -204,10 +193,10 @@ public class JRT {
 	 *
 	 * @return A String representation of o.
 	 */
-	public static String toAwkStringForOutput(Object o, String ofmt) {
+	public static String toAwkStringForOutput(Object o, String ofmt, Locale locale) {
 
 		// Even if specified Object o is not officially a number, we try to convert
-		// it to a Double. Because if it's a litteral representation of a number,
+		// it to a Double. Because if it's a literal representation of a number,
 		// we will need to display it as a number ("12.00" --> 12)
 		if (!(o instanceof Number)) {
 			try {
@@ -217,7 +206,7 @@ public class JRT {
 			}
 		}
 		
-		return toAwkString(o, ofmt);
+		return toAwkString(o, ofmt, locale);
 	}
 
 	/*
@@ -282,40 +271,44 @@ public class JRT {
 	 *   <li>&gt; 0 - Return true if o1 &gt; o2.</li>
 	 *   </ul>
 	 */
-	public static boolean compare2(Object obj1, Object obj2, int mode) {
+	public static boolean compare2(Object o1, Object o2, int mode) {
 
-		Object o1 = obj1;
-		Object o2 = obj2;
-
+		// Pre-compute String representations of o1 and o2
+		String o1String = o1.toString();
+		String o2String = o2.toString();
+		
 		// Special case of Uninitialized objects
 		if (o1 instanceof UninitializedObject) {
 			if (o2 instanceof UninitializedObject ||
-					"".equals(o2.toString()) ||
-					"0".equals(o2.toString())) {
-				return true;
+					"".equals(o2String) ||
+					"0".equals(o2String)) {
+				return mode == 0;
 			} else {
-				return false;
+				return mode != 0;
 			}
 		} else if (o2 instanceof UninitializedObject) {
-			if (o1 instanceof UninitializedObject ||
-					"".equals(o1.toString()) ||
-					"0".equals(o1.toString())) {
-				return true;
+			if ("".equals(o1String) ||
+					"0".equals(o1String)) {
+				return mode == 0;
 			} else {
-				return false;
+				return mode != 0;
 			}
 		}
 		
-		if (!(o1 instanceof Number)) {
-			try {
-				o1 = Double.parseDouble(o1.toString());
-			} catch (NumberFormatException nfe) {
+		if (!(o1 instanceof Number) && !o1String.isEmpty()) {
+			char o1FirstChar = o1String.charAt(0);
+			if (o1FirstChar >= '0' && o1FirstChar <= '9') {
+				try {
+					o1 = Double.parseDouble(o1String);
+				} catch (NumberFormatException nfe) { /* Fail silently */ }
 			}
 		}
-		if (!(o2 instanceof Number)) {
-			try {
-				o2 = Double.parseDouble(o2.toString());
-			} catch (NumberFormatException nfe) {
+		if (!(o2 instanceof Number) && !o2String.isEmpty()) {
+			char o2FirstChar = o2String.charAt(0);
+			if (o2FirstChar >= '0' && o2FirstChar <= '9') {
+				try {
+					o2 = Double.parseDouble(o2String);
+				} catch (NumberFormatException nfe) { /* Fail silently */ }
 			}
 		}
 
@@ -331,11 +324,11 @@ public class JRT {
 
 			// string equality usually occurs more often than natural ordering comparison
 			if (mode == 0) {
-				return (o1.toString().equals(o2.toString()));
+				return o1String.equals(o2String);
 			} else if (mode < 0) {
-				return (o1.toString().compareTo(o2.toString()) < 0);
+				return o1String.compareTo(o2String) < 0;
 			} else {
-				return (o1.toString().compareTo(o2.toString()) > 0);
+				return o1String.compareTo(o2String) > 0;
 			}
 		}
 	}
@@ -467,8 +460,8 @@ public class JRT {
 	 *
 	 * @return The number of parts resulting from this split operation.
 	 */
-	public static int split(Object array, Object string, String convfmt) {
-		return splitWorker(new StringTokenizer(toAwkString(string, convfmt)), (AssocArray) array);
+	public static int split(Object array, Object string, String convfmt, Locale locale) {
+		return splitWorker(new StringTokenizer(toAwkString(string, convfmt, locale)), (AssocArray) array);
 	}
 	/**
 	 * Splits the string into parts separated the regular expression fs.
@@ -484,16 +477,16 @@ public class JRT {
 	 *
 	 * @return The number of parts resulting from this split operation.
 	 */
-	public static int split(Object fs, Object array, Object string, String convfmt) {
-		String fs_string = toAwkString(fs, convfmt);
+	public static int split(Object fs, Object array, Object string, String convfmt, Locale locale) {
+		String fs_string = toAwkString(fs, convfmt, locale);
 		if (fs_string.equals(" ")) {
-			return splitWorker(new StringTokenizer(toAwkString(string, convfmt)), (AssocArray) array);
+			return splitWorker(new StringTokenizer(toAwkString(string, convfmt, locale)), (AssocArray) array);
 		} else if (fs_string.equals("")) {
-			return splitWorker(new CharacterTokenizer(toAwkString(string, convfmt)), (AssocArray) array);
+			return splitWorker(new CharacterTokenizer(toAwkString(string, convfmt, locale)), (AssocArray) array);
 		} else if (fs_string.length() == 1) {
-			return splitWorker(new SingleCharacterTokenizer(toAwkString(string, convfmt), fs_string.charAt(0)), (AssocArray) array);
+			return splitWorker(new SingleCharacterTokenizer(toAwkString(string, convfmt, locale), fs_string.charAt(0)), (AssocArray) array);
 		} else {
-			return splitWorker(new RegexTokenizer(toAwkString(string, convfmt), fs_string), (AssocArray) array);
+			return splitWorker(new RegexTokenizer(toAwkString(string, convfmt, locale), fs_string), (AssocArray) array);
 		}
 	}
 
@@ -529,7 +522,7 @@ public class JRT {
 	 *
 	 * @throws IOException upon an IO error.
 	 */
-	public boolean jrtConsumeInput(final InputStream input, boolean for_getline) throws IOException {
+	public boolean jrtConsumeInput(final InputStream input, boolean for_getline, Locale locale) throws IOException {
 		// first time!
 		if (arglist_aa == null) {
 			Object arglist_obj = vm.getARGV(); // vm.getVariable("argv_field", true);
@@ -551,7 +544,7 @@ public class JRT {
 			for (long i = 1; i < argc; i++) {
 				if (arglist_aa.isIn(i)) {
 					Object namevalue_or_filename_object = arglist_aa.get(i);
-					String namevalue_or_filename = toAwkString(namevalue_or_filename_object, vm.getCONVFMT().toString());
+					String namevalue_or_filename = toAwkString(namevalue_or_filename_object, vm.getCONVFMT().toString(), locale);
 					if (namevalue_or_filename.indexOf('=') == -1) {
 						// filename!
 						has_filenames = true;
@@ -577,7 +570,7 @@ public class JRT {
 						}
 					}
 					if (!(o instanceof UninitializedObject || o.toString().isEmpty())) {
-						String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
+						String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString(), locale);
 						if (name_value_or_filename.indexOf('=') == -1) {
 							partitioningReader = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
 							vm.setFILENAME(name_value_or_filename);
@@ -610,7 +603,7 @@ public class JRT {
 							}
 						}
 						if (!(o instanceof UninitializedObject || o.toString().isEmpty())) {
-							String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString());
+							String name_value_or_filename = toAwkString(o, vm.getCONVFMT().toString(), locale);
 							if (name_value_or_filename.indexOf('=') == -1) {
 								// true = from filename list
 								partitioningReader = new PartitioningReader(new FileReader(name_value_or_filename), vm.getRS().toString(), true);
@@ -1129,7 +1122,7 @@ public class JRT {
 	 *
 	 * @see #sprintfFunctionNoCatch(Object[],String)
 	 */
-	public static String sprintfFunction(Object[] arr, String fmt_arg) {
+	public static String sprintfFunction(Object[] arr, String fmt_arg, Locale locale) {
 		
 		// Try to adapt the object types to the specified formats
 		Pattern percentPattern = Pattern.compile("(%%)|(%n)|(%[ -\\+\\(#0]?[0-9]*(\\.[0-9]+)?[bhscdoxefgat])", Pattern.CASE_INSENSITIVE);
@@ -1151,27 +1144,27 @@ public class JRT {
 								format1Arg.endsWith("x") ||
 								format1Arg.endsWith("X") ||
 								format1Arg.endsWith("o")) {
-							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, toLong(arr[i])));
+							percentMatcher.appendReplacement(formatResultBuffer, String.format(locale, format1Arg, toLong(arr[i])));
 						} else if (format1Arg.endsWith("e") ||
 								format1Arg.endsWith("E") ||
 								format1Arg.endsWith("f") ||
 								format1Arg.endsWith("a") ||
 								format1Arg.endsWith("A")) {
-							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, toDouble(arr[i])));
+							percentMatcher.appendReplacement(formatResultBuffer, String.format(locale, format1Arg, toDouble(arr[i])));
 						} else if (format1Arg.endsWith("g") ||
 								format1Arg.endsWith("G")) {
-							String tempFormatResult = String.format(format1Arg, toDouble(arr[i]));
-							if (tempFormatResult.indexOf('.') > -1 && tempFormatResult.indexOf('e') == -1 && tempFormatResult.indexOf('E') == -1) {
+							String tempFormatResult = String.format(locale, format1Arg, toDouble(arr[i]));
+							if ((tempFormatResult.indexOf('.') > -1 || tempFormatResult.indexOf(',') > -1) && tempFormatResult.indexOf('e') == -1 && tempFormatResult.indexOf('E') == -1) {
 								while (tempFormatResult.endsWith("0")) {
 									tempFormatResult = tempFormatResult.substring(0, tempFormatResult.length() - 1);
 								}
-								if (tempFormatResult.endsWith(".")) {
+								if (tempFormatResult.endsWith(".") || tempFormatResult.endsWith(",")) {
 									tempFormatResult = tempFormatResult.substring(0, tempFormatResult.length() - 1);
 								}
 							}
 							percentMatcher.appendReplacement(formatResultBuffer, tempFormatResult);
 						} else {
-							percentMatcher.appendReplacement(formatResultBuffer, String.format(format1Arg, arr[i]));
+							percentMatcher.appendReplacement(formatResultBuffer, String.format(locale, format1Arg, arr[i]));
 						}
 						i++;
 					}
@@ -1212,8 +1205,8 @@ public class JRT {
 	 *
 	 * @see #printfFunctionNoCatch(Object[],String)
 	 */
-	public static void printfFunction(Object[] arr, String fmt_arg) {
-		System.out.print(sprintfFunction(arr, fmt_arg));
+	public static void printfFunction(Object[] arr, String fmt_arg, Locale locale) {
+		System.out.print(sprintfFunction(arr, fmt_arg, locale));
 	}
 
 	/**
@@ -1235,28 +1228,28 @@ public class JRT {
 	 *
 	 * @see #printfFunctionNoCatch(PrintStream,Object[],String)
 	 */
-	public static void printfFunction(PrintStream ps, Object[] arr, String fmt_arg) {
-		ps.print(sprintfFunction(arr, fmt_arg));
+	public static void printfFunction(PrintStream ps, Object[] arr, String fmt_arg, Locale locale) {
+		ps.print(sprintfFunction(arr, fmt_arg, locale));
 	}
 
-	public static String sprintfFunctionNoCatch(Object[] arr, String fmt_arg)
+	public static String sprintfFunctionNoCatch(Object[] arr, String fmt_arg, Locale locale)
 			throws IllegalFormatException
 	{
-		return String.format(fmt_arg, arr);
+		return String.format(locale, fmt_arg, arr);
 	}
 
-	public static void printfFunctionNoCatch(Object[] arr, String fmt_arg) {
-		System.out.print(sprintfFunctionNoCatch(arr, fmt_arg));
+	public static void printfFunctionNoCatch(Object[] arr, String fmt_arg, Locale locale) {
+		System.out.print(sprintfFunctionNoCatch(arr, fmt_arg, locale));
 	}
 
-	public static void printfFunctionNoCatch(PrintStream ps, Object[] arr, String fmt_arg) {
-		ps.print(sprintfFunctionNoCatch(arr, fmt_arg));
+	public static void printfFunctionNoCatch(PrintStream ps, Object[] arr, String fmt_arg, Locale locale) {
+		ps.print(sprintfFunctionNoCatch(arr, fmt_arg, locale));
 	}
 
-	public static Integer replaceFirst(Object orig_value_obj, Object repl_obj, Object ere_obj, StringBuffer sb, String convfmt) {
-		String orig_value = toAwkString(orig_value_obj, convfmt);
-		String repl = toAwkString(repl_obj, convfmt);
-		String ere = toAwkString(ere_obj, convfmt);
+	public static Integer replaceFirst(Object orig_value_obj, Object repl_obj, Object ere_obj, StringBuffer sb, String convfmt, Locale locale) {
+		String orig_value = toAwkString(orig_value_obj, convfmt, locale);
+		String repl = toAwkString(repl_obj, convfmt, locale);
+		String ere = toAwkString(ere_obj, convfmt, locale);
 		// remove special meaning for backslash and dollar signs
 		repl = Matcher.quoteReplacement(repl);
 		sb.setLength(0);
@@ -1268,10 +1261,10 @@ public class JRT {
 		}
 	}
 
-	public static Integer replaceAll(Object orig_value_obj, Object repl_obj, Object ere_obj, StringBuffer sb, String convfmt) {
-		String orig_value = toAwkString(orig_value_obj, convfmt);
-		String repl = toAwkString(repl_obj, convfmt);
-		String ere = toAwkString(ere_obj, convfmt);
+	public static Integer replaceAll(Object orig_value_obj, Object repl_obj, Object ere_obj, StringBuffer sb, String convfmt, Locale locale) {
+		String orig_value = toAwkString(orig_value_obj, convfmt, locale);
+		String repl = toAwkString(repl_obj, convfmt, locale);
+		String ere = toAwkString(ere_obj, convfmt, locale);
 		// remove special meaning for backslash and dollar signs
 		repl = Matcher.quoteReplacement(repl);
 		sb.setLength(0);
