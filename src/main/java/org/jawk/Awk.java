@@ -87,7 +87,6 @@ public class Awk {
 
 	private static final String DEFAULT_EXTENSIONS
 			= org.jawk.ext.CoreExtension.class.getName()
-			+ "#" + org.jawk.ext.SocketExtension.class.getName()
 			+ "#" + org.jawk.ext.StdinExtension.class.getName();
 	private static final Logger LOG = LoggerFactory.getLogger(Awk.class);
 

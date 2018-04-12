@@ -36,7 +36,7 @@ public abstract class AbstractExtension implements JawkExtension {
 	 *   has been applied.
 	 */
 	protected final String toAwkString(Object obj) {
-		return JRT.toAwkString(obj, getVm().getCONVFMT().toString());
+		return JRT.toAwkString(obj, getVm().getCONVFMT().toString(), settings.getLocale());
 	}
 
 	/**
