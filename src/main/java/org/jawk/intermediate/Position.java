@@ -31,7 +31,7 @@ public interface Position {
 	 *
 	 * @return the integer representation of the item.
 	 */
-	int intArg(int idx);
+	long intArg(int idx);
 
 	/**
 	 * Get the boolean representation for a particular

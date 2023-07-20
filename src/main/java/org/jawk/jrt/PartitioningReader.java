@@ -72,7 +72,7 @@ public class PartitioningReader extends FilterReader {
 		this.fromFileNameList = fromFileNameList;
 		setRecordSeparator(recordSeparator);
 	}
-	private String priorRecordSeparator = null;
+	private String recordSeparator = null;
 	private boolean consumeAll = false;
 
 	/**
@@ -81,16 +81,19 @@ public class PartitioningReader extends FilterReader {
 	 * @param recordSeparator The new record separator, as a regular expression.
 	 */
 	public final void setRecordSeparator(String recordSeparator) {
-		//assert !recordSeparator.equals("") : "recordSeparator cannot be BLANK";
-		if (!recordSeparator.equals(priorRecordSeparator)) {
-			if (recordSeparator.equals("")) {
+		if (!recordSeparator.equals(this.recordSeparator)) {
+			if ("".equals(recordSeparator)) {
 				consumeAll = true;
 				rs = Pattern.compile("\\z", Pattern.DOTALL | Pattern.MULTILINE);
+			} else if ("\n".equals(recordSeparator) || "\r\n".equals(recordSeparator) || "\r".equals(recordSeparator)) {
+				// For performance reason, handle the default RS in a specific way here
+				consumeAll = false;
+				rs = Pattern.compile(recordSeparator, Pattern.LITERAL);
 			} else {
 				consumeAll = false;
 				rs = Pattern.compile(recordSeparator, Pattern.DOTALL | Pattern.MULTILINE);
 			}
-			priorRecordSeparator = recordSeparator;
+			this.recordSeparator = recordSeparator;
 		}
 	}
 
@@ -102,27 +105,18 @@ public class PartitioningReader extends FilterReader {
 		return fromFileNameList;
 	}
 
-	private StringBuffer remaining = new StringBuffer();
+	private StringBuilder remaining = new StringBuilder();
 	private char[] readBuffer = new char[4096];
 
 	@Override
 	public int read(char[] b, int start, int len) throws IOException {
-		int retVal = super.read(b, start, len);
-		if (retVal >= 0) {
-			remaining.append(b, start, retVal);
+		int readChars = super.read(b, start, len);
+		if (readChars >= 0) {
+			remaining.append(b, start, readChars);
 		}
-		return retVal;
+		return readChars;
 	}
 
-	public boolean willBlock() {
-		if (matcher == null) {
-			matcher = rs.matcher(remaining);
-		} else {
-			matcher.reset(remaining);
-		}
-
-		return (consumeAll || eof || remaining.length() == 0 || !matcher.find());
-	}
 	private boolean eof = false;
 
 	/**
@@ -159,8 +153,6 @@ public class PartitioningReader extends FilterReader {
 			matcher = rs.matcher(remaining);
 		}
 
-		matcher.reset();
-
 		// if force greedy regex consumption:
 		if (FORCE_GREEDY_RS) {
 			// attempt to move last match away from the end of the input
@@ -179,15 +171,8 @@ public class PartitioningReader extends FilterReader {
 
 		// we have a record separator!
 
-		String[] splitString = rs.split(remaining, 2);
-
-		String retVal = splitString[0];
-		remaining.setLength(0);
-		// append to remaining only if the split
-		// resulted in multiple parts
-		if (splitString.length > 1) {
-			remaining.append(splitString[1]);
-		}
+		String retVal = remaining.substring(0, matcher.start());
+		remaining.delete(0, matcher.end());
 		return retVal;
 	}
 }

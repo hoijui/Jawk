@@ -2,10 +2,6 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<!--
-			This may get better support in Maven 3, see:
-			http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding
-		-->
 		<project.build.encoding>UTF-8</project.build.encoding>
 		<project.build.sourceEncoding>${project.build.encoding}</project.build.sourceEncoding>
 		<project.build.resourceEncoding>${project.build.encoding}</project.build.resourceEncoding>
@@ -15,15 +11,21 @@
 		<java.old.home>${env.JAVA6_HOME}</java.old.home>
 	</properties>
 
-	<groupId>org.jawk</groupId>
+	<parent>
+		<groupId>com.sentrysoftware.integration</groupId>
+		<artifactId>java-parent</artifactId>
+		<version>3</version>
+	</parent>
+
+	<groupId>com.sentrysoftware.monitoring</groupId>
 	<artifactId>jawk</artifactId>
-	<version>1.03-SNAPSHOT</version>
+	<version>2.0.00</version>
 
 	<packaging>bundle</packaging>
 
 	<name>Jawk</name>
 	<description>Java AWK interpreter/compiler</description>
-	<url>https://github.com/hoijui/Jawk</url>
+	<url>https://github.com/sentrysoftware/Jawk</url>
 	<inceptionYear>2006</inceptionYear>
 
 	<licenses>
@@ -36,7 +38,7 @@
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/hoijui/Jawk/issues/</url>
+		<url>https://github.com/sentrysoftware/Jawk/issues/</url>
 	</issueManagement>
 
 	<developers>
@@ -56,10 +58,7 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/hoijui/Jawk</connection>
-		<developerConnection>scm:git:git@github.com:hoijui/Jawk.git</developerConnection>
-		<url>http://github.com/hoijui/Jawk</url>
-		<tag>HEAD</tag>
+		<connection>scm:git:http://alpha.internal.sentrysoftware.net/source/scm/~bertrand/jawk.git</connection>
 	</scm>
 
 	<reporting>
@@ -71,7 +70,7 @@
 				<configuration>
 					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
 					<linkXref>true</linkXref>
-					<configLocation>src/main/resources/checkstyle.xml</configLocation>
+					<configLocation>src/test/resources/checkstyle.xml</configLocation>
 				</configuration>
 			</plugin>
 
@@ -86,7 +85,7 @@
 					<minimumTokens>50</minimumTokens>
 					<targetJdk>1.${java.old.version}</targetJdk>
 					<rulesets>
-						<ruleset>src/main/resources/pmd.xml</ruleset>
+						<ruleset>src/test/resources/pmd.xml</ruleset>
 					</rulesets>
 				</configuration>
 			</plugin>
@@ -195,16 +194,44 @@
 				</configuration>
 			</plugin>
 
+			<!-- source -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+					<goals>
+						<goal>jar</goal>
+					</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- javadoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.0.0</version>
+				<executions>
+					<execution>
+							<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalJOptions>
+								<additionalJOption>-Xdoclint:none</additionalJOption>
+							</additionalJOptions>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.5.1</version>
 			</plugin>
 
 			<plugin>
@@ -302,7 +329,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
 			</plugin>
 
 		</plugins>
@@ -316,19 +342,14 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
 		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.7</version>
-			<scope>runtime</scope>
-		</dependency>
 
 		<dependency>
-			<groupId>org.apache.bcel</groupId>
-			<artifactId>bcel</artifactId>
-			<version>5.2</version>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-simple</artifactId>
+		    <version>1.7.21</version>
 		</dependency>
-		<dependency>
+
+ 		<dependency>
 			<groupId>com.github.stefanbirkner</groupId>
 			<artifactId>system-rules</artifactId>
 			<version>1.16.0</version>
@@ -518,12 +539,5 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 </project>

@@ -3,6 +3,8 @@ package org.jawk.util;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +72,7 @@ public class AwkParameters {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AwkParameters.class);
 
-	private Class mainClass;
+	private Class<?> mainClass;
 	private String extensionDescription;
 
 	/**
@@ -78,7 +80,7 @@ public class AwkParameters {
 	 * @param extensionDescription a text description of extensions that
 	 *   are enabled (for compiled scripts)
 	 */
-	public AwkParameters(Class mainClass, String extensionDescription) {
+	public AwkParameters(Class<?> mainClass, String extensionDescription) {
 		this.mainClass = mainClass;
 		this.extensionDescription = extensionDescription;
 	}
@@ -99,7 +101,6 @@ public class AwkParameters {
 	 *
 	 * @param args The command-line arguments provided by the user.
 	 */
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public AwkSettings parseCommandLineArguments(String[] args) {
 
 		AwkSettings settings = new AwkSettings();
@@ -158,6 +159,10 @@ public class AwkParameters {
 					checkParameterHasArgument(args, argIdx);
 					++argIdx;
 					settings.setFieldSeparator(args[argIdx]);
+				} else if (args[argIdx].equals("--locale")) {
+					checkParameterHasArgument(args, argIdx);
+					++argIdx;
+					settings.setLocale(new Locale(args[argIdx]));
 				} else if (args[argIdx].equals("-ext")) {
 					settings.setUserExtensions(true);
 				} else if (args[argIdx].equals("-ni")) {
@@ -238,6 +243,7 @@ public class AwkParameters {
 				+ " [-x]"
 				+ " [-y]"
 				+ " [-r]"
+				+ " [--locale locale]"
 				+ " [-ext]"
 				+ " [-ni]"
 				: "")
@@ -266,6 +272,7 @@ public class AwkParameters {
 			dest.println("                  (Note: exec enabled only in interpreted mode.)");
 			dest.println(" -y = (extension) Enable _INTEGER, _DOUBLE, and _STRING casting keywords.");
 			dest.println(" -r = (extension) Do NOT hide IllegalFormatExceptions for [s]printf.");
+			dest.println(" --locale Locale = (extension) Specify a locale to be used instead of US-English");
 			dest.println("-ext= (extension) Enable user-defined extensions. (default: not enabled)");
 			dest.println("-ni = (extension) Do NOT process stdin or ARGC/V through input rules.");
 			dest.println("                  (Useful for blocking extensions.)");

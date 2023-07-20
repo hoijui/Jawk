@@ -1,1 +1,6 @@
-target
+/target/
+/bin/
+/.settings/
+.project
+.classpath
+*.bak
