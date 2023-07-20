@@ -29,6 +29,14 @@
 	<url>https://github.com/sentrysoftware/Jawk</url>
 	<inceptionYear>2006</inceptionYear>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Apache Maven Packages for Sentry Software</name>
+			<url>https://maven.pkg.github.com/sentrysoftware/repo</url>
+		</repository>
+	</distributionManagement>
+
 	<licenses>
 		<license>
 			<name>GPL</name>
