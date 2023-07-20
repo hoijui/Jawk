@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
@@ -7,24 +9,23 @@
 		<project.build.resourceEncoding>${project.build.encoding}</project.build.resourceEncoding>
 		<project.pkgName>org.jawk</project.pkgName>
 		<project.mainClass>org.jawk.Main</project.mainClass>
-		<java.old.version>6</java.old.version>
+		<java.version>8</java.version>
 		<java.old.home>${env.JAVA6_HOME}</java.old.home>
 	</properties>
 
-	<parent>
-		<groupId>com.sentrysoftware.integration</groupId>
-		<artifactId>java-parent</artifactId>
-		<version>3</version>
-	</parent>
+	<organization>
+		<name>Sentry Software</name>
+		<url>http://www.sentrysoftware.com</url>
+	</organization>
 
-	<groupId>com.sentrysoftware.monitoring</groupId>
+	<groupId>com.sentrysoftware</groupId>
 	<artifactId>jawk</artifactId>
-	<version>2.0.00</version>
+	<version>2.1.00-SNAPSHOT</version>
 
 	<packaging>bundle</packaging>
 
 	<name>Jawk</name>
-	<description>Java AWK interpreter/compiler</description>
+	<description>Java AWK interpreter</description>
 	<url>https://github.com/sentrysoftware/Jawk</url>
 	<inceptionYear>2006</inceptionYear>
 
@@ -43,14 +44,21 @@
 
 	<developers>
 		<developer>
-			<name>Danny Daglas (ddaglas)</name>
+			<name>Danny Daglas (@ddaglas)</name>
 			<roles>
 				<role>project founder</role>
 			</roles>
 		</developer>
 		<developer>
-			<name>hoijui</name>
+			<name>hoijui (@hoijui)</name>
 			<email>hoijui.quaero@gmail.com</email>
+			<roles>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Bertrand Martin (@bertysentry)</name>
+			<email>bertrand@sentrysoftware.com</email>
 			<roles>
 				<role>maintainer</role>
 			</roles>
@@ -58,7 +66,7 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:http://alpha.internal.sentrysoftware.net/source/scm/~bertrand/jawk.git</connection>
+		<connection>scm:git:https://github.com/sentrysoftware/Jawk.git</connection>
 	</scm>
 
 	<reporting>
@@ -66,7 +74,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.17</version>
+				<version>3.3.0</version>
 				<configuration>
 					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
 					<linkXref>true</linkXref>
@@ -77,13 +85,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.6</version>
+				<version>3.21.0</version>
 				<configuration>
 					<aggregate>true</aggregate>
 					<linkXref>true</linkXref>
 					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
 					<minimumTokens>50</minimumTokens>
-					<targetJdk>1.${java.old.version}</targetJdk>
+					<targetJdk>${java.version}</targetJdk>
 					<rulesets>
 						<ruleset>src/test/resources/pmd.xml</ruleset>
 					</rulesets>
@@ -93,7 +101,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.3</version>
+				<version>3.0.5</version>
 			</plugin>
 
 			<plugin>
@@ -105,7 +113,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>taglist-maven-plugin</artifactId>
-				<version>2.4</version>
+				<version>3.0.0</version>
 				<configuration>
 					<tagListOptions>
 						<tagClasses>
@@ -154,7 +162,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.19.1</version>
+				<version>3.1.2</version>
 			</plugin>
 
 			<plugin>
@@ -166,7 +174,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
+				<version>3.4.5</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -175,20 +183,20 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>3.11.0</version>
 				<configuration>
 					<compilerArgument>-Xlint:unchecked</compilerArgument>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<showDeprecation>true</showDeprecation>
-					<source>1.${java.old.version}</source>
-					<target>1.${java.old.version}</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.3.1</version>
 				<configuration>
 					<encoding>${project.build.resourceEncoding}</encoding>
 				</configuration>
@@ -198,13 +206,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
-					<goals>
-						<goal>jar</goal>
-					</goals>
+						<goals>
+							<goal>jar</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
@@ -213,10 +221,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.5.0</version>
 				<executions>
 					<execution>
-							<id>attach-javadocs</id>
+						<id>attach-javadocs</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -232,12 +240,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
+				<version>4.0.0-M9</version>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+				<version>3.0.1</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<useReleaseProfile>false</useReleaseProfile>
@@ -253,7 +262,7 @@
 
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.3.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -266,7 +275,7 @@
 
 			<plugin>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.5.0</version>
 				<executions>
 					<execution>
 						<id>stand-alone</id>
@@ -301,7 +310,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.5.0</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -317,7 +326,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>5.1.9</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
@@ -329,6 +338,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>3.4.5</version>
 			</plugin>
 
 		</plugins>
@@ -340,25 +350,25 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.21</version>
+			<version>2.0.7</version>
 		</dependency>
 
 		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-simple</artifactId>
-		    <version>1.7.21</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>2.0.7</version>
 		</dependency>
 
- 		<dependency>
+		<dependency>
 			<groupId>com.github.stefanbirkner</groupId>
 			<artifactId>system-rules</artifactId>
-			<version>1.16.0</version>
+			<version>1.19.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -377,7 +387,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jxr-plugin</artifactId>
-						<version>2.5</version>
+						<version>3.3.0</version>
 						<configuration>
 							<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
 						</configuration>
@@ -386,7 +396,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.4</version>
+						<version>3.5.0</version>
 						<configuration>
 							<charset>${project.build.sourceEncoding}</charset>
 							<encoding>${project.build.sourceEncoding}</encoding>
@@ -504,40 +514,6 @@
 			</build>
 		</profile>
 
-		<profile>
-			<id>compileWithOldJava</id>
-			<!--
-				NOTE
-				Make sure to set the environment variable JAVA${VERSION}_HOME
-				to your old JDK HOME when using this profile.
-				For example: JAVA6_HOME=.../jdk1.6.0_00
-				Also set the Maven properties:
-				* 'java.old.version' (for example: '6')
-				* 'java.old.home' (for example: '${env.JAVA6_HOME}')
-			-->
-			<properties>
-				<java.old.libs>${java.old.home}/jre/lib</java.old.libs>
-				<java.old.bootclasspath>${java.old.libs}/rt.jar${path.separator}${java.old.libs}/jce.jar</java.old.bootclasspath>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<configuration>
-							<source>1.${java.old.version}</source>
-							<target>1.${java.old.version}</target>
-							<encoding>${project.build.sourceEncoding}</encoding>
-							<showDeprecation>true</showDeprecation>
-							<compilerArgument>-Xlint:unchecked</compilerArgument>
-							<compilerArguments>
-								<bootclasspath>${java.old.bootclasspath}</bootclasspath>
-							</compilerArguments>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 
 </project>
