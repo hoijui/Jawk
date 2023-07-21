@@ -33,7 +33,7 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Apache Maven Packages for Sentry Software</name>
-			<url>https://maven.pkg.github.com/sentrysoftware/repo</url>
+			<url>https://maven.pkg.github.com/sentrysoftware/Jawk</url>
 		</repository>
 	</distributionManagement>
 
@@ -225,7 +225,7 @@
 				</executions>
 			</plugin>
 
-			<!-- javadoc -->
+	<!-- javadoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -260,7 +260,7 @@
 					<useReleaseProfile>false</useReleaseProfile>
 					<releaseProfiles>release</releaseProfiles>
 					<goals>deploy</goals>
-					<!--
+			<!--
 						Workaround to prevent the gpg plugin from hanging, see:
 						http://jira.codehaus.org/browse/MGPG-9
 					-->
@@ -296,7 +296,7 @@
 							<shadedClassifierName>stand-alone</shadedClassifierName>
 							<filters>
 								<filter>
-									<!--
+							<!--
 										Exclude files that sign a jar
 										(one or multiple of the dependencies).
 										One may not repack a signed jar without
