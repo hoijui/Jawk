@@ -1,0 +1,2 @@
+gawk: symtab10.awk:1: fatal: reference to uninitialized element `SYMTAB["x"] is not allowed'
+EXIT CODE: 2

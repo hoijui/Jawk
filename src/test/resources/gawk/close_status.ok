@@ -1,0 +1,6 @@
+red
+close(echo red; exit 9) returned 9
+red
+blue
+close(echo blue; exit 0) returned 0
+close(echo red; exit 9) returned 9

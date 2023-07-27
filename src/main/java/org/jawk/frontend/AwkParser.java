@@ -693,7 +693,7 @@ public class AwkParser {
 			// string
 			read();
 			string.setLength(0);
-			while (token != _EOF_ && c != '"' && c != '\n') {
+			while (token != _EOF_ && c > 0 && c != '"' && c != '\n') {
 				if (c == '\\') {
 					read();
 					if (c == 't') {
@@ -710,7 +710,7 @@ public class AwkParser {
 				}
 				read();
 			}
-			if (token == _EOF_ || c == '\n') {
+			if (token == _EOF_ || c == '\n' || c <= 0) {
 				throw new LexerException("Unterminated string: " + text);
 			}
 			read();
@@ -4647,9 +4647,10 @@ public class AwkParser {
 				tuples.assignArray(id_ast.offset, id_ast.is_global);
 			} else if (ast2 instanceof DollarExpression_AST) {
 				DollarExpression_AST dollar_expr = (DollarExpression_AST) ast2;
-				assert dollar_expr.ast2 != null;
-				int ast2_result = dollar_expr.ast2.populateTuples(tuples);
-				assert ast2_result == 1;
+				if (dollar_expr.ast2 != null) {
+					int ast2_result = dollar_expr.ast2.populateTuples(tuples);
+					assert ast2_result == 1;
+				}
 				// stack contains eval of dollar arg
 				tuples.assignAsInputField();
 			} else {

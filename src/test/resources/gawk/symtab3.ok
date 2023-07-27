@@ -1,0 +1,2 @@
+gawk: symtab3.awk:1: fatal: `delete' is not allowed with SYMTAB
+EXIT CODE: 2

@@ -1,0 +1,3 @@
+test1
+gawk: clos1way3.awk:6: fatal: print: attempt to write to closed write end of two-way pipe
+EXIT CODE: 2

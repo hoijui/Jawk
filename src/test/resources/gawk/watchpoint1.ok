@@ -1,0 +1,65 @@
+1       #! /usr/bin/gawk -f
+2       BEGIN {
+3            c = 0
+4       }
+5       
+6       /apple/ {
+7            nr = NR
+8            c++
+9            # printf "[c, NR] = [%s, %s]\n", c, NR
+10      }
+11      
+12      END {
+13          print c
+14      }
+Watchpoint 1: c
+1: c = untyped variable
+2: nr = untyped variable
+3: NR = 0
+Breakpoint 2 set at file `watchpoint1.awk', line 6
+Starting program:
+Stopping in Rule ...
+Watchpoint 1: c
+  Old value: untyped variable
+  New value: 0
+main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 0
+2: nr = untyped variable
+3: NR = 1
+Breakpoint 2, main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 0
+2: nr = untyped variable
+3: NR = 1
+Breakpoint 2, main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 0
+2: nr = untyped variable
+3: NR = 2
+Watchpoint 1: c
+  Old value: 0
+  New value: 1
+main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 1
+2: nr = 2
+3: NR = 3
+Breakpoint 2, main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 1
+2: nr = 2
+3: NR = 3
+Breakpoint 2, main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 1
+2: nr = 2
+3: NR = 4
+Watchpoint 1: c
+  Old value: 1
+  New value: 2
+main() at `watchpoint1.awk':6
+6       /apple/ {
+1: c = 2
+2: nr = 4
+3: NR = 5

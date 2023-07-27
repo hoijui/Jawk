@@ -1,0 +1,3 @@
+gawk: getlnfa.awk:1: getline $1+++++++
+gawk: getlnfa.awk:1:               ^ syntax error
+EXIT CODE: 1

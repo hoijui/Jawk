@@ -1,0 +1,3 @@
+gawk: nsbad2.awk:2: function gsub () {
+gawk: nsbad2.awk:2:          ^ `gsub' is a built-in function, it cannot be redefined
+EXIT CODE: 1

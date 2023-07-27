@@ -1,0 +1,29 @@
+test
+ARGC: 2
+ARGIND: 1
+ARGV: array, 2 elements
+BINMODE: 0
+CONVFMT: "%.6g"
+ERRNO: ""
+FIELDWIDTHS: ""
+FNR: 1
+FPAT: "[^[:space:]]+"
+FS: " "
+FUNCTAB: array, 42 elements
+IGNORECASE: 0
+LINT: 0
+NF: 1
+NR: 1
+OFMT: "%.6g"
+OFS: " "
+ORS: "\n"
+PREC: 53
+RLENGTH: 0
+ROUNDMODE: "N"
+RS: "\n"
+RSTART: 0
+RT: "\n"
+SUBSEP: "\034"
+SYMTAB: array, 29 elements
+TEXTDOMAIN: "messages"
+test: 1

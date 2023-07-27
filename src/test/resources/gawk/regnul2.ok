@@ -1,0 +1,27 @@
+match():        +
+split():        +
+patsplit():     +
+gsub():         +
+sub():          +
+gensub():       +
+str~/rexp/:     +
+__________________________
+
+match():        -
+split():        -
+patsplit():     -
+gsub():         -
+sub():          -
+gensub():       -
+str~/rexp/:     -
+__________________________
+
+match():        +
+split():        +
+patsplit():     +
+gsub():         +
+sub():          +
+gensub():       +
+str~/rexp/:     +
+__________________________
+

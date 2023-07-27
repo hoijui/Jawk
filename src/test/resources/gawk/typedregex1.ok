@@ -1,0 +1,37 @@
+switch-case: ok
+match ~: ok
+match !~: ok
+variable match ~: ok
+variable match !~: ok
+variable as numeric value: ok
+variable as string value: ok
+typeof constant: ok
+typeof variable: ok
+conversion to number: ok
+typeof variable after conversion: ok
+match(constant): ok
+match(variable): ok
+match(constant) indirect: ok
+match(variable) indirect: ok
+sub(constant): ok
+sub(variable): ok
+sub(constant) indirect: ok
+sub(variable) indirect: ok
+gsub(constant): ok
+gsub(variable): ok
+gsub(constant) indirect: ok
+gsub(variable) indirect: ok
+gensub(constant): ok
+gensub(variable): ok
+gensub(constant) indirect: ok
+gensub(variable) indirect: ok
+gensub(constant) indirect 2: ok
+gensub(variable) indirect 2: ok
+split(constant): ok
+split(variable): ok
+split(constant) indirect: ok
+split(variable) indirect: ok
+patsplit(constant): ok
+patsplit(variable): ok
+patsplit(constant) indirect: ok
+patsplit(variable) indirect: ok

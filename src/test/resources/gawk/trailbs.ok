@@ -1,0 +1,2 @@
+gawk: trailbs.awk:1: (FILENAME=- FNR=1) fatal: invalid regexp: Trailing backslash: /00000ía000000000000000\/
+EXIT CODE: 2

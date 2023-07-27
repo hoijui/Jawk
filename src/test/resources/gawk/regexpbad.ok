@@ -1,0 +1,2 @@
+gawk: regexpbad.awk:1: error: Invalid regular expression: /^[^[]\x5b/
+EXIT CODE: 1

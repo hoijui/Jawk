@@ -1,0 +1,2 @@
+gawk: mdim6.awk:5: fatal: attempt to use array `a["0"]' in a scalar context
+EXIT CODE: 2

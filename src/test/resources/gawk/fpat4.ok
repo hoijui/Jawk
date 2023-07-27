@@ -1,0 +1,65 @@
+Splitting: <Robbins,,Arnold,>
+n = 4 m = 4
+fields[1] = <Robbins>	fields2[1] = <Robbins>
+fields[2] = <>	fields2[2] = <>
+fields[3] = <Arnold>	fields2[3] = <Arnold>
+fields[4] = <>	fields2[4] = <>
+seps[0] = <>	seps2[0] = <>
+seps[1] = <,>	seps2[1] = <,>
+seps[2] = <,>	seps2[2] = <,>
+seps[3] = <,>	seps2[3] = <,>
+Splitting: <Smith,,"1234 A Pretty Place, NE",Sometown,NY,12345-6789,USA>
+n = 7 m = 7
+fields[1] = <Smith>	fields2[1] = <Smith>
+fields[2] = <>	fields2[2] = <>
+fields[3] = <"1234 A Pretty Place, NE">	fields2[3] = <"1234 A Pretty Place, NE">
+fields[4] = <Sometown>	fields2[4] = <Sometown>
+fields[5] = <NY>	fields2[5] = <NY>
+fields[6] = <12345-6789>	fields2[6] = <12345-6789>
+fields[7] = <USA>	fields2[7] = <USA>
+seps[0] = <>	seps2[0] = <>
+seps[1] = <,>	seps2[1] = <,>
+seps[2] = <,>	seps2[2] = <,>
+seps[3] = <,>	seps2[3] = <,>
+seps[4] = <,>	seps2[4] = <,>
+seps[5] = <,>	seps2[5] = <,>
+seps[6] = <,>	seps2[6] = <,>
+Splitting: <Robbins,Arnold,"1234 A Pretty Place, NE",Sometown,NY,12345-6789,USA>
+n = 7 m = 7
+fields[1] = <Robbins>	fields2[1] = <Robbins>
+fields[2] = <Arnold>	fields2[2] = <Arnold>
+fields[3] = <"1234 A Pretty Place, NE">	fields2[3] = <"1234 A Pretty Place, NE">
+fields[4] = <Sometown>	fields2[4] = <Sometown>
+fields[5] = <NY>	fields2[5] = <NY>
+fields[6] = <12345-6789>	fields2[6] = <12345-6789>
+fields[7] = <USA>	fields2[7] = <USA>
+seps[0] = <>	seps2[0] = <>
+seps[1] = <,>	seps2[1] = <,>
+seps[2] = <,>	seps2[2] = <,>
+seps[3] = <,>	seps2[3] = <,>
+seps[4] = <,>	seps2[4] = <,>
+seps[5] = <,>	seps2[5] = <,>
+seps[6] = <,>	seps2[6] = <,>
+Splitting: <bbbaaacccdddaaaaaqqqq>
+n = 2 m = 2
+fields[1] = <aaa>	fields2[1] = <aaa>
+fields[2] = <aaaaa>	fields2[2] = <aaaaa>
+seps[0] = <bbb>	seps2[0] = <bbb>
+seps[1] = <cccddd>	seps2[1] = <cccddd>
+seps[2] = <qqqq>	seps2[2] = <qqqq>
+Splitting: <bbbaaacccdddaaaaaqqqqa>
+n = 2 m = 2
+fields[1] = <aaa>	fields2[1] = <aaa>
+fields[2] = <aaaaa>	fields2[2] = <aaaaa>
+seps[0] = <bbb>	seps2[0] = <bbb>
+seps[1] = <cccddd>	seps2[1] = <cccddd>
+seps[2] = <qqqqa>	seps2[2] = <qqqqa>
+Splitting: <aAbBcC>
+n = 3 m = 3
+fields[1] = <a>	fields2[1] = <a>
+fields[2] = <b>	fields2[2] = <b>
+fields[3] = <c>	fields2[3] = <c>
+seps[0] = <>	seps2[0] = <>
+seps[1] = <A>	seps2[1] = <A>
+seps[2] = <B>	seps2[2] = <B>
+seps[3] = <C>	seps2[3] = <C>

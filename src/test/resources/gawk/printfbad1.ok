@@ -1,0 +1,5 @@
+gawk: printfbad1.awk:35: fatal: not enough arguments to satisfy format string
+	`%3$*10$.*1$s
+'
+	      ^ ran out for this one
+EXIT CODE: 2

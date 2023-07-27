@@ -1,0 +1,6 @@
+indirect, 65
+gawk: indirectbuiltin2.awk:14: fatal: length: called with 0 arguments
+gawk: indirectbuiltin2.awk:17: fatal: length: called with 2 arguments
+gawk: indirectbuiltin2.awk:20: fatal: indirect call to match requires two or three arguments
+gawk: indirectbuiltin2.awk:23: fatal: indirect call to match requires two or three arguments
+gawk: indirectbuiltin2.awk:26: fatal: systime: called with 1 arguments

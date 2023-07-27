@@ -1,0 +1,98 @@
+pets has 5 elements
+dump_array_and_delete: sym_lookup of pets passed
+dump_array_and_delete: incoming size is 5
+	pets["1"] = "blacky"
+	pets["2"] = "rusty"
+	pets["3"] = "sophie"
+dump_array_and_delete: marking element "3" for deletion
+	pets["4"] = "raincloud"
+	pets["5"] = "lucky"
+dump_array_and_delete(pets) returned 1
+dump_array_and_delete() did remove index "3"!
+
+try_modify_environ: sym_lookup of ENVIRON passed
+try_modify_environ: set_array_element of ENVIRON failed
+try_modify_environ: marking element "testext" for deletion
+try_del_environ() could not delete element - pass
+try_del_environ() could not add an element - pass
+var_test: sym_lookup of PROCINFO passed - got a value!
+var_test: sym_lookup of ARGC passed - got a value!
+var_test: sym_update of ARGC failed - correctly
+var_test: sym_update("testvar") succeeded
+var_test() returned 1, test_var = 42
+
+test_errno() returned 1, ERRNO = No child processes
+
+fubar = 9
+rumpus = -5
+uid matches 1
+api_major matches 1
+test_deferred returns 1
+
+length of test_array is 10, should be 10
+test_array_size: incoming size is 10
+test_array_size() returned 1, length is now 0
+
+test_array_elem: a["3"] = "three"
+test_array_elem() returned 1, test_array2[3] = 42
+test_array_elem() did remove element "5"
+test_array_elem() added element "7" --> seven
+test_array2["subarray"]["hello"] = world
+test_array2["subarray"]["answer"] = 42
+
+test_array_param() returned 1
+isarray(a_new_array) = 1
+a_new_array["hello"] = world
+a_new_array["answer"] = 42
+test_array_param: argument is not undefined (1)
+test_array_param() returned 0
+isarray(a_scalar) = 0
+
+test_array_create returned 1
+good: we have an array
+hello element value inside function is world
+hello element global scope is world
+Initial value of LINT is 0
+print_do_lint: lint = 0
+print_do_lint() returned 1
+Changed value of LINT is 1
+print_do_lint: lint = 1
+print_do_lint() returned 1
+
+test_scalar(1) returned 1, the_scalar is 1
+test_scalar(3) returned 1, the_scalar is 3
+test_scalar(5) returned 1, the_scalar is 5
+test_scalar(7) returned 1, the_scalar is 7
+test_scalar(9) returned 1, the_scalar is 9
+test_scalar(11) returned 1, the_scalar is 11
+test_scalar(the) returned 1, the_scalar is the
+test_scalar(quick) returned 1, the_scalar is quick
+test_scalar(brown) returned 1, the_scalar is brown
+test_scalar(fox) returned 1, the_scalar is fox
+test_scalar(jumps) returned 1, the_scalar is jumps
+test_scalar(over) returned 1, the_scalar is over
+test_scalar(the) returned 1, the_scalar is the
+test_scalar(lazy) returned 1, the_scalar is lazy
+test_scalar(dog) returned 1, the_scalar is dog
+test_scalar_reserved: sym_lookup of ARGC passed - got a value!
+test_scalar_reserved: could not update new_value2 for ARGC - pass
+test_indirect_var: sym_lookup of NR passed
+test_indirect_var: value of NR is 3
+test_indirect_var() return 1
+
+test_get_file returned 0
+File [.test.alias] nr [1]: line 1
+File [.test.alias] nr [2]: line 2
+File [.test.alias] nr [3]: line 3
+
+answer_num = 42
+message_string = hello, world
+new_array["hello"] = "world"
+new_array["answer"] = "42"
+
+test::testval = in namespace test
+test::test_function() called.
+
+at_exit2 called (should be first): data = NULL, exit_status = 0
+at_exit1 called (should be second): (data is & data_for_1), data value = 0xdeadbeef, exit_status = 0
+at_exit0 called (should be third): data = NULL, exit_status = 0

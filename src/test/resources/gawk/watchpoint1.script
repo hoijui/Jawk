@@ -1,0 +1,14 @@
+list
+watch c
+display c
+display nr
+display NR
+break 6
+run
+continue
+continue
+continue
+continue
+continue
+continue
+quit

@@ -1,0 +1,25 @@
+Robbins
+Robbins "1234 A Pretty Place, NE"
+1 Robbins
+2 Arnold
+3 "1234 A Pretty Place, NE"
+4 Sometown
+5 NY
+6 12345-6789
+7 USA
+NF = 7
+$1 = <Robbins>
+$2 = <Arnold>
+$3 = <"1234 A Pretty Place, NE">
+$4 = <Sometown>
+$5 = <NY>
+$6 = <12345-6789>
+$7 = <USA>
+NF = 7
+$1 = <Smith>
+$2 = <>
+$3 = <"1234 A Pretty Place, NE">
+$4 = <Sometown>
+$5 = <NY>
+$6 = <12345-6789>
+$7 = <USA>

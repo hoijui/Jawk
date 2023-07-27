@@ -1,0 +1,16 @@
+gawk: lintold.awk:7: warning: `delete' is not supported in old awk
+gawk: lintold.awk:8: warning: old awk does not support the keyword `in' except after `for'
+gawk: lintold.awk:9: warning: operator `**=' is not supported in old awk
+gawk: lintold.awk:10: warning: old awk does not support the keyword `in' except after `for'
+gawk: lintold.awk:10: warning: old awk does not support multidimensional arrays
+gawk: lintold.awk:11: warning: operator `^=' is not supported in old awk
+gawk: lintold.awk:11: warning: operator `**' is not supported in old awk
+gawk: lintold.awk:11: warning: operator `^' is not supported in old awk
+gawk: lintold.awk:13: warning: old awk does not support multiple `BEGIN' or `END' rules
+gawk: lintold.awk:15: warning: old awk does not support the `\b' escape sequence
+gawk: lintold.awk:15: warning: old awk does not support the `\f' escape sequence
+gawk: lintold.awk:15: warning: old awk does not support the `\r' escape sequence
+gawk: lintold.awk:19: warning: old awk does not support multiple `BEGIN' or `END' rules
+1
+gawk: lintold.awk:14: warning: old awk does not support regexps as value of `FS'
+done

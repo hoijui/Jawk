@@ -1,8 +1,10 @@
 package org.jawk.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -25,12 +27,6 @@ import org.slf4j.LoggerFactory;
  *   an argument to -f.</li>
  * <li><i>Extension</i> -o filename <br/>
  *   Output filename for intermediate file, tuples, or syntax tree.</li>
- * <li><i>Extension</i> -z <br/>
- *   Compile to JVM rather than interpret it.</li>
- * <li><i>Extension</i> -Z <br/>
- *   Compile to JVM rather and execute it.</li>
- * <li><i>Extension</i> -d <br/>
- *   Compile results to destination directory instead of current working dir.</li>
  * <li><i>Extension</i> -s <br/>
  *   Dump the intermediate code.</li>
  * <li><i>Extension</i> -S <br/>
@@ -72,17 +68,17 @@ public class AwkParameters {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AwkParameters.class);
 
-	private Class<?> mainClass;
-	private String extensionDescription;
-
-	/**
-	 * @param mainClass The main class to print when displaying usage.
-	 * @param extensionDescription a text description of extensions that
-	 *   are enabled (for compiled scripts)
-	 */
-	public AwkParameters(Class<?> mainClass, String extensionDescription) {
-		this.mainClass = mainClass;
-		this.extensionDescription = extensionDescription;
+	private static final String JAR_NAME;
+	static {
+		String myName;
+		try {
+			File me = new File(AwkParameters.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			myName = me.getName();
+		}
+		catch (URISyntaxException e) {
+			myName = "Jawk.jar";
+		}
+		JAR_NAME = myName;
 	}
 
 	/**
@@ -101,7 +97,7 @@ public class AwkParameters {
 	 *
 	 * @param args The command-line arguments provided by the user.
 	 */
-	public AwkSettings parseCommandLineArguments(String[] args) {
+	public static AwkSettings parseCommandLineArguments(String[] args) {
 
 		AwkSettings settings = new AwkSettings();
 
@@ -129,20 +125,12 @@ public class AwkParameters {
 					checkParameterHasArgument(args, argIdx);
 					++argIdx;
 					settings.addScriptSource(new ScriptFileSource(args[argIdx]));
-				} else if (args[argIdx].equals("-d")) {
-					checkParameterHasArgument(args, argIdx);
-					++argIdx;
-					settings.setDestinationDirectory(args[argIdx]);
 				} else if (args[argIdx].equals("-c")) {
 					settings.setWriteIntermediateFile(true);
 				} else if (args[argIdx].equals("-o")) {
 					checkParameterHasArgument(args, argIdx);
 					++argIdx;
 					settings.setOutputFilename(args[argIdx]);
-				} else if (args[argIdx].equals("-z")) {
-					settings.setCompile(true);
-				} else if (args[argIdx].equals("-Z")) {
-					settings.setCompileRun(true);
 				} else if (args[argIdx].equals("-S")) {
 					settings.setDumpSyntaxTree(true);
 				} else if (args[argIdx].equals("-s")) {
@@ -174,37 +162,35 @@ public class AwkParameters {
 					usage(System.out);
 					System.exit(0);
 				} else {
-					throw new IllegalArgumentException("unknown parameter: " + args[argIdx]);
+					throw new IllegalArgumentException("Unknown parameter: " + args[argIdx]);
 				}
 
 				++argIdx;
 			}
 
-			if (extensionDescription == null) {
-				// script mode (if -f is not provided)
-				if (settings.getScriptSources().isEmpty()) {
-					if (argIdx >= args.length) {
-						throw new IllegalArgumentException("Awk script not provided.");
-					}
-					String scriptContent = args[argIdx++];
-					settings.addScriptSource(new ScriptSource(
-							ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT,
-							new StringReader(scriptContent),
-							false));
-				} else {
-					// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
-					// initialize the Readers or InputStreams
-					for (ScriptSource scriptSource : settings.getScriptSources()) {
-						try {
-							if (scriptSource.isIntermediate()) {
-								scriptSource.getInputStream();
-							} else {
-								scriptSource.getReader();
-							}
-						} catch (IOException ex) {
-							LOG.error("Failed to read script '" + scriptSource.getDescription() + "'", ex);
-							System.exit(1);
+			// script mode (if -f is not provided)
+			if (settings.getScriptSources().isEmpty()) {
+				if (argIdx >= args.length) {
+					throw new IllegalArgumentException("Awk script not provided.");
+				}
+				String scriptContent = args[argIdx++];
+				settings.addScriptSource(new ScriptSource(
+						ScriptSource.DESCRIPTION_COMMAND_LINE_SCRIPT,
+						new StringReader(scriptContent),
+						false));
+			} else {
+				// XXX Maybe we should delay that to a later stage? The only difference would be, that errors (for example: File not found, or unable to read) would occure later
+				// initialize the Readers or InputStreams
+				for (ScriptSource scriptSource : settings.getScriptSources()) {
+					try {
+						if (scriptSource.isIntermediate()) {
+							scriptSource.getInputStream();
+						} else {
+							scriptSource.getReader();
 						}
+					} catch (IOException ex) {
+						LOG.error("Failed to read script '" + scriptSource.getDescription() + "'", ex);
+						System.exit(1);
 					}
 				}
 			}
@@ -225,19 +211,14 @@ public class AwkParameters {
 	/**
 	 * Dump usage to stderr; exit with a non-zero error code.
 	 */
-	private void usage(PrintStream dest) {
+	private static void usage(PrintStream dest) {
 		//String cls = Awk.class.getName();
-		String cls = mainClass.getName();
-		dest.println("usage:");
+		dest.println("Usage:");
 		dest.println(
-				"java ... " + cls + " [-F fs_val]"
-				+ (extensionDescription == null ? ""
+				"java -jar " + JAR_NAME + " [-F fs_val]"
 				+ " [-f script-filename]"
 				+ " [-o output-filename]"
 				+ " [-c]"
-				+ " [-z]"
-				+ " [-Z]"
-				+ " [-d dest-directory]"
 				+ " [-S]"
 				+ " [-s]"
 				+ " [-x]"
@@ -246,45 +227,27 @@ public class AwkParameters {
 				+ " [--locale locale]"
 				+ " [-ext]"
 				+ " [-ni]"
-				: "")
 				+ " [-t]"
 				+ " [-v name=val]..."
-				+ (extensionDescription == null ? " [script]" : "")
+				+ " [script]"
 				+ " [name=val | input_filename]...");
 		dest.println();
 		dest.println(" -F fs_val = Use fs_val for FS.");
-		if (extensionDescription == null) {
-			dest.println(" -f filename = Use contents of filename for script.");
-		}
+		dest.println(" -f filename = Use contents of filename for script.");
 		dest.println(" -v name=val = Initial awk variable assignments.");
 		dest.println();
 		dest.println(" -t = (extension) Maintain array keys in sorted order.");
-		if (extensionDescription == null) {
-			dest.println(" -c = (extension) Compile to intermediate file. (default: a.ai)");
-			dest.println(" -o = (extension) Specify output file.");
-			dest.println(" -z = (extension) | Compile for JVM. (default: AwkScript.class)");
-			dest.println(" -Z = (extension) | Compile for JVM and execute it. (default: AwkScript.class)");
-			dest.println(" -d = (extension) | Compile to destination directory. (default: <CWD>)");
-			dest.println(" -S = (extension) Write the syntax tree to file. (default: syntax_tree.lst)");
-			dest.println(" -s = (extension) Write the intermediate code to file. (default: avm.lst)");
-			dest.println(" -x = (extension) Enable _sleep, _dump as keywords, and exec as a builtin func.");
-			//dest.println("                  (Note: exec not enabled in compiled mode.)");
-			dest.println("                  (Note: exec enabled only in interpreted mode.)");
-			dest.println(" -y = (extension) Enable _INTEGER, _DOUBLE, and _STRING casting keywords.");
-			dest.println(" -r = (extension) Do NOT hide IllegalFormatExceptions for [s]printf.");
-			dest.println(" --locale Locale = (extension) Specify a locale to be used instead of US-English");
-			dest.println("-ext= (extension) Enable user-defined extensions. (default: not enabled)");
-			dest.println("-ni = (extension) Do NOT process stdin or ARGC/V through input rules.");
-			dest.println("                  (Useful for blocking extensions.)");
-			//dest.println("                  (Note: -ext & -ni not available in compiled mode.)");
-			dest.println("                  (Note: -ext & -ni available only in interpreted mode.)");
-		} else {
-			// separate the extension description
-			// from the -t argument description (above)
-			// with a newline
-			dest.println();
-			dest.println(extensionDescription);
-		}
+		dest.println(" -c = (extension) Compile to intermediate file. (default: a.ai)");
+		dest.println(" -o = (extension) Specify output file.");
+		dest.println(" -S = (extension) Write the syntax tree to file. (default: syntax_tree.lst)");
+		dest.println(" -s = (extension) Write the intermediate code to file. (default: avm.lst)");
+		dest.println(" -x = (extension) Enable _sleep, _dump as keywords, and exec as a builtin func.");
+		dest.println(" -y = (extension) Enable _INTEGER, _DOUBLE, and _STRING casting keywords.");
+		dest.println(" -r = (extension) Do NOT hide IllegalFormatExceptions for [s]printf.");
+		dest.println(" --locale Locale = (extension) Specify a locale to be used instead of US-English");
+		dest.println("-ext= (extension) Enable user-defined extensions. (default: not enabled)");
+		dest.println("-ni = (extension) Do NOT process stdin or ARGC/V through input rules.");
+		dest.println("                  (Useful for blocking extensions.)");
 		dest.println();
 		dest.println(" -h or -? = (extension) This help screen.");
 	}

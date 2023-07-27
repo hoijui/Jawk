@@ -1,0 +1,2 @@
+gawk: sandbox1.awk:6: fatal: cannot add a new file (/dev/null) to ARGV in sandbox mode
+EXIT CODE: 2

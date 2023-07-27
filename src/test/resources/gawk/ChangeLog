@@ -1,0 +1,876 @@
+2023-07-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, regexpbad.
+	* regexpbad.sh, regexpbad.ok: New files.
+
+2023-06-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* csv1.ok: Updated after code fix.
+
+2023-06-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, cmdlinefsbacknl.
+	* cmdlinefsbacknl.sh, cmdlinefsbacknl.ok: New files.
+
+2023-06-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, gensub4.
+	* gensub4.awk, gensub4.ok: New files.
+
+2023-05-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (readdir_test): Adjust comparison programs.
+
+2023-05-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Deal with removal of extension/readdir_test.c.
+
+	* Makefile.am (EXTRA_DIST, GENTEST_UNUSED): New file: check_retest.awk.
+	(readdir_test): Simplified.
+	(readdir_retest): Revised.
+	* check_retest.awk: New file.
+
+2023-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.2: Release tar ball made.
+
+2023-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Update after code changes (again).
+
+2023-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Update after code changes.
+
+2023-04-13         Manuel Collado        <mcollado2011@gmail.com>
+
+	* Makefile.am (EXTRA_DIST): New test: csvodd.
+	(NEED_CSV): Add csvodd.
+	* New files: csvodd.awk, csvodd.in, csvodd.ok:
+
+2023-04-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: asortsymtab.
+	* asortsymtab.awk, asortsymtab.ok: New files.
+
+2023-04-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Update after code changes.
+
+2023-04-07         zhou shuiqing         <zhoushuiqing321@outlook.com>
+
+	* sort1.awk: Add tests for ind_num_desc and @ind_str_asc.
+	* sort1.ok: Updated.
+
+2023-03-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: unicode1.
+	* unicode1.awk, unicode1.ok: New files.
+	* funstack.ok: Updated after code change.
+
+2023-03-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* csv1.in, csv1.ok: Adjusted after code change and to match
+	RFC 4180 format.
+
+2023-03-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST, NEED_CSV, GAWK_EXT_TESTS): New test, csv3.
+	* csv3.awk, csv3.in, csv3.ok: New files.
+
+2023-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST, NEED_CSV, GAWK_EXT_TESTS): New test, csv2.
+	* csv2.awk, csv2.ok: New files.
+
+2023-03-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Gentests: Handle NEED_CSV.
+	* Makefile.am (NEED_CSV): New list of tests that need --csv.
+	* badargs.ok: Update after code changes.
+	* csv1.awk: Adjust after code changes.
+
+2023-03-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Update after code changes.
+
+2023-02-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Multiple files: Remove trailing whitespace.
+
+2023-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: elemnew2.
+	* elemnew2.awk, elemnew2.ok: New files.
+	* Makefile.am (EXTRA_DIST): New test: elemnew3.
+	* elemnew3.awk, elemnew3.ok: New files.
+
+2023-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Update after code changes.
+
+2023-01-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: elemnew1.
+	* elemnew1.awk, elemnew1.ok: New files.
+	Also, update the copyright year.
+
+	* Makefile.am (EXTRA_DIST): New test: fieldassign.
+	* fieldassign.awk, fieldassign.in, fieldassign.ok: New files.
+
+2023-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* makepmafile.c (main): Make the file mode 0600.
+	Update copyright year.
+	* time.awk, time.ok: Add test for strptime().
+
+2022-11-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Use `grep -E' instead of egrep in some of the test
+	recipes to avoid the obnoxious warning out of GNU egrep. Thanks
+	to Tomasz Kloczko <kloczko.tomasz@gmail.com> for the report.
+
+2022-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.1: Release tar ball made.
+
+2022-11-03  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (EXPECTED_FAIL_MINGW): Add dbugeval4.
+
+2022-10-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: divzero2.
+	* divzero2.awk, divzero2.ok: New files.
+
+2022-10-14         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.am (readall): Capture stderr from the programs also.
+	* id.ok, readall.ok, readall1.awk, readall2.awk, testext.ok:
+	Adjusted after code changes.
+
+2022-09-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Rename elemnew tests to mdim:
+	* mdim5.*: Renamed from elemnew1.*.
+	* mdim6.*: Renamed from elemnew2.*.
+	* mdim7.*: Renamed from elemnew3.*.
+	* mdim8.*: Renamed from elemnew4.*.
+
+2022-09-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: elemnew4.
+	* elemnew4.awk, elemnew4.in, elemnew4.ok: New files.
+
+2022-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readall.ok, readall1.awk, readall2.awk: Update for code changes.
+
+2022-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: dbugeval4.
+	(NEED_DEBUG): Add dbugeval4.
+	* dbugeval4.awk, dbugeval4.in, dbugeval4.ok: New files.
+
+2022-09-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests: elemnew1, elemnew2, elemnew3.
+	* elemnew1.awk, elemnew1.ok, elemnew2.awk, elemnew2.ok,
+	elemnew3.awk, elemnew3.ok: New files.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.0: Release tar ball made.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (MACHINE_TESTS): Move inf-nan-torture to here.
+	Move these tets to the end and add a message that if any
+	of them fail, don't worry about it. Thanks to
+	"WeissonHan" <Weisson@linux.alibaba.com> for the report.
+
+2022-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): csv1: New test.
+	* csv1.awk, csv1.in, csv1.ok: New files.
+
+2022-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): nsbad2, nsbad3: new tests.
+	* nsbad2.awk, nsbad2.ok, nsbad3.awk, nsbad3.ok: New files.
+	* lintwarn.awk, lintwarn.ok, noparms.ok, nsbad.awk, nsbad.ok,
+	parseme.ok, synerr3.ok, unterm.ok: Modified after code changes.
+
+2022-08-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): divzero: new test.
+	* divzero.awk, divzero.ok: New files.
+
+2022-08-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_MINGW): Remove nsidentifier from the
+	list.
+	(SORT2): New variable, adds LC_ALL=C to sort command.
+	(nsidentifier): Set SORT variable to $(SORT2) in test.
+	* nsidentifier.awk: Use SORT command line variable for sort command,
+	set it to default if not supplied.
+	* nsidentifier.ok: Adjusted after test change.
+
+2022-08-07  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (EXPECTED_FAIL_MINGW): Add 3 failing tests.
+
+2022-07-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add makepmafile.c and pma.ok.
+	(NEED_PMA): New macro.
+	(pma-msg-start, pma-tests, pma-msg-end, pma): New targets.
+	These add a test for the PMA allocator. Thanks to Pat Rankin for
+	the suggestion.
+	(clean-local): Remove the makepmafile executable.
+	* makepmafile, pma.ok: New files.
+
+2022-07-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Take indirectbuiltin2 out of the extension tests also.
+	(mpfrsqrt): Add condition on supporting the API.
+
+2022-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (SHLIB_TESTS): Add indirectbuiltin2, for z/OS.
+
+2022-07-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (env-check): New target to check that GAWK_PERSIST_FILE
+	is not set.  Thanks to Terence Kelly for the suggestion.
+
+2022-07-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Sort and prettify various lists of tests.
+
+2022-07-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* time.ok: Adjust after code changes.
+	* Makefile.am (readall, indirectbuiltin2): Adjust for out of tree
+	build.
+	* indirectbuiltin2.ok: Adjust after code changes.
+
+2022-07-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_DJGPP): Removed.
+
+2022-07-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Update copyright year.
+
+2022-06-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): mdim4: new test.
+	* mdim4.awk, mdim4.in, mdim4.ok: New files.
+
+2022-06-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): mdim3: new test.
+	* mdim3.awk, mdim3.ok: New files.
+
+2022-05-24         Adam Van Scyoc        <avanscy@g.clemson.edu>
+
+	* Makefile.am (EXTRA_DIST): getlnfa, new test.
+	* getlnfa.awk, getlnfa.ok: New files.
+
+2022-05-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (AWK): Add GAWK_NO_MPFR_WARN=1 to the list.
+
+2022-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): symtab12, new test.
+	* symtab12.awk, symtab12.ok: New files.
+
+	Unrelated:
+
+	* Makefile.am (EXTRA_DIST): mpfrnegzero2, new test.
+	(NEED_MPFR): Ditto.
+	* mpfrnegzero2.awk, mpfrnegzero2.ok: New files.
+
+2022-04-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): regex3minus, new test.
+	* regex3minus.awk, regex3minus.ok: New files.
+
+2022-04-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile5.ok, profile10.ok, profile11.ok: Updated after code changes.
+	* profile17.awk, profile17.ok: New files.
+
+2022-03-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* aadelete1.awk, aadelete1.ok: Changed to sync with code changes.
+
+2022-03-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* delarprm2.awk, delarprm2.ok: Changes to make test more helpful.
+
+2022-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): mdim1, mdim2: new tests.
+	* mdim1.awk, mdim1.ok, mdim2.awk, mdim2.ok: New files.
+
+2022-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): indirectcall3, new test.
+	* indirectcall3.awk, indirectcall3.ok: New files.
+
+2022-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Updated after code change.
+
+2022-02-10         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.am (EXTRA_DIST): close_status, new test.
+	* close_status.awk, close_status.ok: New files.
+
+2022-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* nsidentifier.ok: Update after code changes.
+
+2022-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): indirectbuiltin2, new test.
+	* indirectbuiltin2.awk, indirectbuiltin2.ok: New files.
+
+2022-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): nsidentifier, new test.
+	* nsidentifier.awk, nsidentifier.ok: New files.
+
+2021-12-08         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.am (EXTRA_DIST): Add readall1.awk, readall2.awk, and
+	readall.ok.
+	(SHLIB_TESTS): Add readall.
+	(GENTESTS_UNUSED): Add readall1.awk and readall2.awk.
+	(readall): Add new test of the writeall and readall functions.
+	* readall1.awk, readall2.awk, readall.ok: New files.
+
+2021-12-08         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.am (testext): Change awk pattern to include functions in
+	testext.awk.
+	(diffout): If running MPFR tests and there's an mpfr.ok file, compare
+	to that instead of to the regular ok file.
+	* testext.ok, testext-mpfr.ok: Update for new test_array_create test.
+
+2021-12-07         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* iolint.awk, iolint.ok: Reorder "cat" pipe/output file test to reduce
+	the likelihood of a race condition, since close operates on the
+	most-recently-used item. Thanks to Miguel Pineiro Jr.,
+	<mpj@pineiro.cc>, for suggesting the fix.
+
+2021-11-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): stupid5, new test.
+	* stupid5.awk, stupid5.ok: New files.
+	* stupid3.ok, stupid4.ok: Updated after code changes.
+
+2021-11-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* rwarray.awk: Improve test, add string and numbers.
+
+	Unrelated:
+
+	* iolint.awk: Restore the disabled test using eval in the child to
+	run different commands. Thanks to Miguel Pineiro Jr.,
+	<mpj@pineiro.cc>.
+
+2021-11-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* iolint.awk: Disable test with race condition. Thanks to
+	Andreas Schwab <schwab@linux-m68k.org> for the report.
+
+2021-11-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Add a '-' to tests so that if they fail, the whole
+	suite will continue to run. Thanks to Andreas Schwab
+	<schwab@linux-m68k.org> for the report.
+	* Gentests: Ditto.
+
+2021-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.1: Release tar ball made.
+
+2021-10-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): profile16, new test.
+	* profile16.awk, profile16.ok: New files.
+
+2021-10-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Gentest: Add check for ZOS_FAIL targets that have to
+	be edited manually.
+	* Makefile.am: Update relevant targets.
+
+	Unrelated:
+
+	* Makefile.am: Uupdate copryight year, reformat some of the lists.
+
+2021-09-27         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* ordchr.awk, ordchr.awk: Add test for ord signedness.
+
+2021-09-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Remove commas.in from the list.
+	Thanks to `make distcheck' for the report.
+
+2021-09-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_MINGW): Remove fmttest and
+	hsprint. They seem to work now. Thanks to Scott Deifik
+	<scottd.mail@sbcglobal.net> for the report.
+
+2021-09-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): functab6, new test.
+	* functab6.awk, functab6.ok: New files.
+	* symtab10.ok: Modified after code change.
+	* symtab10.in: Removed.
+
+2021-09-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): typeof6, new test.
+	* typeof6.awk, typeof6.ok: New files.
+	* Makefile.am (EXTRA_DIST): commas, new test.
+	* commas.awk, commas.ok: New files.
+
+2021-08-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): regexsub, new test.
+	* regexsub.awk, regexsub.ok: New files.
+
+2021-05-15  Eli Zaretskii  <eliz@gnu.org>
+
+	* iolint.ok: Reorder results to follow the order of iolint.awk.
+
+	* iolint.awk: Use "BINMODE = 2", otherwise the result of cksum on
+	non-Posix platforms will not match.  Reorder the tests to make the
+	binary mode used only in the last one.
+
+2021-05-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_ZOS): Updated and sorted / uniqued.
+	(clean-local): Remove X_* files from diffout-zos.
+
+2021-05-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* localenl.sh: Fix for Bash 5.1. Thanks to
+	Marius Bakke <marius@gnu.org> for the report and fix.
+
+2021-05-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* argcasfile.ok: Add the leading space in the argument; see
+	pc/ChangeLog for explanation why.
+
+	General:
+	- Don't use egrep -q, not portable to Solaris 10.
+	- Use $(CMP) instead of cmp.
+
+	* iolint.awk: Change order so can use plain 'cat' instead of
+	'exec cat'. Makes it available for MinGW.
+	* iolint.ok: Update after code changes.
+	* Makefile.am (iolint): Update shell recipe.
+
+2021-05-09  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (EXPECTED_FAIL_MINGW): Update for the new tests.
+
+	* argcasfile.ok: Adjust for the leading space in the argument; see
+	pc/ChangeLog for explanation why.
+
+2021-05-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* iolint.awk: Use cksum instead of md5sum, for better portability.
+	* iolint.ok: Adjusted.
+
+2021-05-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* CMakeLists.txt: Removed.
+
+2021-05-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (iolint): Fix for out-of-tree builds.
+	(testext): Ditto
+	* iolint.ok: Updated.
+
+2021-05-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* asortbool.awk, functab5.ok, id.ok, rwarrray.awk,
+	symtab11.ok: Revise after code changes.
+
+2021-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* asortbool.ok: Revise after code changes.
+	* rwarray.awk: Ditto.
+
+2021-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* noeffect.awk: Add more test cases. Thanks to Wolfgang Laun
+	<wolfgang.laun@gmail.com>.
+	* lintwarn.ok, noeffect.ok: Updated after code and test changes.
+
+2021-03-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): asortbool, new test.
+	* asortbool.awk, asortbool.ok: New files.
+	* rwarray.awk: Add test of saving/restoring bool values.
+
+2021-03-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dumpvars.ok, functab5.ok, id.ok, intest.awk, symtab11.ok,
+	symtab8.ok: Updated after code changes.
+
+2021-02-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): argcasfile, new test.
+	* argcasfile.awk, argcasfile.in, argcasfile.ok: New files.
+
+2021-01-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): octdec, new test.
+	* octdec.awk, octdec.ok: New files.
+
+2021-01-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): modifiers, new test.
+	* modifiers.sh, modifiers.ok: New files.
+
+	Unrelated:
+
+	* Makefile.am (EXTRA_DIST): rsnullre, new test.
+	* rsnullre.awk, rsnullre.in, rsnullre.ok: New files.
+
+2020-12-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): fpat9, new test.
+	* fpat9.awk, fpat9.in, fpat9.ok: New files.
+
+2020-12-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Remove forcenum-mpfr.ok.
+	* forcenum-mpfr.ok: File deleted, no longer needed.
+
+2020-12-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): inf-nan-torture, new test.
+	* inf-nan-torture.awk, inf-nan-torture.in, inf-nan-torture.ok: New
+	files.
+
+2020-10-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): functab5, new test.
+	(SHLIB_TESTS): Ditto.
+	* functab5.awk, functab5.ok: New files.
+
+2020-10-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* xref.awk: Bug fix: Identifiers can have underscore in the middle.
+	Thanks to Tom Gray <tom_gray@sonic.net> for the report, way
+	back on Wed, 25 Jan 2012.
+	* profile2.ok: Updated after above code change.
+
+2020-10-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* iolint.awk, iolint.ok: Remove |& test to cat. It was
+	inherently racy.
+
+	Unrelated:
+
+	* Makefile.am (diffout): Switch to `diff -u' since Busybox
+	doesn't support the old -c option. Thanks to Nelson Beebe for
+	the report.
+
+2020-10-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* iolint.awk, iolint.ok: Adjust output to cat for exit status
+	portability.  Thanks to Andrew Schorr for finding the issue.
+	* Makefile.am (iolint): Adjust scaffolding around the test.
+
+2020-09-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test iolint. Sort the list of
+	files beginning with 'i'.
+	* iolint.awk, iolint.ok: New files.
+
+2020-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* id.ok: Updated after code changes.
+
+2020-08-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* mbstr1.ok, mbstr2.ok: Updated after code changes.
+
+2020-08-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile14.ok: Updated. Somehow it was not done right to
+	start.
+
+2020-08-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests, profile14 and profile15.
+	* profile14.awk, profile14.ok, profile15.awk, profile15.ok: New files.
+
+2020-08-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* nsprof1.ok, nsprof2.ok: Updated after code changes.
+
+2020-08-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Simplify handling of tests that have an -mpfr.ok file.
+
+	* Gentests: Remove CHECK_MPFR handling. Instead, read the
+	EXTRA_DIST list of files and generate better checking tests
+	for tests that have an -mpfr.ok file. Use GAWK_TEST__ARGS
+	instead of AWKFLAGS.
+	* Makefile.am (CHECK_MPFR): Removed.
+	(arrdbg, testext): Checks updated.
+
+2020-07-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_ZOS): Add posix_compare to the list.
+
+2020-07-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Remove arrdbug-mpfr.ok and
+	add testext-mpfr.ok.
+	(CHECK_MPFR): Cleaned up.
+	(arrdbg): Adjust the flow.
+	(testext): Ditto.
+	* arrdbg.awk: Update code.
+
+2020-07-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add additional ok files for MPFR.
+	(CHECK_MPFR): Add arraytype, arrdbg, forcenum and numrange
+	(arrdbg): Update to check -mpfr.ok file also.
+	* arraytype-mpfr.ok, arrdbg-mpfr.ok, forcenum-mpfr.ok, numrange-mpfr.ok: New files.
+
+2020-07-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, mpfrcase2.
+	* mpfrcase2.awk, mpfrcase2.in, mpfrcase2.ok: New files.
+
+2020-07-06         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.am (AWK): Append $(GAWK_TEST_ARGS) to enable running
+	tests with -M enabled for MPFR debugging.
+
+2020-07-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests, mpfrcase, mpfrnonum.
+	* mpfrcase.awk, mpfrcase.in, mpfrcase.ok,
+	mpfrnonum.awk, mpfrnonum.in, mpfrnonum.ok: New files.
+
+2020-07-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, posix_compare.
+	* posix_compare.awk, posix_compare.ok: New files.
+	
+	Unrelated:
+
+	* badargs.ok: Updated after code changes.
+
+2020-06-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dbugeval2.ok, dbugtypedre1.ok, dbugtypedre2.ok, symtab10.ok,
+	watchpoint1.ok: Updated after code changes.
+
+2020-06-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Miscellanious fixes from Michael Builov <mbuilov@gmail.com>.
+
+	* Gentests: Use correct locale for JP.
+
+2020-06-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, strfieldnum.
+	* strfieldnum.awk, strfieldnum.in, strfieldnum.ok: New files.
+
+2020-05-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, lintplus.
+	* lintplus.awk, lintplus.ok: New files.
+
+2020-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.0: Release tar ball made.
+
+2020-04-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, fpat8.
+	* fpat8.awk, fpat8.in, fpat8.ok: New files.
+
+2020-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, rsnulw.
+	* rsnulw.awk, rsnulw.in, rsnulw.ok: New files.
+
+2020-03-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (zos-diffout): Change per request from
+	Daniel Richard G.
+
+2020-03-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (zos-diffout): New target.
+	(EXPECTED_FAIL_ZOS): Add more tests to the list.
+
+2020-03-09         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* symtab11.ok: Update for @val_type_asc ordering changes.
+
+2020-03-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* beginfile2.ok, funsmnam.ok, incdupe4.ok, incdupe5.ok, incdupe6.ok,
+	incdupe7.ok, lintold.ok, nofile.ok, nulinsrc.ok, paramasfunc1.ok,
+	paramasfunc2.ok, paramres.ok, space.ok: Update after code changes.
+
+2020-03-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* symtab11.awk, symtab11.ok: Add value of array elements
+	to the output.
+
+2020-03-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (profile5): Use AWKPATH so that out-of-tree
+	builds work correctly.
+
+2020-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (profile5): Append results of stderr to the
+	test output. Thanks to John Malmberg for the report.
+	* profile5.ok: Updated.
+
+2020-01-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* functab4.awk: Code changes to avoid race conditions
+	calling stat on the test directory. Thanks to
+	Michal Jaegermann and Andrew J. Schorr.
+	* Makefile.am: Fix lack of backslash continuation and
+	regenerate.
+
+2020-01-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, symtab11.
+	* symtab11.awk, symtab11.ok: New files.
+
+2020-01-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, profile13.
+	* profile13.awk, profile13.ok: New files.
+	* profile5.ok: Updated after code changes.
+
+2020-01-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* indirectbuiltin.awk, numrange.awk, numrange.ok: Changes
+	after code changes.
+	* Makefile.am (EXTRA_DIST): New tests, stupid1 and stupid2.
+	* stupid1.awk, stupid1.ok: New files.
+	* stupid2.awk, stupid2.ok: New files.
+	* Makefile.am (EXTRA_DIST): New tests, stupid3 and stupid4.
+	* stupid3.awk, stupid3.ok: New files.
+	* stupid4.awk, stupid4.ok: New files.
+
+2019-11-09         Alexey Pawlow        <alexey.pawlow@gmail.com>
+
+	* Makefile.am (mbprintf5): Add check for MSYS.
+	(readdir_retest): Ditto.
+
+2019-11-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, fpat7.
+	* fpat7.awk, fpat7.ok, fpat7.in: New files.
+
+2019-10-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests, typedregex5 and
+	typedregex6.
+	* typedregex5.awk, typedregex5.ok, typedregex6.in,
+	typedregex5.in, typedregex6.awk, typedregex6.ok: New files.
+
+2019-09-24         Jürgen Kahrs Google   <juergen.kahrs@googlemail.com>
+
+	* Makefile.am (EXTRA_DIST): New test, mpfranswer42.
+	* mpfranswer42.awk, mpfranswer42.ok: New files.
+
+2019-07-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Fix typos in filenames.
+
+2019-06-28         Michal Jaegermann     <michal.jnn@gmail.com>
+
+	Add backwards compatibility tests for inplace.
+
+	* Makefile.am (EXTRA_DIST): New tests, inplace2bcomp, inplace2bcomp.
+	* inplace2bcomp.1.ok, test/inplace2bcomp.1.orig.ok,
+	test/inplace2bcomp.2.ok, test/inplace2bcomp.2.orig.ok,
+	test/inplace2bcomp.ok, test/inplace3bcomp.1.ok,
+	test/inplace3bcomp.1.orig.ok, test/inplace3bcomp.2.ok,
+	test/inplace3bcomp.2.orig.ok, test/inplace3bcomp.ok: New files.
+
+2019-06-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests, nsawk1[abc] and nsawk2[ab].
+	* nsawk1.awk, nsawk1a.ok, nsawk1b.ok, nsawk1c.ok, nsawk2.awk,
+	nsawk2a.ok, nsawk2b.ok: New files.
+	Tests courtesy of Michal Jaegermann.
+
+	Unrelated:
+
+	* inplace1.ok, inplace2.ok, inplace3.ok: Updated after code changes.
+
+2019-06-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: escapebrace.
+	* escapebrace.awk, escapebrace.in, escapebrace.ok: New files.
+
+2019-06-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.0.1: Release tar ball made.
+
+2019-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Updated after code changes.
+
+2019-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Gentests: Finish handling NEED_SANDBOX.
+
+2019-05-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: sandbox1.
+	(NEED_SANDBOX): New list of tests.
+	* Gentests: Handle NEED_SANDBOX.
+	* sandbox1.awk, sandbox1.ok: New files.
+
+2019-02-22         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* Makefile.am (EXTRA_DIST): New test: assignnumfield2.
+	* assignnumfield2.awk, assignnumfield2.ok: New files.
+
+2019-04-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: fscaret.
+	* fscaret.awk, fscaret.in, fscaret.ok: New files.
+
+2019-04-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add ChangeLog.1 to the list. Ooops.
+	(synerr3): New test.
+	* synerr3.awk, synerr3.ok: New files.
+
+2019-04-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.1: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 5.0.0 and on.
+	* 5.0.0: Release tar ball made.

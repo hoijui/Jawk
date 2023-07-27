@@ -1,0 +1,3 @@
+3 12 34 abcdefghi
+gawk: fwtest6.awk:4: (FILENAME=- FNR=1) fatal: `*' must be the last designator in FIELDWIDTHS
+EXIT CODE: 2

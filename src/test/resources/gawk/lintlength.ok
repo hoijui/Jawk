@@ -1,0 +1,2 @@
+gawk: lintlength.awk:3: warning: length: received non-string argument
+gawk: lintlength.awk:5: warning: length: received non-string argument

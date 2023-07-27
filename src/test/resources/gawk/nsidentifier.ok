@@ -1,0 +1,120 @@
+No  awk::defined_in_ns3 in FUNCTAB
+No  awk::defined_in_ns3 in PROCINFO["identifiers"]
+Yes defined_in_ns3 in SYMTAB
+Yes defined_in_ns3 in PROCINFO["identifiers"]
+
+No  awk::awkspace5 in FUNCTAB
+No  awk::awkspace5 in PROCINFO["identifiers"]
+Yes awkspace5 in SYMTAB
+Yes awkspace5 in PROCINFO["identifiers"]
+
+No  ns1 in FUNCTAB
+No  ns1 in PROCINFO["identifiers"]
+No  ns1 in SYMTAB
+No  ns1 in PROCINFO["identifiers"]
+
+No  ns::ns1 in FUNCTAB
+Yes ns::ns1 in PROCINFO["identifiers"]
+Yes ns::ns1 in SYMTAB
+Yes ns::ns1 in PROCINFO["identifiers"]
+
+No  ns::ns2 in FUNCTAB
+Yes ns::ns2 in PROCINFO["identifiers"]
+Yes ns::ns2 in SYMTAB
+Yes ns::ns2 in PROCINFO["identifiers"]
+
+No  awkspace4 in FUNCTAB
+Yes awkspace4 in PROCINFO["identifiers"]
+Yes awkspace4 in SYMTAB
+Yes awkspace4 in PROCINFO["identifiers"]
+
+No  awkspace5 in FUNCTAB
+Yes awkspace5 in PROCINFO["identifiers"]
+Yes awkspace5 in SYMTAB
+Yes awkspace5 in PROCINFO["identifiers"]
+
+------------------------------
+ARGC
+ARGIND
+ARGV
+BINMODE
+CONVFMT
+ENVIRON
+ERRNO
+FIELDWIDTHS
+FILENAME
+FNR
+FPAT
+FS
+FUNCTAB
+IGNORECASE
+LINT
+NF
+NR
+OFMT
+OFS
+ORS
+PREC
+PROCINFO
+RLENGTH
+ROUNDMODE
+RS
+RSTART
+RT
+SORT
+SUBSEP
+SYMTAB
+TEXTDOMAIN
+and
+asort
+asorti
+atan2
+awkspace4
+awkspace5
+bindtextdomain
+close
+compl
+cos
+dcgettext
+dcngettext
+defined_in_ns3
+exp
+fflush
+gensub
+gsub
+i
+index
+int
+isarray
+length
+list
+log
+lshift
+match
+mkbool
+mktime
+n
+ns::ns1
+ns::ns2
+or
+patsplit
+rand
+rshift
+sin
+split
+sprintf
+sqrt
+srand
+strftime
+strtonum
+sub
+substr
+system
+systime
+test
+tolower
+toupper
+typeof
+var
+xor
+yesno

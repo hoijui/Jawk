@@ -1,0 +1,2 @@
+gawk: inclib.awk:5: error: function name `sandwich' previously defined
+EXIT CODE: 1

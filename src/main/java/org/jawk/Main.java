@@ -6,8 +6,6 @@ import java.io.PrintStream;
 
 import org.jawk.util.AwkParameters;
 import org.jawk.util.AwkSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Entry point into the parsing, analysis, and execution/compilation
@@ -16,8 +14,6 @@ import org.slf4j.LoggerFactory;
  * If you want to use Jawk as a library, please use {@see Awk}.
  */
 public class Main {
-
-	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
 	/**
 	 * Prohibit the instantiation of this class, other than the
@@ -42,7 +38,10 @@ public class Main {
 		System.setIn(is);
 		System.setOut(os);
 		System.setErr(es);
-		invoke(args);
+		
+		AwkSettings settings = AwkParameters.parseCommandLineArguments(args);
+		Awk awk = new Awk();
+		awk.invoke(settings);
 	}
 
 	/**
@@ -63,59 +62,20 @@ public class Main {
 	 * @throws ClassNotFoundException if compilation is requested,
 	 *	 but no compilation implementation class is found.
 	 */
-	public static void main(String[] args)
-			throws IOException, ClassNotFoundException
-	{
-		if (isWindows()) {
-			// under windows, we do not want to pass on a Java Exception
-			// to the OS (hoijui: why?)
-			try {
-				invoke(args);
-			} catch (Error err) {
-				LOG.error("Severe Error", err);
-				System.exit(1);
-			} catch (ExitException eex) {
-				LOG.error("The application requested an exit", eex);
-				System.exit(eex.getCode());
-			} catch (RuntimeException re) {
-				LOG.error("Unexpected state", re);
-				System.exit(1);
-			}
-		} else {
-			// ... under all other OS, we do
-			try {
-				invoke(args);
-			} catch (ExitException eex) {
-				LOG.error("The application requested an exit", eex);
-				System.exit(eex.getCode());
-			}
+	public static void main(String[] args) {
+		
+		try {
+			AwkSettings settings = AwkParameters.parseCommandLineArguments(args);
+			Awk awk = new Awk();
+			awk.invoke(settings);
+		} catch (ExitException e) {
+			System.exit(e.getCode());
+		} catch (Exception e) {
+			System.err.printf("%s: %s", e.getClass().getSimpleName(), e.getMessage());
+			System.exit(1);
 		}
+		
 	}
 
-	/**
-	 * An entry point to Jawk that provides the exit code of the script
-	 * if interpreted or an compiler error status if compiled.
-	 * If compiled, a non-zero exit status indicates that there
-	 * was a compilation problem.
-	 *
-	 * @param args Command line arguments to the VM,
-	 *   or JSR 223 scripting interface arguments.
-	 *
-	 * @throws IOException upon an IO error.
-	 * @throws ClassNotFoundException if compilation is requested,
-	 *	 but no compilation implementation class is found.
-	 * @throws ExitException a specific exit code is requested.
-	 */
-	private static void invoke(String[] args)
-			throws IOException, ClassNotFoundException, ExitException
-	{
-		AwkParameters parameters = new AwkParameters(Main.class, null); // null = NO extension description ==> require AWK script
-		AwkSettings settings = parameters.parseCommandLineArguments(args);
-		Awk awk = new Awk();
-		awk.invoke(settings);
-	}
 
-	private static boolean isWindows() {
-		return (System.getProperty("os.name").indexOf("Windows") >= 0);
-	}
 }

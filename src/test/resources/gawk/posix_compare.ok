@@ -1,0 +1,12 @@
+"abc\0z1" < "abc\0z2": Expecting TRUE: Got TRUE
+"abc\0z2" < "abc\0z2": Expecting FALSE: Got FALSE
+"abc\0z3" < "abc\0z2": Expecting FALSE: Got FALSE
+"abc\0z1" > "abc\0z2": Expecting FALSE: Got FALSE
+"abc\0z2" > "abc\0z2": Expecting FALSE: Got FALSE
+"abc\0z3" > "abc\0z2": Expecting TRUE: Got TRUE
+"abc\0z1" < "abc\0z21": Expecting TRUE: Got TRUE
+"abc\0z2" < "abc\0z21": Expecting TRUE: Got TRUE
+"abc\0z3" < "abc\0z21": Expecting FALSE: Got FALSE
+"abc\0z11" > "abc\0z2": Expecting FALSE: Got FALSE
+"abc\0z21" > "abc\0z2": Expecting TRUE: Got TRUE
+"abc\0z31" > "abc\0z2": Expecting TRUE: Got TRUE

@@ -1,0 +1,48 @@
+Record: 1
+	$1 = <Forename>
+	$2 = <Lastname>
+	$3 = <Address>
+	$4 = <State>
+	$5 = <Zipcode>
+Record: 2
+	$1 = <John>
+	$2 = <Doe>
+	$3 = <120 jefferson st.
+Riverside>
+	$4 = < NJ>
+	$5 = < 08075>
+Record: 3
+	$1 = <Jack>
+	$2 = <McGinnis>
+	$3 = <220 hobo Av.
+Philadelphia>
+	$4 = < PA>
+	$5 = <09119>
+Record: 4
+	$1 = <John "Da Man">
+	$2 = <Repici>
+	$3 = <120 Jefferson St.
+Riverside>
+	$4 = < NJ>
+	$5 = <08075>
+Record: 5
+	$1 = <Stephen>
+	$2 = <Tyler>
+	$3 = <7452 Terrace "At the Plaza" road
+SomeTown>
+	$4 = <SD>
+	$5 = < 91234>
+Record: 6
+	$1 = <>
+	$2 = <Blankman>
+	$3 = <
+SomeTown>
+	$4 = < SD>
+	$5 = < 00298>
+Record: 7
+	$1 = <Joan "the bone", Anne>
+	$2 = <Jet>
+	$3 = <9th, at Terrace plc
+Desert City>
+	$4 = <CO>
+	$5 = <00123>

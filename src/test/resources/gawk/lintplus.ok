@@ -1,0 +1,2 @@
+gawk: lintplus.awk:1: warning: operator `+' used on two string values
+0

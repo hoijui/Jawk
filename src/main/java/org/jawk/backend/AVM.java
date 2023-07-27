@@ -459,6 +459,8 @@ public class AVM implements AwkInterpreter, VariableManager {
 							result = ((Double)o).doubleValue() != 0;
 						} else if (o instanceof String) {
 							result = (o.toString().length() > 0);
+						} else if (o instanceof UninitializedObject) {
+							result = true;
 						} else {
 							throw new Error("Unknown operand_stack type: "+o.getClass()+" for value "+o);
 						}
@@ -2011,7 +2013,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	}
 
 	private void printfTo(PrintStream ps, long num_args) {
-		assert num_args > 0;
+//		assert num_args > 0;
 		ps.print(sprintfFunction(num_args));
 		// for now, since we are not using Process.waitFor()
 		if (IS_WINDOWS) {
@@ -2023,7 +2025,10 @@ public class AVM implements AwkInterpreter, VariableManager {
 	 * sprintf() functionality
 	 */
 	private String sprintfFunction(long num_args) {
-		assert num_args > 0;
+		
+		// Silly case
+		if (num_args == 0) return "";
+		
 		// all but the format argument
 		Object[] arg_array = new Object[(int) (num_args - 1)];
 		// the format argument!

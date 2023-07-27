@@ -1,0 +1,3 @@
+gawk: mbstr1.awk:2: warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+4
+1

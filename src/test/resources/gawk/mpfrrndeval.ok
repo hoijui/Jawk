@@ -1,0 +1,18 @@
+3.1416
+2.7183
+1.618
+
+Variable pi U: 4
+Variable pi D: 3
+Literal  pi U: 4
+Literal  pi D: 3
+
+Variable e D: 2
+Variable e U: 3
+Literal  e D: 2
+Literal  e U: 3
+
+Variable golden N: 2
+Variable golden Z: 1
+Literal  golden N: 2
+Literal  golden Z: 1

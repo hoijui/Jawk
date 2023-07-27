@@ -1,0 +1,4 @@
+gawk: nsbad3.awk:2: error: using reserved identifier `if' as a namespace is not allowed
+gawk: nsbad3.awk:2: 	if::junk = 3
+gawk: nsbad3.awk:2: 	         ^ syntax error
+EXIT CODE: 1

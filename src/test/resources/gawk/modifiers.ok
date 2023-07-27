@@ -1,0 +1,12 @@
+gawk: cmd. line:1: warning: `h' is meaningless in awk formats; ignored
+gawk: cmd. line:1: fatal: `h' is not permitted in POSIX awk formats
+gawk: cmd. line:1: warning: `l' is meaningless in awk formats; ignored
+gawk: cmd. line:1: fatal: `l' is not permitted in POSIX awk formats
+gawk: cmd. line:1: warning: `L' is meaningless in awk formats; ignored
+gawk: cmd. line:1: fatal: `L' is not permitted in POSIX awk formats
+gawk: cmd. line:1: warning: `j' is meaningless in awk formats; ignored
+gawk: cmd. line:1: fatal: `j' is not permitted in POSIX awk formats
+gawk: cmd. line:1: warning: `t' is meaningless in awk formats; ignored
+gawk: cmd. line:1: fatal: `t' is not permitted in POSIX awk formats
+gawk: cmd. line:1: warning: `z' is meaningless in awk formats; ignored
+gawk: cmd. line:1: fatal: `z' is not permitted in POSIX awk formats
