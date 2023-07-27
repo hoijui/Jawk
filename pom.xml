@@ -10,7 +10,7 @@
 		<project.pkgName>org.jawk</project.pkgName>
 		<project.mainClass>org.jawk.Main</project.mainClass>
 		<java.version>8</java.version>
-		<java.old.home>${env.JAVA6_HOME}</java.old.home>
+		<testExcludedClass>**/*GawkTest.java</testExcludedClass>
 	</properties>
 
 	<organization>
@@ -210,6 +210,18 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<excludes>
+						<exclude>${testExcludedClass}</exclude>
+					</excludes>
+					<workingDirectory>${project.build.directory}/test-classes/gawk</workingDirectory>
+				</configuration>
+			</plugin>
+
 			<!-- source -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -225,7 +237,7 @@
 				</executions>
 			</plugin>
 
-	<!-- javadoc -->
+			<!-- javadoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -260,7 +272,7 @@
 					<useReleaseProfile>false</useReleaseProfile>
 					<releaseProfiles>release</releaseProfiles>
 					<goals>deploy</goals>
-			<!--
+					<!--
 						Workaround to prevent the gpg plugin from hanging, see:
 						http://jira.codehaus.org/browse/MGPG-9
 					-->
@@ -296,7 +308,7 @@
 							<shadedClassifierName>stand-alone</shadedClassifierName>
 							<filters>
 								<filter>
-							<!--
+									<!--
 										Exclude files that sign a jar
 										(one or multiple of the dependencies).
 										One may not repack a signed jar without
@@ -427,7 +439,16 @@
 					</plugin>
 
 				</plugins>
+
 			</reporting>
+		</profile>
+
+		<profile>
+			<id>gawk</id>
+			<properties>
+				<testExcludedClass></testExcludedClass>
+			</properties>
+
 		</profile>
 
 		<profile>
