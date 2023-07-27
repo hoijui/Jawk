@@ -1,0 +1,3 @@
+gawk: eofsrc1a.awk:2: (END OF FILE)
+gawk: eofsrc1a.awk:2: ^ source files / command-line arguments must contain complete functions or rules
+EXIT CODE: 1

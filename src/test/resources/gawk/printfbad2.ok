@@ -1,0 +1,3 @@
+gawk: printfbad2.awk:2: (FILENAME=printfbad2.in FNR=1) warning: ignoring unknown format specifier character `b': no argument converted
+gawk: printfbad2.awk:2: (FILENAME=printfbad2.in FNR=1) warning: field width is ignored for `%%' specifier
+%28b%c

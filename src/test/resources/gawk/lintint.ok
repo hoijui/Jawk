@@ -1,0 +1,2 @@
+gawk: lintint.awk:5: warning: int: received non-numeric argument
+gawk: lintint.awk:8: warning: int: received non-numeric argument

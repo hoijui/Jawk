@@ -1,0 +1,4 @@
+gawk: clos1way2.awk:5: (FILENAME=- FNR=1) warning: fflush: cannot flush: two-way pipe `cat - 1>&2 && sleep 2' has closed write end
+test
+gawk: clos1way2.awk:6: (FILENAME=- FNR=1) fatal: print: attempt to write to closed write end of two-way pipe
+EXIT CODE: 2

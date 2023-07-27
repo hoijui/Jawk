@@ -1,0 +1,93 @@
+--Test 1a--
+In BEGIN
+In BEGINFILE: beginfile2.in
+1
+--Test 1b--
+In BEGIN
+In BEGINFILE: beginfile2.in
+In BEGINFILE: file/does/not/exist
+gawk: cmd. line:3: fatal: cannot open file `file/does/not/exist' for reading: No such file or directory
+--Test 2--
+In BEGINFILE: beginfile2.in
+In ENDFILE: beginfile2.in
+In BEGINFILE: file/does/not/exist
+--Test 3--
+In BEGINFILE: beginfile2.in
+In ENDFILE: beginfile2.in
+executing END rule
+In BEGINFILE: beginfile2.sh
+In ENDFILE: beginfile2.sh
+1
+Done executing END rule
+--Test 4--
+In BEGINFILE: beginfile2.in
+ENDFILE: beginfile2.in
+executing END rule
+In BEGINFILE: beginfile2.sh
+ENDFILE: beginfile2.sh
+
+Done executing END rule
+--Test 5--
+1 1
+1
+--Test 6--
+In BEGINFILE: beginfile2.in
+1 1
+In ENDFILE: beginfile2.in
+1
+--Test 7--
+In BEGINFILE: beginfile2.in
+In ENDFILE: beginfile2.in
+0
+In BEGINFILE: beginfile2.sh
+In BEGIN: beginfile2.sh
+In ENDFILE: beginfile2.sh
+1
+--Test 8--
+beginfile2.in
+1 2
+--Test 9a--
+Skipping: 1:file/does/not/exist
+In BEGINFILE: 2:beginfile2.in
+In Rule: beginfile2.in
+In ENDFILE: beginfile2.in
+--Test 9b--
+Skipping: 1:file/does/not/exist
+Skipping: 2:beginfile2.in
+In ENDFILE: beginfile2.in
+--Test 10--
+82 82
+--Test 11--
+beginfile2.in
+beginfile2.sh
+gawk: cmd. line:9: fatal: non-redirected `getline' invalid inside `BEGINFILE' rule
+--Test 12--
+In BEGINFILE: beginfile2.in
+1
+0
+In ENDFILE: beginfile2.in
+In BEGINFILE: beginfile2.sh
+1
+0
+In ENDFILE: beginfile2.sh
+--Test 13--
+In BEGINFILE: beginfile2.in
+In END: beginfile2.in
+In ENDFILE: beginfile2.in
+In BEGINFILE: beginfile2.sh
+--Test 14--
+In BEGINFILE: beginfile2.in
+In ENDFILE: beginfile2.in
+In END: beginfile2.in
+In BEGINFILE: beginfile2.sh
+In ENDFILE: beginfile2.sh
+--Test 15--
+BEGINFILE: beginfile2.in
+BEGINFILE: beginfile2.sh
+2
+--Test 16--
+In BEGINFILE: beginfile2.in
+In BEGIN: beginfile2.in
+In Rule: beginfile2.in
+In ENDFILE:  beginfile2.in
+In BEGINFILE: beginfile2.sh

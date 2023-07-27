@@ -1,0 +1,17 @@
+BEGIN
+gawk: getfile.awk:9: warning: cannot open unrecognized file type `<<' for `echo hello; echo goodbye'
+get_file: get_file(echo hello; echo goodbye, <<, -1) failed
+expected error result 0 
+get_file returned 1
+input_name echo hello; echo goodbye
+1
+hello
+BEGINFILE (-) ERRNO ()
+get_file returned 1
+input_name -
+end BEGIN
+ENDFILE (-) ERRNO ()
+END
+1
+goodbye
+0

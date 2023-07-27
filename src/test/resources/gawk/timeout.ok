@@ -1,0 +1,11 @@
+With timeouts
+hello
+-1 1 1
+1
+
+With timeouts and retries
+hello
+1 timed out; trying again
+2 timed out; trying again
+goodbye
+0

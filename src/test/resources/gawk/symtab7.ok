@@ -1,0 +1,2 @@
+gawk: symtab7.awk:4: (FILENAME=- FNR=1) fatal: cannot assign to arbitrary elements of SYMTAB
+EXIT CODE: 2

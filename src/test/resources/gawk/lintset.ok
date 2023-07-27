@@ -1,0 +1,1 @@
+gawk: lintset.awk:4: warning: exp: received non-numeric argument

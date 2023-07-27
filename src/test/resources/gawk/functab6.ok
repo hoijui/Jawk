@@ -1,0 +1,2 @@
+gawk: functab6.awk:1: fatal: reference to uninitialized element `FUNCTAB["0"] is not allowed'
+EXIT CODE: 2

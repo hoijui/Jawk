@@ -1,0 +1,3 @@
+gawk: inchello:1: warning: `include' is a gawk extension
+gawk: inchello:2: fatal: cannot include `hello' and use it as a program file
+EXIT CODE: 2

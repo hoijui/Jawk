@@ -1,0 +1,14 @@
+In BEGINFILE:
+	FILENAME = beginfile1.awk, FNR = 0, ERRNO = ""
+processing beginfile1.awk
+In ENDFILE:
+	FILENAME = beginfile1.awk, FNR = 2, ERRNO = ""
+In BEGINFILE:
+	FILENAME = ., FNR = 0, ERRNO = "Is a directory"
+In BEGINFILE:
+	FILENAME = file, FNR = 0, ERRNO = "No such file or directory"
+In BEGINFILE:
+	FILENAME = Makefile, FNR = 0, ERRNO = ""
+processing Makefile
+In ENDFILE:
+	FILENAME = Makefile, FNR = 2, ERRNO = ""

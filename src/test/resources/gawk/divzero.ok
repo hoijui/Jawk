@@ -1,0 +1,2 @@
+gawk: divzero.awk:1: error: division by zero attempted
+EXIT CODE: 1

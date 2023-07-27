@@ -1,0 +1,2 @@
+gawk: symtab6.awk:1: fatal: cannot assign to arbitrary elements of SYMTAB
+EXIT CODE: 2

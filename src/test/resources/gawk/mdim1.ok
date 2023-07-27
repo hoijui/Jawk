@@ -1,0 +1,9 @@
+typeof(x[0]) is untyped
+typeof(x[1]) is unassigned
+typeof(x[0]) is array
+typeof(x[0][1]) is string
+typeof(y) is untyped
+typeof(y) is unassigned
+typeof(z) is unassigned
+gawk: mdim1.awk:13: fatal: attempt to use scalar `x["1"]' as an array
+EXIT CODE: 2

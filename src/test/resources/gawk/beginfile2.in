@@ -1,0 +1,242 @@
+#TEST1#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+}
+BEGIN {
+	count = 0
+	print "In BEGIN"
+	while (getline > 0)
+		count++;
+	print count == NR
+}
+
+#TEST2#
+BEGINFILE {
+        print "In BEGINFILE:", FILENAME
+        nextfile
+}
+ENDFILE{
+        print "In ENDFILE:", FILENAME
+}
+
+
+#TEST3#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+}
+END {
+	print "executing END rule"
+	ARGV[ARGC++] = src;
+	count = 0
+	while (getline> 0)
+		count++;
+	print count == FNR
+	print "Done executing END rule"
+}
+ENDFILE {
+	print "In ENDFILE:", FILENAME
+}
+
+#TEST4#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+	nextfile
+}
+END {
+	print "executing END rule"
+	ARGV[ARGC++] = src;
+	getline
+	print $0
+	print "Done executing END rule"
+}
+ENDFILE {
+	print "ENDFILE:", FILENAME
+}
+
+
+#TEST5#
+BEGIN {
+	getline
+	count++
+	print NR, count
+}
+{
+	count++
+}
+END {
+	print NR == count
+}
+
+#TEST6#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+	count = 0
+}
+BEGIN {
+	getline
+	count++
+	print FNR, count
+}
+{
+	count++
+}
+ENDFILE {
+	print "In ENDFILE:", FILENAME
+	print count == FNR
+}
+
+#TEST7#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+	count = 0
+	if (ARGIND == 1)
+		nextfile
+}
+BEGIN {
+	getline
+	print "In BEGIN:", FILENAME
+}
+{ count++ }
+ENDFILE {
+	print "In ENDFILE:", FILENAME
+	print (FNR - count)
+}
+
+#TEST8#
+function f(a, b) {
+	getline
+	print FILENAME
+	print a, b
+}
+function g(x, y) {
+	return x
+}
+BEGINFILE { nextfile }
+BEGIN { g(3, f(1, 2)) }
+
+#TEST9#
+function f(a, b) {
+	b = b ":" a;
+	if (skip || ERRNO != "") {
+		print "Skipping:", b
+		nextfile
+	}
+	return b
+}
+BEGINFILE { print "In BEGINFILE:", f(FILENAME, ++i)}
+FNR == 1 { print "In Rule:", FILENAME }
+ENDFILE { print "In ENDFILE:", FILENAME }
+
+#TEST10#
+function f() {
+	nextfile
+}
+function g(	cnt) {
+	cnt = 0
+	while (getline > 0)
+		cnt++;
+	return cnt
+}
+BEGINFILE { if (ARGIND == 1) f(); }
+BEGIN {
+		print g(), NR		
+}
+
+#TEST11#
+function f(a, b) {
+	print a
+	nextfile
+	print b
+}
+function g(x, y) {
+	print x
+	getline
+	return y
+}
+BEGINFILE { ARGIND == 1 ? g(3, f(FILENAME, 2)) : f(3, g(FILENAME, 2)) }
+
+#TEST12#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+}
+function g() {
+	nextfile
+}
+function f(	cnt) {
+	print cnt + 0
+	while (getline > 0) {
+		if (++cnt == 2) {
+			g()
+			print "shouldn't see this line"
+		}
+	}
+}
+{
+	print FNR
+	f()
+}
+ENDFILE {
+	print "In ENDFILE:", FILENAME
+}
+
+#TEST13#
+# exit in BEGINFILE
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+	exit(0)
+}
+ENDFILE {
+	print "In ENDFILE:", FILENAME
+}
+END {
+	print "In END:", FILENAME
+	while (getline > 0)
+		;
+	print "shouldn't see this line"
+}
+
+#TEST14#
+# exit in ENDFILE
+BEGINFILE {
+        print "In BEGINFILE:", FILENAME
+}
+ENDFILE {
+        print "In ENDFILE:", FILENAME
+        exit(0)
+}
+END {
+        print "In END:", FILENAME
+        while (getline > 0)
+			;
+        print "shouldn't see this line"
+}
+
+#TEST15#
+BEGINFILE {
+	print "BEGINFILE:", FILENAME
+}
+{ nextfile }
+END {
+	print NR
+}
+
+#TEST16#
+BEGINFILE {
+	print "In BEGINFILE:", FILENAME
+}
+BEGIN {
+	getline
+	print "In BEGIN:", FILENAME
+}
+{
+	if (NR == FNR) {
+		print "In Rule:", FILENAME
+		nextfile
+	}
+	exit(0)
+}
+
+ENDFILE {
+	print "In ENDFILE: ", FILENAME
+}
+

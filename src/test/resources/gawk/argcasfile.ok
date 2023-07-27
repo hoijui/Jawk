@@ -1,0 +1,9 @@
+0 gawk
+1 ARGC=1
+2  /no/such/file
+0 gawk
+1 ARGC=1
+2  /no/such/file
+0 gawk
+1 ARGC=1
+2  /no/such/file

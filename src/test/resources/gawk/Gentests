@@ -1,0 +1,322 @@
+#!/usr/bin/gawk -f
+
+# This program should generate Maketests
+
+BEGIN {
+	# read the list of files
+	for (i = 2; i < ARGC; i++)
+		files[ARGV[i]]
+
+	# throw it away
+	ARGC = 2
+
+	ntests = 0
+
+	Locale["C"] = "C"
+	Locale["EN"] = "en_US.UTF-8"
+	Locale["FR"] = "fr_FR.UTF-8"
+	Locale["GR"] = "el_GR.iso88597"
+	Locale["JP"] = "ja_JP.UTF-8"
+	Locale["RU"] = "ru_RU.UTF-8"
+}
+
+# process the file Makefile.am:
+
+/^EXTRA_DIST *=/,/[^\\]$/ {
+	gsub(/(^EXTRA_DIST *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		extra_dist[$i]
+	next
+}
+
+/^[[:upper:]_]*_TESTS *=/,/[^\\]$/ {
+	gsub(/(^[[:upper:]_]*_TESTS *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		tests[++ntests] = $i
+	next
+}
+
+/^NEED_DEBUG *=/,/[^\\]$/ {
+	gsub(/(^NEED_DEBUG *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		debug[$i]
+	next
+}
+
+/^NEED_LINT *=/,/[^\\]$/ {
+	gsub(/(^NEED_LINT *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		lint[$i]
+	next
+}
+
+/^NEED_LINT_OLD *=/,/[^\\]$/ {
+	gsub(/(^NEED_LINT_OLD *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		lint_old[$i]
+	next
+}
+
+/^NEED_MPFR *=/,/[^\\]$/ {
+	gsub(/(^NEED_MPFR *=|\\$)/,"")
+	for (i = 1; i <= NF; i++) {
+		simple_mpfr[$i]
+		tests[++ntests] = $i
+	}
+	next
+}
+
+/^NEED_NONDEC *=/,/[^\\]$/ {
+	gsub(/(^NEED_NONDEC *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		nondec[$i]
+	next
+}
+
+/^NEED_PRETTY *=/,/[^\\]$/ {
+	gsub(/(^NEED_PRETTY *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		pretty[$i]
+	next
+}
+
+/^NEED_POSIX *=/,/[^\\]$/ {
+	gsub(/(^NEED_POSIX *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		posix[$i]
+	next
+}
+
+/^NEED_RE_INTERVAL *=/,/[^\\]$/ {
+	gsub(/(^NEED_RE_INTERVAL *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		re_interval[$i]
+	next
+}
+
+/^NEED_TRADITIONAL *=/,/[^\\]$/ {
+	gsub(/(^NEED_TRADITIONAL *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		traditional[$i]
+	next
+}
+
+/^NEED_SANDBOX *=/,/[^\\]$/ {
+	gsub(/(^NEED_SANDBOX *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		sandbox[$i]
+	next
+}
+
+/^NEED_CSV *=/,/[^\\]$/ {
+	gsub(/(^NEED_CSV *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		csv[$i]
+	next
+}
+
+/^GENTESTS_UNUSED *=/,/[^\\]$/ {
+	gsub(/(^GENTESTS_UNUSED *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		unused[$i]
+	next
+}
+
+# Tests needing a particular locale
+/^NEED_LOCALE_.* *=/,/[^\\]$/ {
+	if (/^NEED/)
+		cur_locale = gensub(/^NEED_LOCALE_([[:alnum:]]+).*/, "\\1", 1, $1)
+
+	gsub(/^NEED_LOCALE_.* *=|\\$/, "")
+	for (i = 1; i <= NF; i++) {
+		locale_tests[cur_locale][$i]
+		all_locale_tests[$i]
+ 	}
+}
+
+# Tests that fail on z/OS
+/EXPECTED_FAIL_ZOS *=/,/[^\\]$/ {
+	gsub(/(^EXPECTED_FAIL_ZOS *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+	{
+		zos_fail[$i]
+	}
+	next
+}
+
+/^[[:alpha:]_][-[:alnum:]_]*:/ {
+	# remember all targets from Makefile.am
+	sub(/:.*/,"")
+	targets[$0]
+}
+
+# Now write the output file:
+END {
+	# this line tells automake to keep the comment with the rules:
+	print "Gt-dummy:"
+	print "# file Maketests, generated from Makefile.am by the Gentests program"
+
+	for (i = 1; i <= ntests; i++) {
+		x = tests[i]
+		if (!(x in targets))
+			generate(x)
+	}
+
+	print "# end of file Maketests"
+}
+
+function generate_shell(x,	s)
+{
+	delete files[x".sh"]
+
+	s = ""
+	if (x".in" in files) {
+		s = "\"$(srcdir)\"/$@.in"
+		delete files[x".in"]
+	}
+
+	print x ":"
+	printf "\t@echo $@\n"
+
+	printf "\t@-$(LOCALES) AWK=\"$(AWKPROG)\" \"$(srcdir)\"/$@.sh %s > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
+	printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
+	
+}
+
+function generate(x,	s, i, locale_string)
+{
+	if (x".sh" in files)
+		return generate_shell(x)
+
+	if (!(x".awk" in files))
+		printf "WARNING: file `%s.awk' not found.\n", x > "/dev/stderr"
+	else
+		delete files[x".awk"]
+
+	print x ":"
+
+	s = ""
+	if (x in lint) {
+		s = s " --lint"
+		delete lint[x]
+	}
+	if (x in lint_old) {
+		s = s " --lint-old"
+		delete lint_old[x]
+	}
+	if (x in simple_mpfr) {
+		s = s " -M"
+		delete simple_mpfr[x]
+	}
+	if (x in posix) {
+		s = s " --posix"
+		delete posix[x]
+	}
+	if (x in traditional) {
+		s = s " --traditional"
+		delete traditional[x]
+	}
+	if (x in sandbox) {
+		s = s " --sandbox"
+		delete sandbox[x]
+	}
+	if (x in pretty) {
+		s = s " --pretty-print=_$@"
+		delete pretty[x]
+	}
+	if (x in debug) {
+		s = s " --debug"
+		delete debug[x]
+	}
+	if (x in nondec) {
+		s = s " --non-decimal-data"
+		delete nondec[x]
+	}
+	if (x in re_interval) {
+		s = s " --re-interval"
+		delete re_interval[x]
+	}
+	if (x in csv) {
+		s = s " --csv"
+		delete csv[x]
+	}
+	if (x".in" in files) {
+		s = s " < \"$(srcdir)\"/$@.in"
+		delete files[x".in"]
+	}
+
+	if (x in zos_fail) {
+		printf "\t@echo $@ $(ZOS_FAIL)\n"
+		delete zos_fail[x]
+	} else
+		printf "\t@echo $@\n"
+
+	# default is the leading tab and @
+	locale_string = "\t@-"
+	if (x in all_locale_tests) {
+		delete all_locale_tests[x]
+		for (i in locale_tests) {
+			if (x in locale_tests[i]) {
+				locale_string = sprintf("\t@-[ -z \"$$GAWKLOCALE\" ] && GAWKLOCALE=%s; export GAWKLOCALE; \\\n\t", Locale[i])
+				delete locale_tests[i][x]
+				break
+			}
+		}
+	}
+
+	printf "%s", locale_string
+	printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
+
+	if ((x "-mpfr.ok") in extra_dist) {
+		printf "\t@-if echo \"$$GAWK_TEST_ARGS\" | egrep -q -e '-M|--bignum' > /dev/null ; \\\n"
+		printf "\tthen $(CMP) \"$(srcdir)\"/$@-mpfr.ok _$@ && rm -f _$@ ; \\\n"
+		printf "\telse $(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@ ; fi\n\n"
+	} else {
+		printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
+	}
+}
+
+END {
+	for (x in lint)
+		if (!(x in targets))
+			printf "WARNING: --lint target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in lint_old)
+		if (!(x in targets))
+			printf "WARNING: --lint-old target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in simple_mpfr)
+		if (!(x in targets))
+			printf "WARNING: -M target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in posix)
+		if (!(x in targets))
+			printf "WARNING: --posix target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in traditional)
+		if (!(x in targets))
+			printf "WARNING: --traditional target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in sandbox)
+		if (!(x in targets))
+			printf "WARNING: --sandbox target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in pretty)
+		if (!(x in targets))
+			printf "WARNING: --pretty-print target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in debug)
+		if (!(x in targets))
+			printf "WARNING: --debug target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in nondec)
+		if (!(x in targets))
+			printf "WARNING: --non-decimal-data target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in re_interval)
+		if (!(x in targets))
+			printf "WARNING: --re-interval target `%s' is missing.\n", x > "/dev/stderr"
+	for (x in locale_tests)
+		for (y in locale_tests[x])
+			if (!(y in targets))
+				printf("WARNING: Locale `%s' target `%s' is missing.\n", x, y) > "/dev/stderr"
+	if ("check_zos" in ENVIRON)
+		for (x in zos_fail)
+			printf "WARNING: check target `%s' for $(ZOS_FAIL).\n", x > "/dev/stderr"
+
+	for (x in files)
+		if (!(x in unused) && \
+		    !(gensub(/\.(awk|in|sh)$/,"",1,x) in targets))
+			printf "WARNING: unused file `%s'.\n", x > "/dev/stderr"
+}

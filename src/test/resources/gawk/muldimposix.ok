@@ -1,0 +1,2 @@
+gawk: muldimposix.awk:1: fatal: multidimensional arrays are a gawk extension
+EXIT CODE: 2

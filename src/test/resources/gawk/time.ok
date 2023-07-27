@@ -1,0 +1,4 @@
+gettimeofday - systime = 0
+sleep(1.3) = 0
+gettimeofday - systime = 0
+<Feb 11 13:12:11 1990> <<Feb 11 13:12:11 1990>>

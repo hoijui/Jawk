@@ -1,0 +1,5 @@
+2007
+gawk: mbstr2.awk:1: (FILENAME=- FNR=2) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+2007
+2007
+2007

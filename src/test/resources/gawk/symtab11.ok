@@ -1,0 +1,79 @@
+BEGIN -- Symtab is next
+[i] = i
+[NF] = 0
+[ARGIND] = 0
+[BINMODE] = 0
+[FNR] = 0
+[LINT] = 0
+[NR] = 0
+[RLENGTH] = 0
+[RSTART] = 0
+[ARGC] = 1
+[IGNORECASE] = 1
+[PREC] = 53
+[ERRNO] = 
+[FIELDWIDTHS] = 
+[FILENAME] = 
+[RT] = 
+[ORS] = 
+
+[RS] = 
+
+[SUBSEP] = 
+[FS] =  
+[OFS] =  
+[CONVFMT] = %.6g
+[OFMT] = %.6g
+[FPAT] = [^[:space:]]+
+[TEXTDOMAIN] = messages
+[ROUNDMODE] = N
+[ARGV] = <array>
+[ENVIRON] = <array>
+[PROCINFO] = <array>
+BEGIN-- after Symtab loop
+BEGIN -- Functab is next
+[and] = and
+[asort] = asort
+[asorti] = asorti
+[atan2] = atan2
+[bindtextdomain] = bindtextdomain
+[close] = close
+[compl] = compl
+[cos] = cos
+[dcgettext] = dcgettext
+[dcngettext] = dcngettext
+[exp] = exp
+[fflush] = fflush
+[gensub] = gensub
+[gsub] = gsub
+[index] = index
+[int] = int
+[isarray] = isarray
+[length] = length
+[log] = log
+[lshift] = lshift
+[match] = match
+[mkbool] = mkbool
+[mktime] = mktime
+[or] = or
+[patsplit] = patsplit
+[rand] = rand
+[rshift] = rshift
+[sin] = sin
+[split] = split
+[sprintf] = sprintf
+[sqrt] = sqrt
+[srand] = srand
+[strftime] = strftime
+[strtonum] = strtonum
+[sub] = sub
+[substr] = substr
+[system] = system
+[systime] = systime
+[tolower] = tolower
+[toupper] = toupper
+[typeof] = typeof
+[xor] = xor
+[bar] = bar
+[foo] = foo
+BEGIN-- after Functab loop

@@ -1,0 +1,12 @@
+before
+gawk: inplace:59: warning: inplace::begin: disabling in-place editing for invalid FILENAME `-'
+stdin start
+is bar replaced?
+stdin end
+after
+Before
+gawk: inplace:59: warning: inplace::begin: disabling in-place editing for invalid FILENAME `-'
+stdin start
+is foo replaced?
+stdin end
+After

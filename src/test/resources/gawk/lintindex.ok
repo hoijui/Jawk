@@ -1,0 +1,4 @@
+gawk: lintindex.awk:4: warning: index: received non-string first argument
+gawk: lintindex.awk:4: warning: index: received non-string second argument
+gawk: lintindex.awk:7: warning: index: received non-string first argument
+gawk: lintindex.awk:7: warning: index: received non-string second argument

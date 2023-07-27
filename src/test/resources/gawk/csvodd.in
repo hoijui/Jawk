@@ -1,0 +1,25 @@
+Normal record
+a,b,c,d
+EOL = CR+LF
+a,b,c,d
+EOL = CR+CR+LF
+a,b,c,d
+Quoted field
+a,"b,c",d
+Quote in quoted field
+a,"b""c",d
+Null fields
+,a,b,,c,d,
+Quoted null field, EOL = CR+LF
+a,b,"",c,d
+Embedded LF
+a,"b
+c",d
+Embedded CR+LF and LF, EOL = CR+LF
+"a
+b","c
+d"
+Embedded plain CR, EOL = LR
+a,bc,d
+No EOL at EOF
+a,b,c,d

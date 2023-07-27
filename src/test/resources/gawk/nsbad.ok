@@ -1,0 +1,8 @@
+gawk: nsbad.awk:1: error: namespace name `1foo' must meet identifier naming rules
+gawk: nsbad.awk:2: error: using reserved identifier `for' as a namespace is not allowed
+gawk: nsbad.awk:3: error: namespace name `42f' must meet identifier naming rules
+gawk: nsbad.awk:4: error: namespace name `ab#d' must meet identifier naming rules
+gawk: nsbad.awk:8: error: using reserved identifier `match' as second component of a qualified name is not allowed
+gawk: nsbad.awk:8: 	foo::match = 3
+gawk: nsbad.awk:8: 	           ^ syntax error
+EXIT CODE: 1

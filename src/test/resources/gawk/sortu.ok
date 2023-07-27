@@ -1,0 +1,50 @@
+--- number before string, ascending by index ---
+1         10
+2         200
+100       1
+bat       tab
+cat       tac
+rat       tar
+--- deterministic, by value (index), descending numeric ---
+2         200
+20        10
+14        10
+11        10
+100       5
+4         1
+--- asort(a, b, "comp_val_num"), IGNORECASE = 0---
+[1]       :barz      Zebra     
+[2]       :blattt    barz      
+[3]       :Zebra     blattt    
+[4]       :1234      234       
+[5]       :234       1234      
+--- asort(a, b, "comp_val_str"), IGNORECASE = 0---
+[1]       :barz      1234      
+[2]       :blattt    234       
+[3]       :Zebra     Zebra     
+[4]       :1234      barz      
+[5]       :234       blattt    
+--- asort(a, a, "comp_val_str"), IGNORECASE = 0---
+[1]       :1234      
+[2]       :234       
+[3]       :Zebra     
+[4]       :barz      
+[5]       :blattt    
+--- asort(a, b, "comp_val_num"), IGNORECASE = 1---
+[1]       :barz      barz      
+[2]       :blattt    blattt    
+[3]       :Zebra     Zebra     
+[4]       :1234      234       
+[5]       :234       1234      
+--- asort(a, b, "comp_val_str"), IGNORECASE = 1---
+[1]       :barz      1234      
+[2]       :blattt    234       
+[3]       :Zebra     barz      
+[4]       :1234      blattt    
+[5]       :234       Zebra     
+--- asort(a, a, "comp_val_str"), IGNORECASE = 1---
+[1]       :1234      
+[2]       :234       
+[3]       :barz      
+[4]       :blattt    
+[5]       :Zebra     

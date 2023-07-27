@@ -1,0 +1,2 @@
+gawk: lintexp.awk:5: warning: exp: received non-numeric argument
+gawk: lintexp.awk:8: warning: exp: received non-numeric argument

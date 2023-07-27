@@ -1,0 +1,30 @@
+Initialize strong regex
+Test gsub on strong regex
+rgx1 = '[abc]'	typeof(rgx1) = 'regexp'
+rgx2 = '[abc]'	typeof(rgx2) = 'regexp'
+Test gsub() a strong regex
+rgx1 = '[abc]'	typeof(rgx1) = 'regexp'
+rgx2 = '[aec]'	typeof(rgx2) = 'regexp'
+Test value not found in regex
+rgx1 = '[abc]'	typeof(rgx1) = 'regexp'
+Test gsub on numbers
+v1 = '12345'	typeof(v1) = 'number'
+v2 = '12345'	typeof(v2) = 'number'
+v1 = '12345'	typeof(v1) = 'number'
+v2 = '12x45'	typeof(v2) = 'string'
+Test value not found in number
+v1 = '12345'	typeof(v1) = 'number'
+Test gensub on regex
+a = @/abc/	typeof(a) = 'regexp'
+c = "axc"	typeof(c) = 'string'
+Test value not found in regex
+b = @/abc/	typeof(b) = 'regexp'
+c = "abc"	typeof(c) = 'string'
+Test gensub on numbers
+a = "12345"	typeof(a) = 'number'
+b = "12345"	typeof(b) = 'number'
+c = "12x45"	typeof(c) = 'string'
+Test value not found in number
+b = "12345"	typeof(b) = 'number'
+c = "12345"	typeof(c) = 'string'
+string 12345

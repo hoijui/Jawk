@@ -1,0 +1,2 @@
+gawk: functab1.awk:3: fatal: `delete' is not allowed with FUNCTAB
+EXIT CODE: 2

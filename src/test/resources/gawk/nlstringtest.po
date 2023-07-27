@@ -1,0 +1,16 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# Les gateaux allemands sont les meilleurs du monde.
+#, awk-format
+msgid "a piece of cake"
+msgid_plural "%d pieces of cake"
+msgstr[0] "un morceau de gateau"
+msgstr[1] "%d morceaux de gateau"
+
+# Reverse the arguments.
+#, awk-format
+msgid "%s is replaced by %s."
+msgstr "%2$s remplace %1$s."

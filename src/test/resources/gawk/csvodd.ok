@@ -1,0 +1,44 @@
+<Normal record><\n>
+<Normal record>
+<a,b,c,d><\n>
+<a><b><c><d>
+<EOL = CR+LF><\n>
+<EOL = CR+LF>
+<a,b,c,d><\n>
+<a><b><c><d>
+<EOL = CR+CR+LF><\n>
+<EOL = CR+CR+LF>
+<a,b,c,d><\n>
+<a><b><c><d>
+<Quoted field><\n>
+<Quoted field>
+<a,"b,c",d><\n>
+<a><b,c><d>
+<Quote in quoted field><\n>
+<Quote in quoted field>
+<a,"b""c",d><\n>
+<a><b"c><d>
+<Null fields><\n>
+<Null fields>
+<,a,b,,c,d,><\n>
+<><a><b><><c><d><>
+<Quoted null field, EOL = CR+LF><\n>
+<Quoted null field>< EOL = CR+LF>
+<a,b,"",c,d><\n>
+<a><b><><c><d>
+<Embedded LF><\n>
+<Embedded LF>
+<a,"b\nc",d><\n>
+<a><b\nc><d>
+<Embedded CR+LF and LF, EOL = CR+LF><\n>
+<Embedded CR+LF and LF>< EOL = CR+LF>
+<"a\nb","c\nd"><\n>
+<a\nb><c\nd>
+<Embedded plain CR, EOL = LR><\n>
+<Embedded plain CR>< EOL = LR>
+<a,b\rc,d><\n>
+<a><b\rc><d>
+<No EOL at EOF><\n>
+<No EOL at EOF>
+<a,b,c,d><>
+<a><b><c><d>

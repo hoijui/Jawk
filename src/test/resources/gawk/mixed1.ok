@@ -1,0 +1,3 @@
+gawk: cmd. line:1: BEGIN {return junk}
+gawk: cmd. line:1:        ^ `return' used outside function context
+EXIT CODE: 1

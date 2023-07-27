@@ -1,0 +1,2 @@
+gawk: printfbad4.awk:3: fatal: fatal: must use `count$' on all formats or none
+EXIT CODE: 2

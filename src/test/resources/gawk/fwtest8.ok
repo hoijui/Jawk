@@ -1,0 +1,2 @@
+gawk: fwtest8.awk:1: fatal: invalid FIELDWIDTHS value, for field 2, near `-1 4'
+EXIT CODE: 2

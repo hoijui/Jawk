@@ -1,0 +1,3 @@
+gawk: unterm.awk:1: BEGIN{x="...}
+gawk: unterm.awk:1:         ^ unterminated string
+EXIT CODE: 1
