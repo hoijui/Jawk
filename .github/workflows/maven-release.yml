@@ -14,9 +14,15 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: read
       packages: write
-
+      contents: write
+      checks: write
+      actions: read
+      issues: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+      
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
