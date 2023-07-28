@@ -1,7 +1,9 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+# When a release is created:
+# - Build the package
+# - Deploy to GitHub Packages
+# - Upload as an asset to the release
 
-name: Maven Package
+name: Maven Release
 
 on:
   release:
@@ -25,10 +27,28 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-
-    - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+    - name: Build and Deploy to GitHub Packages Apache Maven
+      run: mvn -B deploy --file pom.xml -s $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Get Artifact Name
+      shell: bash
+      run: |
+        echo "artifact_name=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> "$GITHUB_ENV"
+
+    - name: Get Artifact Version
+      shell: bash
+      run: |
+        echo "artifact_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
+        
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./target/${{ env.artifact_name }}-${{ env.artifact_version }}-stand-alone.jar
+        asset_name: jawk.jar
+        asset_content_type: application/jar
