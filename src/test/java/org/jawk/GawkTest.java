@@ -3,11 +3,13 @@ package org.jawk;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,6 +22,7 @@ import java.util.stream.IntStream;
 
 import org.jawk.util.AwkSettings;
 import org.jawk.util.ScriptFileSource;
+import org.jawk.util.ScriptSource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -137,9 +140,11 @@ public class GawkTest {
 	 * @param scriptFile File containing the AWK script to execute
 	 * @param inputFileList List of files that contain the input to be parsed by the AWK script
 	 * @return the printed output of the script as a String
-	 * @throws Exception in case of problems when parsing or executing the AWK script
+	 * @throws ExitException when the AWK script forces its exit with a specified code
+	 * @throws IOException on I/O problems
+	 * @throws ClassNotFoundException 
 	 */
-	private String runAwk(File scriptFile, List<String> inputFileList) throws Exception {
+	private String runAwk(File scriptFile, List<String> inputFileList) throws IOException, ExitException, ClassNotFoundException {
 		
 		AwkSettings settings = new AwkSettings();
 		
@@ -155,6 +160,44 @@ public class GawkTest {
     	
     	// Sets the AWK script to execute
     	settings.addScriptSource(new ScriptFileSource(scriptFile.getAbsolutePath()));
+    	
+    	// Execute the awk script against the specified input
+		Awk awk = new Awk();
+		awk.invoke(settings);
+		
+		// Return the result as a string
+		return resultBytesStream.toString(StandardCharsets.UTF_8);
+
+	}
+	
+
+	/**
+	 * Executes the specified script against the specified input
+	 * <p>
+	 * @param script AWK script to execute (as a String)
+	 * @param input Text to process (as a String)
+	 * @return result as a String
+	 * @throws ExitException when the AWK script forces its exit with a specified code
+	 * @throws IOException on I/O problems
+	 * @throws ClassNotFoundException 
+	 */
+	private String runAwk(String script, String input) throws IOException, ExitException, ClassNotFoundException {
+		
+		AwkSettings settings = new AwkSettings();
+		
+		// Set the input files
+		settings.setInput(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+		
+       	// We force \n as the Record Separator (RS) because even if running on Windows
+       	// we're passing Java strings, where end of lines are simple \n
+       	settings.setDefaultRS("\n");
+       	
+       	// Create the OutputStream, to collect the result as a String
+		ByteArrayOutputStream resultBytesStream = new ByteArrayOutputStream();
+    	settings.setOutputStream(new UniformPrintStream(resultBytesStream));
+    	
+    	// Sets the AWK script to execute
+    	settings.addScriptSource(new ScriptSource("Body", new StringReader(script), false));
     	
     	// Execute the awk script against the specified input
 		Awk awk = new Awk();
