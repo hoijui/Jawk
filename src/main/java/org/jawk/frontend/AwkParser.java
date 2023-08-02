@@ -314,6 +314,19 @@ public class AwkParser {
 	}
 
 	/**
+	 * Logs a warning about the syntax of the script (at which line, of which file)
+	 * @param message
+	 */
+	private void warn(String message) {
+		LOG.warn(
+				"%s (%s:%d)",
+				message,
+				scriptSources.get(scriptSourcesCurrentIndex).getDescription(),
+				reader.getLineNumber()
+		);
+	}
+	
+	/**
 	 * Parse the script streamed by script_reader. Build and return the
 	 * root of the abstract syntax tree which represents the Jawk script.
 	 *
@@ -337,7 +350,7 @@ public class AwkParser {
 		return SCRIPT();
 	}
 
-	private class LexerException extends IOException {
+	public class LexerException extends IOException {
 
 		LexerException(String msg) {
 			super(msg + " ("
@@ -696,14 +709,60 @@ public class AwkParser {
 			while (token != _EOF_ && c > 0 && c != '"' && c != '\n') {
 				if (c == '\\') {
 					read();
-					if (c == 't') {
-						string.append('\t');
-					} else if (c == 'n') {
-						string.append('\n');
-					} else if (c == 'r') {
-						string.append('\r');
-					} else {
-						string.append((char)c);
+					switch (c) {
+					case 'n': string.append('\n'); break;
+					case 't': string.append('\t'); break;
+					case 'r': string.append('\r'); break;
+					case 'a': string.append('\007'); break; // BEL 0x07
+					case 'b': string.append('\010'); break; // BS 0x08
+					case 'f': string.append('\014'); break; // FF 0x0C
+					case 'v': string.append('\013'); break; // VT 0x0B
+					// Octal notation: \N \NN \NNN
+					case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': {
+						int octalChar = c - '0';
+						read();
+						if (c >= '0' && c <= '7') {
+							octalChar = (octalChar << 3) + c - '0';
+							read();
+							if (c >= '0' && c <= '7') {
+								octalChar = (octalChar << 3) + c - '0';
+								read();
+							}
+						}
+						string.append((char)octalChar);
+						continue;
+					}
+					// Hexadecimal notation: \xN \xNN
+					case 'x': {
+						int hexChar = 0;
+						read();
+						if (c >= '0' && c <= '9') {
+							hexChar = c - '0';
+						} else if (c >= 'A' && c <= 'F') {
+							hexChar = c - 'A' + 10;
+						} else if (c >= 'a' && c <= 'f') {
+							hexChar = c - 'a' + 10;
+						} else {
+							warn("no hex digits in `\\x' sequence");
+							string.append('x');
+							continue;
+						}
+						read();
+						if (c >= '0' && c <= '9') {
+							hexChar = (hexChar << 4) + c - '0';
+						} else if (c >= 'A' && c <= 'F') {
+							hexChar = (hexChar << 4) + c - 'A' + 10;
+						} else if (c >= 'a' && c <= 'f') {
+							hexChar = (hexChar << 4) + c - 'a' + 10;
+						} else {
+							// Append what we already have, and continue directly, because we already have read the next char
+							string.append((char)hexChar);
+							continue;
+						}
+						string.append((char)hexChar);
+						break;
+					}
+					default: string.append((char)c); break; // Remove the backslash
 					}
 				} else {
 					string.append((char) c);
