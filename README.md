@@ -72,6 +72,12 @@ Total Used: 559.8 GB
 Total Available: 2048.0 GB
 ```
 
+Matrix in your terminal (Linux):
+
+```bash
+$ while :;do echo $LINES $COLUMNS $(( $RANDOM % $COLUMNS)) $(printf "\U$(($RANDOM % 500))");sleep 0.05;done|java -jar Jawk.jar '{a[$3]=0;for (x in a){o=a[x];a[x]=a[x]+1;printf "\033[%s;%sH\033[2;32m%s",o,x,$4;printf "\033[%s;%sH\033[1;37m%s\033[0;0H",a[x],x,$4;if (a[x]>=$1){a[x]=0;}}}'
+```
+
 ## Run AWK inside Java
 
 Add the below repository to the list of repositories in your [Maven settings](https://maven.apache.org/settings.html):

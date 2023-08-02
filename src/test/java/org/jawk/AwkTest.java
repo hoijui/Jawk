@@ -86,7 +86,7 @@ public class AwkTest {
 	 */
 	@Test
 	public void testDontPanic() throws Exception {
-		awk("BEGIN { print \"Don\47t Panic!\" }");
+		awk("BEGIN { print \"Don\\47t Panic!\" }");
 		assertArrayEquals(array("Don't Panic!"), linesOutput());
 	}
 
