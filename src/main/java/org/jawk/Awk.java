@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,19 +17,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import org.jawk.backend.AVM;
-import org.jawk.backend.AwkCompiler;
 import org.jawk.ext.JawkExtension;
 import org.jawk.frontend.AwkParser;
 import org.jawk.frontend.AwkSyntaxTree;
 import org.jawk.intermediate.AwkTuples;
 import org.jawk.util.AwkSettings;
-import org.jawk.util.DestDirClassLoader;
 import org.jawk.util.ScriptSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Entry point into the parsing, analysis, and execution/compilation
+ * Entry point into the parsing, analysis, and execution
  * of a Jawk script.
  * This entry point is used when Jawk is executed as a library.
  * If you want to use Jawk as a stand-alone application, please use {@see Main}.
@@ -40,13 +37,8 @@ import org.slf4j.LoggerFactory;
  * <li>Parse the Jawk script, producing an abstract syntax tree.</li>
  * <li>Traverse the abstract syntax tree, producing a list of
  *	 instruction tuples for the interpreter.</li>
- * <li>Either:
- *   <ul>
- *   <li>Traverse the list of tuples, providing a runtime which
- *	   ultimately executes the Jawk script, <strong>or</strong></li>
- *   <li>Translate the list of tuples into JVM code, providing
- *     a compiled representation of the script to JVM.</li>
- *   </ul>
+ * <li>Traverse the list of tuples, providing a runtime which
+ *	 ultimately executes the Jawk script, <strong>or</strong></li>
  *   Command-line parameters dictate which action is to take place.</li>
  * </ul>
  * Two additional semantic checks on the syntax tree are employed
@@ -54,10 +46,6 @@ import org.slf4j.LoggerFactory;
  * As a result, the syntax tree is traversed three times.
  * And the number of times tuples are traversed is depends
  * on whether interpretation or compilation takes place.
- * As of this writing, Jawk traverses the tuples once for
- * interpretation, and two times for compilation (once for
- * global variable arrangement, and the second time for
- * translation to byte-code).
  * </p>
  * <p>
  * By default a minimal set of extensions are automatically
@@ -72,15 +60,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </p>
  * <p>
- * <strong>Note:</strong> Compilation requires the installation of
- * <a href="http://jakarta.apache.org/bcel/" target=_TOP>
- * The Apache Byte Code Engineering Library (BCEL)</a>.
- * Please see the AwkCompilerImpl JavaDocs or the
- * project web page for more details.
- * </p>
- *
  * @see org.jawk.backend.AVM
- * @see org.jawk.backend.AwkCompilerImpl
  *
  * @author Danny Daglas
  */
@@ -94,21 +74,13 @@ public class Awk {
 	public Awk() {}
 
 	/**
-	 * An entry point to Jawk that provides the exit code of the script
-	 * if interpreted or an compiler error status if compiled.
-	 * If compiled, a non-zero exit status indicates that there
-	 * was a compilation problem.
-	 *
 	 * @param settings This tells AWK what to do
 	 *   (where to get input from, where to write it to, in what mode to run,
 	 *   ...)
 	 *
-	 * @return The exit code to the script if interpreted, or exit code
-	 * 	 of the compiler.
-	 *
 	 * @throws IOException upon an IO error.
-	 * @throws ClassNotFoundException if compilation is requested,
-	 *	 but no compilation implementation class is found.
+	 * @throws ClassNotFoundException if intermediate code is specified
+	 *           but deserialization fails to load in the JVM
 	 * @throws ExitException if interpretation is requested,
 	 *	 and a specific exit code is requested.
 	 */
@@ -196,89 +168,14 @@ public class Awk {
 				return;
 			}
 
-			if (settings.isCompileRun() || settings.isCompile()) {
-				// compile!
-				attemptToCompile(settings, tuples);
-				if (settings.isCompileRun()) {
-					attemptToExecuteCompiledResult(settings);
-				}
-			} else {
-				// interpret!
-				avm = new AVM(settings, extensions);
-				avm.interpret(tuples);
-			}
+			// interpret!
+			avm = new AVM(settings, extensions);
+			avm.interpret(tuples);
+			
 		} finally {
 			if (avm != null) {
 				avm.waitForIO();
 			}
-		}
-	}
-
-	/**
-	 * Use reflection in attempt to access the compiler.
-	 */
-	private static void attemptToCompile(AwkSettings settings, AwkTuples tuples) {
-		try {
-			LOG.trace("locating AwkCompilerImpl...");
-			Class<?> compilerClass = Class.forName("org.jawk.backend.AwkCompilerImpl");
-			LOG.trace("found: {}", compilerClass);
-			try {
-				Constructor<?> constructor = compilerClass.getConstructor(AwkSettings.class);
-				try {
-					LOG.trace("allocating new instance of the AwkCompiler class...");
-					AwkCompiler compiler = (AwkCompiler) constructor.newInstance(settings);
-					LOG.trace("allocated: {}", compiler);
-					LOG.trace("compiling...");
-					compiler.compile(tuples);
-					LOG.trace("done");
-				} catch (InstantiationException ie) {
-					throw new Error("Cannot instantiate the compiler", ie);
-				} catch (IllegalAccessException iae) {
-					throw new Error("Cannot instantiate the compiler", iae);
-				} catch (java.lang.reflect.InvocationTargetException ite) {
-					throw new Error("Cannot instantiate the compiler", ite);
-				}
-			} catch (NoSuchMethodException nsme) {
-				throw new Error("Cannot find the constructor", nsme);
-			}
-		} catch (ClassNotFoundException cnfe) {
-			throw new IllegalArgumentException("Cannot find the AwkCompiler", cnfe);
-		}
-	}
-
-	private static void attemptToExecuteCompiledResult(AwkSettings settings) {
-		String classname = settings.getOutputFilename("AwkScript");
-		try {
-			LOG.trace("locating {}...", classname);
-			Class<?> scriptClass;
-			String destinationDirectory = settings.getDestinationDirectory();
-			ClassLoader cl = new DestDirClassLoader(destinationDirectory);
-			scriptClass = cl.loadClass(classname);
-			LOG.trace("found: {} in {}", new Object[] {scriptClass, destinationDirectory});
-			try {
-				Constructor<?> constructor = scriptClass.getConstructor();
-				try {
-					LOG.trace("allocating and executing new instance of {} class...", classname);
-					Object obj = constructor.newInstance();
-					Method method = scriptClass.getDeclaredMethod("ScriptMain", new Class<?>[] {AwkSettings.class});
-					method.invoke(obj, new Object[] {settings});
-				} catch (InstantiationException ie) {
-					throw new Error("Cannot instantiate the script", ie);
-				} catch (IllegalAccessException iae) {
-					throw new Error("Cannot instantiate the script", iae);
-				} catch (java.lang.reflect.InvocationTargetException ite) {
-					Throwable exception = ite.getCause();
-					if (exception == null) {
-						throw new Error("Cannot instantiate the script", ite);
-					} else {
-						throw new Error("Cannot instantiate the script", exception);
-					}
-				}
-			} catch (NoSuchMethodException nsme) {
-				throw new Error("Cannot find the constructor", nsme);
-			}
-		} catch (ClassNotFoundException cnfe) {
-			throw new IllegalArgumentException("Cannot find the " + classname + " class.", cnfe);
 		}
 	}
 
