@@ -16,6 +16,8 @@ import java.util.LinkedList;
  */
 public class LinkedListStackImpl<E> extends LinkedList<E> implements MyStack<E> {
 
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public void push(E o) {
 		addFirst(o);

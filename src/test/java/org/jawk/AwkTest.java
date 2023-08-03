@@ -10,13 +10,10 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.rules.ExpectedException;
 
-@SuppressWarnings("static-method")
 public class AwkTest {
 
 	private static final boolean IS_WINDOWS = (System.getProperty("os.name").contains("Windows"));
@@ -54,20 +51,11 @@ public class AwkTest {
 	}
 
 	@Rule
-	public ExpectedException willThrow = ExpectedException.none();
-
-	@Rule
 	public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
 
 	String[] linesOutput() {
 		return systemOutRule.getLog().split(LF);
-	}
-
-	@Test @Ignore // FIXME this doesn't work because usage calls exit!
-	public void testEmpty() throws Exception {
-		willThrow.expect(IllegalArgumentException.class);
-		awk("");
 	}
 
 	/**

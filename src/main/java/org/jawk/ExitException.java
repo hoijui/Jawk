@@ -6,6 +6,8 @@ package org.jawk;
  */
 public class ExitException extends Exception {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final int EXIT_CODE_OK = 0;
 
 	private final int code;

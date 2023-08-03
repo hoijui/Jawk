@@ -7,6 +7,8 @@ package org.jawk.jrt;
  */
 public class AwkRuntimeException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	public AwkRuntimeException(String msg) {
 		super(msg);
 	}

@@ -69,7 +69,7 @@ public interface Position {
 	 * has only the class argument, and nothing else.
 	 * </p>
 	 */
-	Class classArg();
+	Class<?> classArg();
 
 	/**
 	 * Get the source line number for this position.
