@@ -7,6 +7,8 @@ package org.jawk.jrt;
  */
 public class IllegalAwkArgumentException extends IllegalArgumentException {
 
+	private static final long serialVersionUID = 1L;
+
 	public IllegalAwkArgumentException(String msg) {
 		super(msg);
 	}

@@ -13,6 +13,8 @@ package org.jawk.jrt;
  */
 public class EndException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	public EndException(String s) {
 		super(s);
 	}

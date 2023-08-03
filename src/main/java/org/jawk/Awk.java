@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -332,7 +333,8 @@ public class Awk {
 				// it is...
 				// create a new instance and put it here
 				try {
-					JawkExtension ji = (JawkExtension) c.newInstance();
+					Constructor<?> constructor = c.getDeclaredConstructor(); // Default constructor
+					JawkExtension ji = (JawkExtension) constructor.newInstance();
 					String[] keywords = ji.extensionKeywords();
 					for (String keyword : keywords) {
 						if (retval.get(keyword) != null) {
@@ -342,10 +344,13 @@ public class Awk {
 						}
 						retval.put(keyword, ji);
 					}
-				} catch (InstantiationException ie) {
-					LOG.warn("Cannot instantiate {} : {}", new Object[] {c, ie});
-				} catch (IllegalAccessException iae) {
-					LOG.warn("Cannot instantiate {} : {}", new Object[] {c, iae});
+				} catch (InstantiationException | 
+						IllegalAccessException | 
+						NoSuchMethodException |
+						SecurityException |
+						IllegalArgumentException |
+						InvocationTargetException e) {
+					LOG.warn("Cannot instantiate " + c.getName(), e);
 				}
 			} catch (ClassNotFoundException cnfe) {
 				LOG.warn("Cannot classload {} : {}", new Object[] {cls, cnfe});

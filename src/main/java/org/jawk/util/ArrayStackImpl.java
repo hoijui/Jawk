@@ -17,6 +17,8 @@ import java.util.ArrayList;
  */
 public class ArrayStackImpl<E> extends ArrayList<E> implements MyStack<E> {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Allocates an ArrayList with a capacity of 100.
 	 */
