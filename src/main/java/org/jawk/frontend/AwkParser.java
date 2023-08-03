@@ -289,7 +289,6 @@ public class AwkParser {
 	private StringBuffer text = new StringBuffer();
 	private StringBuffer string = new StringBuffer();
 	private StringBuffer regexp = new StringBuffer();
-	private int chr;
 
 	private void read()
 			throws IOException
@@ -301,15 +300,12 @@ public class AwkParser {
 			c = reader.read();
 		}
 		if (c < 0) {
-			chr = 0; // EoF
 			// check if there are additional sources
 			if ((scriptSourcesCurrentIndex + 1) < scriptSources.size()) {
 				scriptSourcesCurrentIndex++;
 				reader = new LineNumberReader(scriptSources.get(scriptSourcesCurrentIndex).getReader());
 				read();
 			}
-		} else {
-			chr = c;
 		}
 	}
 
@@ -352,6 +348,8 @@ public class AwkParser {
 
 	public class LexerException extends IOException {
 
+		private static final long serialVersionUID = 1L;
+
 		LexerException(String msg) {
 			super(msg + " ("
 					+ scriptSources.get(scriptSourcesCurrentIndex).getDescription()
@@ -393,7 +391,7 @@ public class AwkParser {
 	}
 
 	private static String toTokenString(int token) {
-		Class c = AwkParser.class;
+		Class<AwkParser> c = AwkParser.class;
 		Field[] fields = c.getDeclaredFields();
 		try {
 			for (Field field : fields) {
@@ -1913,7 +1911,6 @@ public class AwkParser {
 	{
 		expectKeyword("getline");
 		AST lvalue = LVALUE(allow_comparators, allow_in_keyword);
-		AST expr;
 		if (token == _LT_) {
 			lexer();
 			AST assignment_expr = ASSIGNMENT_EXPRESSION(allow_comparators, allow_in_keyword, false);	// do NOT allow multidim indices expressions
@@ -2062,7 +2059,7 @@ public class AwkParser {
 		protected AST parent;
 		protected AST ast1, ast2, ast3, ast4;
 
-		protected final AST searchFor(Class cls) {
+		protected final AST searchFor(Class<?> cls) {
 			AST ptr = this;
 			while (ptr != null) {
 				if (cls.isInstance(ptr)) {
@@ -2286,6 +2283,8 @@ public class AwkParser {
 		 */
 		protected class SemanticException extends RuntimeException {
 
+			private static final long serialVersionUID = 1L;
+
 			SemanticException(String msg) {
 				super(msg + " (" + sourceDescription + ":" + lineNo + ")");
 			}
@@ -2346,6 +2345,7 @@ public class AwkParser {
 	 * @return true if the action rule condition contains
 	 * 	an extension; false otherwise.
 	 */
+	@SuppressWarnings("unused")
 	private static boolean isExtensionConditionRule(AST ast) {
 		if (!isRule(ast)) {
 			return false;
@@ -2363,44 +2363,17 @@ public class AwkParser {
 		}
 
 		return true;
-
-		//return containsExtension(ast.ast1);
-
-		/*
-		// extension { ... }
-		if (ast.ast1 instanceof Extension_AST)
-			return true;
-		// ! extension { ... }
-		if (ast.ast1 instanceof NotExpression_AST && ast.ast1.ast1 instanceof Extension_AST)
-			return true;
-
-		// otherwise, it is not an extension condition rule
-		return false;
-		*/
 	}
 
-	/*
-	private static boolean containsExtension(AST ast) {
-		if (ast == null)
-			return false;
-		if (ast instanceof Extension_AST)
-			return true;
-		if (containsExtension(ast.ast1)) return true;
-		if (containsExtension(ast.ast2)) return true;
-		if (containsExtension(ast.ast3)) return true;
-		if (containsExtension(ast.ast4)) return true;
-		return false;
-	}
-	*/
-	private static boolean containsASTType(AST ast, Class cls) {
+	private static boolean containsASTType(AST ast, Class<?> cls) {
 		return containsASTType(ast, new Class[] {cls});
 	}
 
-	private static boolean containsASTType(AST ast, Class[] cls_array) {
+	private static boolean containsASTType(AST ast, Class<?>[] cls_array) {
 		if (ast == null) {
 			return false;
 		}
-		for (Class cls : cls_array) {
+		for (Class<?> cls : cls_array) {
 			if (cls.isInstance(ast)) {
 				return true;
 			}
@@ -2469,23 +2442,6 @@ public class AwkParser {
 			ID_AST environ_ast = symbol_table.getID("ENVIRON");
 			ID_AST argc_ast = symbol_table.getID("ARGC");
 			ID_AST argv_ast = symbol_table.getID("ARGV");
-			boolean b
-					= nr_ast.is_scalar
-					= fnr_ast.is_scalar
-					= nf_ast.is_scalar
-					= fs_ast.is_scalar
-					= rs_ast.is_scalar
-					= ofs_ast.is_scalar
-					= rstart_ast.is_scalar
-					= rlength_ast.is_scalar
-					= filename_ast.is_scalar
-					= subsep_ast.is_scalar
-					= convfmt_ast.is_scalar
-					= ofmt_ast.is_scalar
-					= environ_ast.is_array	// note!
-					= argc_ast.is_scalar
-					= argv_ast.is_array	// note!
-					= true;
 
 			// MUST BE DONE AFTER FUNCTIONS ARE COMPILED,
 			// and after special variables are made known to the symbol table
@@ -2939,13 +2895,11 @@ public class AwkParser {
 
 			break_address = tuples.createAddress("break_address");
 
-			// push array onto the stack
-			int ast2_result = ast2.populateTuples(tuples);
+			ast2.populateTuples(tuples);
 			// pops the array and pushes the keyset
 			tuples.keylist();
 
 			// stack now contains:
-			//
 			// keylist
 
 			// LOOP
@@ -2989,6 +2943,7 @@ public class AwkParser {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private final class EmptyStatement_AST extends AST {
 
 		private EmptyStatement_AST() {
@@ -3973,12 +3928,9 @@ public class AwkParser {
 	private final class FunctionDefParamList_AST extends AST {
 
 		private String id;
-		private int offset;
-
 		private FunctionDefParamList_AST(String id, int offset, AST rest) {
 			super(rest);
 			this.id = id;
-			this.offset = offset;
 		}
 
 		public final int populateTuples(AwkTuples tuples) {
@@ -4037,8 +3989,6 @@ public class AwkParser {
 		}
 		private boolean is_array = false;
 		private boolean is_scalar = false;
-		private Set<ID_AST> formal_parameters = new HashSet<ID_AST>();
-
 		@Override
 		public String toString() {
 			return super.toString() + " (" + id + ")";
@@ -5167,6 +5117,8 @@ public class AwkParser {
 	}
 
 	private class ParserException extends RuntimeException {
+
+		private static final long serialVersionUID = 1L;
 
 		ParserException(String msg) {
 			super(msg + " ("
